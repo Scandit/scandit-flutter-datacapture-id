@@ -6,6 +6,7 @@
 
 library scandit_flutter_datacapture_id;
 
+export 'src/aamva_viz_barcode_comparison_verifier.dart' show AamvaVizBarcodeComparisonVerifier;
 export 'src/captured_id.dart' show CapturedId;
 export 'src/captured_result_type.dart' show CapturedResultType;
 export 'src/document_type.dart' show DocumentType;
@@ -17,6 +18,8 @@ export 'src/id_document_type.dart' show IdDocumentType;
 export 'src/id_image_type.dart' show IdImageType;
 export 'src/id_layout.dart' show IdLayout, IdLayoutStyle, IdLayoutLineStyle;
 export 'src/result/aamva_barcode_result.dart' show AamvaBarcodeResult;
+export 'src/result/aamva_viz_barcode_comparison_result.dart'
+    show AamvaVizBarcodeComparisonResult, ComparisonCheck, ComparisonCheckResult;
 export 'src/result/argentina_id_barcode_result.dart' show ArgentinaIdBarcodeResult;
 export 'src/result/colombia_id_barcode_result.dart' show ColombiaIdBarcodeResult;
 export 'src/result/date_result.dart' show DateResult;

@@ -7,6 +7,7 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
 
 import 'captured_result_type.dart';
 import 'document_type.dart';
@@ -21,46 +22,36 @@ import 'result/south_africa_id_barcode_result.dart';
 import 'result/us_uniformed_barcode_result.dart';
 import 'result/viz_result.dart';
 
-class CapturedId {
-  String? _firstName;
-  String? _lastName;
-  String _fullName;
-  String? _sex;
-  DateResult? _dateOfBirth;
-  String? _nationality;
-  String? _address;
-  CapturedResultType _capturedResultType;
-  DocumentType _documentType;
-  String? _issuingCountryIso;
-  String? _issuingCountry;
-  String? _documentNumber;
-  DateResult? _dateOfExpiry;
-  DateResult? _dateOfIssue;
-  AamvaBarcodeResult? _aamvaBarcodeResult;
-  ColombiaIdBarcodeResult? _colombiaIdBarcodeResult;
-  ArgentinaIdBarcodeResult? _argentinaIdBarcodeResult;
-  SouthAfricaDlBarcodeResult? _southAfricaDlBarcodeResult;
-  SouthAfricaIdBarcodeResult? _southAfricaIdBarcodeResult;
-  MrzResult? _mrzResult;
-  UsUniformedServicesBarcodeResult? _usUniformedServicesBarcodeResult;
-  VizResult? _vizResult;
-  _ImageInfo _imagesForTypes;
+@immutable
+class CapturedId extends Serializable {
+  final CapturedResultType _capturedResultType;
+  final AamvaBarcodeResult? _aamvaBarcodeResult;
+  final ColombiaIdBarcodeResult? _colombiaIdBarcodeResult;
+  final ArgentinaIdBarcodeResult? _argentinaIdBarcodeResult;
+  final SouthAfricaDlBarcodeResult? _southAfricaDlBarcodeResult;
+  final SouthAfricaIdBarcodeResult? _southAfricaIdBarcodeResult;
+  final MrzResult? _mrzResult;
+  final UsUniformedServicesBarcodeResult? _usUniformedServicesBarcodeResult;
+  final VizResult? _vizResult;
+  final _ImageInfo _imagesForTypes;
+  final Set<CapturedResultType> _capturedResultTypes;
+  final Map<String, dynamic> _json;
+  final String? _firstName;
+  final String? _lastName;
+  final String _fullName;
+  final String? _sex;
+  final DateResult? _dateOfBirth;
+  final String? _nationality;
+  final String? _address;
+  final DocumentType _documentType;
+  final String? _issuingCountryIso;
+  final String? _issuingCountry;
+  final String? _documentNumber;
+  final DateResult? _dateOfExpiry;
+  final DateResult? _dateOfIssue;
 
   CapturedId._(
-      this._firstName,
-      this._lastName,
-      this._fullName,
-      this._sex,
-      this._dateOfBirth,
-      this._nationality,
-      this._address,
       this._capturedResultType,
-      this._documentType,
-      this._issuingCountryIso,
-      this._issuingCountry,
-      this._documentNumber,
-      this._dateOfExpiry,
-      this._dateOfIssue,
       this._aamvaBarcodeResult,
       this._colombiaIdBarcodeResult,
       this._argentinaIdBarcodeResult,
@@ -69,24 +60,24 @@ class CapturedId {
       this._mrzResult,
       this._usUniformedServicesBarcodeResult,
       this._vizResult,
-      this._imagesForTypes);
+      this._imagesForTypes,
+      this._capturedResultTypes,
+      this._firstName,
+      this._lastName,
+      this._fullName,
+      this._sex,
+      this._dateOfBirth,
+      this._nationality,
+      this._address,
+      this._documentType,
+      this._issuingCountryIso,
+      this._issuingCountry,
+      this._documentNumber,
+      this._dateOfExpiry,
+      this._dateOfIssue,
+      this._json);
 
   factory CapturedId.fromJSON(Map<String, dynamic> json) {
-    DateResult? dateOfBirth;
-    if (json.containsKey("dateOfBirth") && json["dateOfBirth"] != null) {
-      dateOfBirth = DateResult.fromJSON(json["dateOfBirth"] as Map<String, dynamic>);
-    }
-
-    DateResult? dateOfExpiry;
-    if (json.containsKey("dateOfExpiry") && json["dateOfExpiry"] != null) {
-      dateOfExpiry = DateResult.fromJSON(json["dateOfExpiry"] as Map<String, dynamic>);
-    }
-
-    DateResult? dateOfIssue;
-    if (json.containsKey("dateOfIssue") && json["dateOfIssue"] != null) {
-      dateOfIssue = DateResult.fromJSON(json["dateOfIssue"] as Map<String, dynamic>);
-    }
-
     AamvaBarcodeResult? dlAamvaBarcodeResult;
     if (json.containsKey("aamvaBarcodeResult") && json["aamvaBarcodeResult"] != null) {
       dlAamvaBarcodeResult = AamvaBarcodeResult.fromJSON(json["aamvaBarcodeResult"] as Map<String, dynamic>);
@@ -136,21 +127,29 @@ class CapturedId {
         ? _ImageInfo.fromJSON(json["imageInfo"] as Map<String, dynamic>)
         : _ImageInfo._({});
 
+    var capturedResultTypes = (json['capturedResultTypes'] as List<dynamic>)
+        .map((e) => CapturedResultTypeDeserializer.fromJSON(e as String))
+        .toList()
+        .cast<CapturedResultType>()
+        .toSet();
+
+    DateResult? dateOfBirth;
+    if (json.containsKey("dateOfBirth") && json["dateOfBirth"] != null) {
+      dateOfBirth = DateResult.fromJSON(json["dateOfBirth"] as Map<String, dynamic>);
+    }
+
+    DateResult? dateOfExpiry;
+    if (json.containsKey("dateOfExpiry") && json["dateOfExpiry"] != null) {
+      dateOfExpiry = DateResult.fromJSON(json["dateOfExpiry"] as Map<String, dynamic>);
+    }
+
+    DateResult? dateOfIssue;
+    if (json.containsKey("dateOfIssue") && json["dateOfIssue"] != null) {
+      dateOfIssue = DateResult.fromJSON(json["dateOfIssue"] as Map<String, dynamic>);
+    }
+
     return CapturedId._(
-        json["firstName"] as String?,
-        json["lastName"] as String?,
-        json["fullName"] as String,
-        json["sex"] as String?,
-        dateOfBirth,
-        json["nationality"] as String?,
-        json["address"] as String?,
         CapturedResultTypeDeserializer.fromJSON(json["capturedResultType"] as String),
-        DocumentTypeDeserializer.fromJSON(json["documentType"] as String),
-        json["issuingCountryIso"] as String?,
-        json["issuingCountry"] as String?,
-        json["documentNumber"] as String?,
-        dateOfExpiry,
-        dateOfIssue,
         dlAamvaBarcodeResult,
         colombiaIdBarcodeResult,
         argentinaIdBarcodeResult,
@@ -159,7 +158,22 @@ class CapturedId {
         mrzResult,
         usUniformedServicesBarcodeResult,
         vizResult,
-        imageInfo);
+        imageInfo,
+        capturedResultTypes,
+        json["firstName"] as String?,
+        json["lastName"] as String?,
+        json["fullName"] as String,
+        json["sex"] as String?,
+        dateOfBirth,
+        json["nationality"] as String?,
+        json["address"] as String?,
+        DocumentTypeDeserializer.fromJSON(json["documentType"] as String),
+        json["issuingCountryIso"] as String?,
+        json["issuingCountry"] as String?,
+        json["documentNumber"] as String?,
+        dateOfExpiry,
+        dateOfIssue,
+        json);
   }
 
   String? get firstName {
@@ -192,6 +206,10 @@ class CapturedId {
 
   CapturedResultType get capturedResultType {
     return _capturedResultType;
+  }
+
+  Set<CapturedResultType> get capturedResultTypes {
+    return _capturedResultTypes;
   }
 
   DocumentType get documentType {
@@ -253,10 +271,16 @@ class CapturedId {
   Image? getImageForType(IdImageType imageType) {
     return _imagesForTypes.getImageForType(imageType);
   }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return _json;
+  }
 }
 
+@immutable
 class _ImageInfo {
-  Map<IdImageType, String> _imagesForTypes;
+  final Map<IdImageType, String> _imagesForTypes;
 
   _ImageInfo._(this._imagesForTypes);
 

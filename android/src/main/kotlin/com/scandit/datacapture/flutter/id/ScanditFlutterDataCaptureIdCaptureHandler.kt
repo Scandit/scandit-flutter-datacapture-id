@@ -7,6 +7,9 @@ import com.scandit.datacapture.flutter.id.listeners.ScanditFlutterIdCaptureListe
 import com.scandit.datacapture.id.capture.IdCapture
 import com.scandit.datacapture.id.capture.serialization.IdCaptureDeserializer
 import com.scandit.datacapture.id.capture.serialization.IdCaptureDeserializerListener
+import com.scandit.datacapture.id.data.CapturedId
+import com.scandit.datacapture.id.verification.aamvavizbarcode.AamvaVizBarcodeComparisonResult
+import com.scandit.datacapture.id.verification.aamvavizbarcode.AamvaVizBarcodeComparisonVerifier
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -19,6 +22,7 @@ class ScanditFlutterDataCaptureIdCaptureHandler(
     MethodChannel.MethodCallHandler {
     private var idCaptureListenerChannel: MethodChannel? = null
     private var idCaptureDefaultsChannel: MethodChannel? = null
+    private var idCaptureAamvaVizBarcodeComparisonVerifierChannel: MethodChannel? = null
 
     private var idCapture: IdCapture? = null
         private set(value) {
@@ -41,12 +45,19 @@ class ScanditFlutterDataCaptureIdCaptureHandler(
         ).also {
             it.setMethodCallHandler(this)
         }
+        idCaptureAamvaVizBarcodeComparisonVerifierChannel = MethodChannel(
+            binding.binaryMessenger,
+            "com.scandit.datacapture.id.capture.method/aamva_viz_barcode_comparison_verifier"
+        ).also {
+            it.setMethodCallHandler(this)
+        }
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         Deserializers.Factory.removeModeDeserializer(idCaptureDeserializer)
         idCaptureListenerChannel?.setMethodCallHandler(null)
         idCaptureDefaultsChannel?.setMethodCallHandler(null)
+        idCaptureAamvaVizBarcodeComparisonVerifierChannel?.setMethodCallHandler(null)
         idCaptureDeserializer.listener = null
         idCapture = null
     }
@@ -71,7 +82,16 @@ class ScanditFlutterDataCaptureIdCaptureHandler(
                 idCapture?.reset()
                 result.success(null)
             }
+            "verify" -> {
+                val verificationResult = verify(call.arguments as String)
+                result.success(verificationResult.toJson())
+            }
         }
+    }
+
+    private fun verify(capturedIdJson: String): AamvaVizBarcodeComparisonResult {
+        val capturedId = CapturedId.fromJson(capturedIdJson)
+        return AamvaVizBarcodeComparisonVerifier.create().verify(capturedId)
     }
 
     override fun onModeDeserializationFinished(

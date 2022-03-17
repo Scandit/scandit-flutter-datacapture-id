@@ -4,8 +4,11 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
+@immutable
 class ColombiaIdBarcodeResult {
-  String _bloodType;
+  final String _bloodType;
 
   ColombiaIdBarcodeResult._(this._bloodType);
 

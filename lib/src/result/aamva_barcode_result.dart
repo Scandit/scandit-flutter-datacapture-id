@@ -4,37 +4,40 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
 import 'date_result.dart';
 
+@immutable
 class AamvaBarcodeResult {
-  int _aamvaVersion;
-  int _jurisdictionVersion;
-  String _iIN;
-  String _issuingJurisdiction;
-  String _issuingJurisdictionIso;
-  String? _eyeColor;
-  String? _hairColor;
-  int? _heightInch;
-  int? _heightCm;
-  int? _weightLbs;
-  int? _weightKg;
-  String? _placeOfBirth;
-  String? _race;
-  String? _documentDiscriminatorNumber;
-  String? _vehicleClass;
-  String? _restrictionsCode;
-  String? _endorsementsCode;
-  DateResult? _cardRevisionDate;
-  String? _middleName;
-  String? _driverNameSuffix;
-  String? _driverNamePrefix;
-  String? _lastNameTruncation;
-  String? _firstNameTruncation;
-  String? _middleNameTruncation;
-  String? _aliasFamilyName;
-  String? _aliasGivenName;
-  String? _aliasSuffixName;
-  Map<String, String> _barcodeDataElements;
+  final int _aamvaVersion;
+  final int _jurisdictionVersion;
+  final String _iIN;
+  final String _issuingJurisdiction;
+  final String _issuingJurisdictionIso;
+  final String? _eyeColor;
+  final String? _hairColor;
+  final int? _heightInch;
+  final int? _heightCm;
+  final int? _weightLbs;
+  final int? _weightKg;
+  final String? _placeOfBirth;
+  final String? _race;
+  final String? _documentDiscriminatorNumber;
+  final String? _vehicleClass;
+  final String? _restrictionsCode;
+  final String? _endorsementsCode;
+  final DateResult? _cardRevisionDate;
+  final String? _middleName;
+  final String? _driverNameSuffix;
+  final String? _driverNamePrefix;
+  final String? _lastNameTruncation;
+  final String? _firstNameTruncation;
+  final String? _middleNameTruncation;
+  final String? _aliasFamilyName;
+  final String? _aliasGivenName;
+  final String? _aliasSuffixName;
+  final Map<String, String> _barcodeDataElements;
 
   AamvaBarcodeResult._(
       this._aamvaVersion,

@@ -4,46 +4,49 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
 import 'date_result.dart';
 
+@immutable
 class UsUniformedServicesBarcodeResult {
-  int _version;
-  String _sponsorFlag;
-  int _personDesignatorDocument;
-  int _familySequenceNumber;
-  int _deersDependentSuffixCode;
-  String _deersDependentSuffixDescription;
-  int _height;
-  int _weight;
-  String _hairColor;
-  String _eyeColor;
-  String _directCareFlagCode;
-  String _directCareFlagDescription;
-  String _civilianHealthCareFlagCode;
-  String _civilianHealthCareFlagDescription;
-  String _commissaryFlagCode;
-  String _commissaryFlagDescription;
-  String _mwrFlagCode;
-  String _mwrFlagDescription;
-  String _exchangeFlagCode;
-  String _exchangeFlagDescription;
-  DateResult? _champusEffectiveDate;
-  DateResult? _champusExpiryDate;
-  String _formNumber;
-  String _securityCode;
-  String _serviceCode;
-  String _statusCode;
-  String _statusCodeDescription;
-  String _branchOfService;
-  String _rank;
-  String? _payGrade;
-  String? _sponsorName;
-  int? _sponsorPersonDesignatorIdentifier;
-  String? _relationshipCode;
-  String? _relationshipDescription;
-  String? _jpegData;
-  String? _genevaConventionCategory;
-  String? _bloodType;
+  final int _version;
+  final String _sponsorFlag;
+  final int _personDesignatorDocument;
+  final int _familySequenceNumber;
+  final int _deersDependentSuffixCode;
+  final String _deersDependentSuffixDescription;
+  final int _height;
+  final int _weight;
+  final String _hairColor;
+  final String _eyeColor;
+  final String _directCareFlagCode;
+  final String _directCareFlagDescription;
+  final String _civilianHealthCareFlagCode;
+  final String _civilianHealthCareFlagDescription;
+  final String _commissaryFlagCode;
+  final String _commissaryFlagDescription;
+  final String _mwrFlagCode;
+  final String _mwrFlagDescription;
+  final String _exchangeFlagCode;
+  final String _exchangeFlagDescription;
+  final DateResult? _champusEffectiveDate;
+  final DateResult? _champusExpiryDate;
+  final String _formNumber;
+  final String _securityCode;
+  final String _serviceCode;
+  final String _statusCode;
+  final String _statusCodeDescription;
+  final String _branchOfService;
+  final String _rank;
+  final String? _payGrade;
+  final String? _sponsorName;
+  final int? _sponsorPersonDesignatorIdentifier;
+  final String? _relationshipCode;
+  final String? _relationshipDescription;
+  final String? _jpegData;
+  final String? _genevaConventionCategory;
+  final String? _bloodType;
 
   UsUniformedServicesBarcodeResult._(
       this._version,

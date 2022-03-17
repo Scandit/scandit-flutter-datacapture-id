@@ -4,17 +4,20 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
 import 'date_result.dart';
 
+@immutable
 class SouthAfricaDlBarcodeResult {
-  int _version;
-  String _licenseCountryOfIssue;
-  String _personalIdNumber;
-  String _personalIdNumberType;
-  int _documentCopy;
-  ProfessionalDrivingPermit? _professionalDrivingPermit;
-  List<VehicleRestriction> _vehicleRestrictions;
-  List<int> _driverRestrictionCodes;
+  final int _version;
+  final String _licenseCountryOfIssue;
+  final String _personalIdNumber;
+  final String _personalIdNumberType;
+  final int _documentCopy;
+  final ProfessionalDrivingPermit? _professionalDrivingPermit;
+  final List<VehicleRestriction> _vehicleRestrictions;
+  final List<int> _driverRestrictionCodes;
 
   SouthAfricaDlBarcodeResult._(
       this._version,
@@ -87,9 +90,10 @@ class SouthAfricaDlBarcodeResult {
   }
 }
 
+@immutable
 class ProfessionalDrivingPermit {
-  DateResult _dateOfExpiry;
-  List<String> _codes;
+  final DateResult _dateOfExpiry;
+  final List<String> _codes;
 
   ProfessionalDrivingPermit._(this._dateOfExpiry, this._codes);
 
@@ -105,10 +109,11 @@ class ProfessionalDrivingPermit {
   }
 }
 
+@immutable
 class VehicleRestriction {
-  String _vehicleCode;
-  String _vehicleRestriction;
-  DateResult _dateOfIssue;
+  final String _vehicleCode;
+  final String _vehicleRestriction;
+  final DateResult _dateOfIssue;
 
   VehicleRestriction._(this._vehicleCode, this._vehicleRestriction, this._dateOfIssue);
 

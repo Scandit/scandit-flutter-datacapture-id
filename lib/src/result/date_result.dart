@@ -4,10 +4,14 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
-class DateResult {
-  int _day;
-  int _month;
-  int _year;
+import 'package:flutter/widgets.dart';
+import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+
+@immutable
+class DateResult extends Serializable {
+  final int _day;
+  final int _month;
+  final int _year;
 
   DateResult._(this._day, this._month, this._year);
 
@@ -28,5 +32,10 @@ class DateResult {
 
   DateTime get date {
     return DateTime.utc(year, month, day);
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {"day": _day, "month": _month, "year": _year};
   }
 }

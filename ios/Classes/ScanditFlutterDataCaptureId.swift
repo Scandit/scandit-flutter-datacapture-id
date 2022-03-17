@@ -26,10 +26,12 @@ public class ScanditFlutterDataCaptureId: NSObject {
         static let removeListener = "removeIdCaptureListener"
         static let finishDidCaptureId = "finishDidCaptureId"
         static let reset = "reset"
+        static let verify = "verify"
     }
 
     private let defaultsMethodChannel: FlutterMethodChannel
     private let listenerMethodChannel: FlutterMethodChannel
+    private let aamvaVizVerifierMethodChannel: FlutterMethodChannel
     private let eventChannel: FlutterEventChannel
     var eventSink: FlutterEventSink?
     var hasListeners = false
@@ -55,12 +57,15 @@ public class ScanditFlutterDataCaptureId: NSObject {
                                                      binaryMessenger: messenger)
         listenerMethodChannel = FlutterMethodChannel(name: "\(prefix).method/id_capture_listener",
                                                      binaryMessenger: messenger)
+        aamvaVizVerifierMethodChannel = FlutterMethodChannel(name: "\(prefix).method/aamva_viz_barcode_comparison_verifier",
+                                                     binaryMessenger: messenger)
         eventChannel = FlutterEventChannel(name: "\(prefix).event/id_capture_listener",
                                            binaryMessenger: messenger)
         super.init()
         registerDeserializer()
         defaultsMethodChannel.setMethodCallHandler(handleMethodCall(_:result:))
         listenerMethodChannel.setMethodCallHandler(handleMethodCall(_:result:))
+        aamvaVizVerifierMethodChannel.setMethodCallHandler(handleMethodCall(_:result:))
         eventChannel.setStreamHandler(self)
     }
 
@@ -77,6 +82,8 @@ public class ScanditFlutterDataCaptureId: NSObject {
             finishDidCaptureId(enabled: call.arguments as? Bool ?? false, result: result)
         case FunctionNames.reset:
             reset(result: result)
+        case FunctionNames.verify:
+            verify(arguments: call.arguments, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -107,11 +114,22 @@ public class ScanditFlutterDataCaptureId: NSObject {
         idCapture?.reset()
         result(nil)
     }
+    
+    public func verify(arguments: Any?, result: FlutterResult) {
+        guard let capturedIdJson = arguments as? String else {
+            result(nil)
+            return
+        }
+        
+        let capturedId = CapturedId(jsonString: capturedIdJson)
+        result(AAMVAVizBarcodeComparisonVerifier().verify(capturedId).jsonString)
+    }
 
     @objc
     public func dispose() {
         defaultsMethodChannel.setMethodCallHandler(nil)
         listenerMethodChannel.setMethodCallHandler(nil)
+        aamvaVizVerifierMethodChannel.setMethodCallHandler(nil)
         eventChannel.setStreamHandler(nil)
         idCapturedLock.reset()
     }

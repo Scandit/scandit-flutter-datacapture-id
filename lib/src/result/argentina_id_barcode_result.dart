@@ -4,9 +4,12 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
+@immutable
 class ArgentinaIdBarcodeResult {
-  String _personalIdNumber;
-  String _documentCopy;
+  final String _personalIdNumber;
+  final String _documentCopy;
 
   ArgentinaIdBarcodeResult._(this._personalIdNumber, this._documentCopy);
 

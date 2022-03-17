@@ -4,12 +4,15 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
+@immutable
 class MrzResult {
-  String _documentCode;
-  bool _namesAreTruncated;
-  String? _optional;
-  String? _optional1;
-  String _capturedMrz;
+  final String _documentCode;
+  final bool _namesAreTruncated;
+  final String? _optional;
+  final String? _optional1;
+  final String _capturedMrz;
 
   MrzResult._(this._documentCode, this._namesAreTruncated, this._optional, this._optional1, this._capturedMrz);
 

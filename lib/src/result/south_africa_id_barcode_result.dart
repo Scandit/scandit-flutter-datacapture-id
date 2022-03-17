@@ -4,11 +4,14 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
+@immutable
 class SouthAfricaIdBarcodeResult {
-  String _countryOfBirth;
-  String _countryOfBirthIso;
-  String _citizenshipStatus;
-  String _personalIdNumber;
+  final String _countryOfBirth;
+  final String _countryOfBirthIso;
+  final String _citizenshipStatus;
+  final String _personalIdNumber;
 
   SouthAfricaIdBarcodeResult._(
       this._countryOfBirth, this._countryOfBirthIso, this._citizenshipStatus, this._personalIdNumber);

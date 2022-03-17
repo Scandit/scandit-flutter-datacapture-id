@@ -9,19 +9,37 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /** ScanditFlutterDataCaptureIdProxyPlugin */
 class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, MethodCallHandler {
+    companion object {
+        @JvmStatic
+        private val lock = ReentrantLock()
+
+        @JvmStatic
+        private var isPluginAttached = false
+    }
+
     private var scanditFlutterDataCaptureIdCapturePlugin:
         ScanditFlutterDataCaptureIdCaptureHandler? = null
 
     override fun onAttachedToEngine(
         @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     ) {
-        scanditFlutterDataCaptureIdCapturePlugin = ScanditFlutterDataCaptureIdCaptureHandler(
-            provideScanditFlutterIdCaptureListener(flutterPluginBinding.binaryMessenger)
-        )
-        scanditFlutterDataCaptureIdCapturePlugin?.onAttachedToEngine(flutterPluginBinding)
+        lock.withLock {
+            if (isPluginAttached) return
+
+            scanditFlutterDataCaptureIdCapturePlugin = ScanditFlutterDataCaptureIdCaptureHandler(
+                provideScanditFlutterIdCaptureListener(
+                    flutterPluginBinding.binaryMessenger
+                )
+            )
+            scanditFlutterDataCaptureIdCapturePlugin?.onAttachedToEngine(flutterPluginBinding)
+
+            isPluginAttached = true
+        }
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -29,11 +47,16 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, MethodCallHandler 
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        scanditFlutterDataCaptureIdCapturePlugin?.onDetachedFromEngine(binding)
-        scanditFlutterDataCaptureIdCapturePlugin = null
+        lock.withLock {
+            scanditFlutterDataCaptureIdCapturePlugin?.onDetachedFromEngine(binding)
+            scanditFlutterDataCaptureIdCapturePlugin = null
+            isPluginAttached = false
+        }
     }
 
-    private fun provideScanditFlutterIdCaptureListener(binaryMessenger: BinaryMessenger) =
+    private fun provideScanditFlutterIdCaptureListener(
+        binaryMessenger: BinaryMessenger
+    ) =
         ScanditFlutterIdCaptureListener(
             EventHandler(
                 EventChannel(

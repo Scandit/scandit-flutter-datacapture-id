@@ -4,24 +4,28 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+import 'package:flutter/widgets.dart';
+
 import '../supported_sides.dart';
 
+@immutable
 class VizResult {
-  String? _additionalNameInformation;
-  String? _additionalAddressInformation;
-  String? _placeOfBirth;
-  String? _race;
-  String? _religion;
-  String? _profession;
-  String? _maritalStatus;
-  String? _residentialStatus;
-  String? _employer;
-  String? _personalIdNumber;
-  String? _documentAdditionalNumber;
-  String? _issuingJurisdiction;
-  String? _issuingAuthority;
-  SupportedSides _capturedSides;
-  bool _isBackSideCaptureSupported;
+  final String? _additionalNameInformation;
+  final String? _additionalAddressInformation;
+  final String? _placeOfBirth;
+  final String? _race;
+  final String? _religion;
+  final String? _profession;
+  final String? _maritalStatus;
+  final String? _residentialStatus;
+  final String? _employer;
+  final String? _personalIdNumber;
+  final String? _documentAdditionalNumber;
+  final String? _issuingJurisdiction;
+  final String? _issuingJurisdictionIso;
+  final String? _issuingAuthority;
+  final SupportedSides _capturedSides;
+  final bool _isBackSideCaptureSupported;
 
   VizResult._(
       this._additionalNameInformation,
@@ -36,6 +40,7 @@ class VizResult {
       this._personalIdNumber,
       this._documentAdditionalNumber,
       this._issuingJurisdiction,
+      this._issuingJurisdictionIso,
       this._issuingAuthority,
       this._capturedSides,
       this._isBackSideCaptureSupported);
@@ -54,6 +59,7 @@ class VizResult {
             json['personalIdNumber'] as String?,
             json['documentAdditionalNumber'] as String?,
             json['issuingJurisdiction'] as String?,
+            json['issuingJurisdictionIso'] as String?,
             json['issuingAuthority'] as String?,
             SupportedSidesDeserializer.fromJSON(json['capturedSides']),
             json['isBackSideCaptureSupported'] as bool);
@@ -104,6 +110,10 @@ class VizResult {
 
   String? get issuingJurisdiction {
     return _issuingJurisdiction;
+  }
+
+  String? get issuingJurisdictionIso {
+    return _issuingJurisdictionIso;
   }
 
   String? get issuingAuthority {

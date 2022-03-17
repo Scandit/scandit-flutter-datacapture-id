@@ -9,7 +9,7 @@ import ScanditIdCapture
 extension ScanditFlutterDataCaptureId: IdCaptureListener {
     public func idCapture(_ idCapture: IdCapture,
                           didCaptureIn session: IdCaptureSession,
-                          frameData: FrameData) {
+                          frameData: FrameData) {        
         guard let value = idCapturedLock.wait(afterDoing: {
             return send(.didCaptureId, body: ["session": session.jsonString])
         }) else { return }
