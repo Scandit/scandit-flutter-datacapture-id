@@ -16,7 +16,7 @@ class DateResult extends Serializable {
   DateResult._(this._day, this._month, this._year);
 
   DateResult.fromJSON(Map<String, dynamic> json)
-      : this._(json['day'] as int, json['month'] as int, json['year'] as int);
+      : this._(json['day'] as int? ?? 1, json['month'] as int? ?? 1, json['year'] as int? ?? 1);
 
   int get day {
     return _day;

@@ -36,19 +36,7 @@ class CapturedId extends Serializable {
   final _ImageInfo _imagesForTypes;
   final Set<CapturedResultType> _capturedResultTypes;
   final Map<String, dynamic> _json;
-  final String? _firstName;
-  final String? _lastName;
-  final String _fullName;
-  final String? _sex;
-  final DateResult? _dateOfBirth;
-  final String? _nationality;
-  final String? _address;
-  final DocumentType _documentType;
-  final String? _issuingCountryIso;
-  final String? _issuingCountry;
-  final String? _documentNumber;
-  final DateResult? _dateOfExpiry;
-  final DateResult? _dateOfIssue;
+  final _CommonCapturedIdFields? _commonCapturedIdFields;
 
   CapturedId._(
       this._capturedResultType,
@@ -62,65 +50,63 @@ class CapturedId extends Serializable {
       this._vizResult,
       this._imagesForTypes,
       this._capturedResultTypes,
-      this._firstName,
-      this._lastName,
-      this._fullName,
-      this._sex,
-      this._dateOfBirth,
-      this._nationality,
-      this._address,
-      this._documentType,
-      this._issuingCountryIso,
-      this._issuingCountry,
-      this._documentNumber,
-      this._dateOfExpiry,
-      this._dateOfIssue,
+      this._commonCapturedIdFields,
       this._json);
 
   factory CapturedId.fromJSON(Map<String, dynamic> json) {
+    _CommonCapturedIdFields? commonCapturedIdFields;
+
     AamvaBarcodeResult? dlAamvaBarcodeResult;
     if (json.containsKey("aamvaBarcodeResult") && json["aamvaBarcodeResult"] != null) {
       dlAamvaBarcodeResult = AamvaBarcodeResult.fromJSON(json["aamvaBarcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["aamvaBarcodeResult"]);
     }
 
     ColombiaIdBarcodeResult? colombiaIdBarcodeResult;
     if (json.containsKey("colombiaIdBarcodeResult") && json["colombiaIdBarcodeResult"] != null) {
       colombiaIdBarcodeResult =
           ColombiaIdBarcodeResult.fromJSON(json["colombiaIdBarcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["colombiaIdBarcodeResult"]);
     }
 
     ArgentinaIdBarcodeResult? argentinaIdBarcodeResult;
     if (json.containsKey("argentinaIdBarcodeResult") && json["argentinaIdBarcodeResult"] != null) {
       argentinaIdBarcodeResult =
           ArgentinaIdBarcodeResult.fromJSON(json["argentinaIdBarcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["argentinaIdBarcodeResult"]);
     }
 
     SouthAfricaDlBarcodeResult? southAfricaDlBarcodeResult;
     if (json.containsKey("southAfricaDlBarcodeResult") && json["southAfricaDlBarcodeResult"] != null) {
       southAfricaDlBarcodeResult =
           SouthAfricaDlBarcodeResult.fromJSON(json["southAfricaDlBarcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["southAfricaDlBarcodeResult"]);
     }
 
     SouthAfricaIdBarcodeResult? southAfricaIdBarcodeResult;
     if (json.containsKey("southAfricaIdBarcodeResult") && json["southAfricaIdBarcodeResult"] != null) {
       southAfricaIdBarcodeResult =
           SouthAfricaIdBarcodeResult.fromJSON(json["southAfricaIdBarcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["southAfricaIdBarcodeResult"]);
     }
 
     MrzResult? mrzResult;
     if (json.containsKey("mrzResult") && json["mrzResult"] != null) {
       mrzResult = MrzResult.fromJSON(json["mrzResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["mrzResult"]);
     }
 
     UsUniformedServicesBarcodeResult? usUniformedServicesBarcodeResult;
     if (json.containsKey("usUniformedServicesBarcodeResult") && json["usUniformedServicesBarcodeResult"] != null) {
       usUniformedServicesBarcodeResult =
           UsUniformedServicesBarcodeResult.fromJSON(json["usUniformedServicesBarcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["usUniformedServicesBarcodeResult"]);
     }
 
     VizResult? vizResult;
     if (json.containsKey("vizResult") && json["vizResult"] != null) {
       vizResult = VizResult.fromJSON(json["vizResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["vizResult"]);
     }
 
     var imageInfo = (json.containsKey("imageInfo") && json["imageInfo"] != null)
@@ -132,21 +118,6 @@ class CapturedId extends Serializable {
         .toList()
         .cast<CapturedResultType>()
         .toSet();
-
-    DateResult? dateOfBirth;
-    if (json.containsKey("dateOfBirth") && json["dateOfBirth"] != null) {
-      dateOfBirth = DateResult.fromJSON(json["dateOfBirth"] as Map<String, dynamic>);
-    }
-
-    DateResult? dateOfExpiry;
-    if (json.containsKey("dateOfExpiry") && json["dateOfExpiry"] != null) {
-      dateOfExpiry = DateResult.fromJSON(json["dateOfExpiry"] as Map<String, dynamic>);
-    }
-
-    DateResult? dateOfIssue;
-    if (json.containsKey("dateOfIssue") && json["dateOfIssue"] != null) {
-      dateOfIssue = DateResult.fromJSON(json["dateOfIssue"] as Map<String, dynamic>);
-    }
 
     return CapturedId._(
         CapturedResultTypeDeserializer.fromJSON(json["capturedResultType"] as String),
@@ -160,48 +131,36 @@ class CapturedId extends Serializable {
         vizResult,
         imageInfo,
         capturedResultTypes,
-        json["firstName"] as String?,
-        json["lastName"] as String?,
-        json["fullName"] as String,
-        json["sex"] as String?,
-        dateOfBirth,
-        json["nationality"] as String?,
-        json["address"] as String?,
-        DocumentTypeDeserializer.fromJSON(json["documentType"] as String),
-        json["issuingCountryIso"] as String?,
-        json["issuingCountry"] as String?,
-        json["documentNumber"] as String?,
-        dateOfExpiry,
-        dateOfIssue,
+        commonCapturedIdFields,
         json);
   }
 
   String? get firstName {
-    return _firstName;
+    return _commonCapturedIdFields?.firstName;
   }
 
   String? get lastName {
-    return _lastName;
+    return _commonCapturedIdFields?.lastName;
   }
 
   String get fullName {
-    return _fullName;
+    return _commonCapturedIdFields?.fullName ?? "";
   }
 
   String? get sex {
-    return _sex;
+    return _commonCapturedIdFields?.sex;
   }
 
   DateResult? get dateOfBirth {
-    return _dateOfBirth;
+    return _commonCapturedIdFields?.dateOfBirth;
   }
 
   String? get nationality {
-    return _nationality;
+    return _commonCapturedIdFields?.nationality;
   }
 
   String? get address {
-    return _address;
+    return _commonCapturedIdFields?.address;
   }
 
   CapturedResultType get capturedResultType {
@@ -213,27 +172,27 @@ class CapturedId extends Serializable {
   }
 
   DocumentType get documentType {
-    return _documentType;
+    return _commonCapturedIdFields?.documentType ?? DocumentType.none;
   }
 
   String? get issuingCountryIso {
-    return _issuingCountryIso;
+    return _commonCapturedIdFields?.issuingCountryIso;
   }
 
   String? get issuingCountry {
-    return _issuingCountry;
+    return _commonCapturedIdFields?.issuingCountry;
   }
 
   String? get documentNumber {
-    return _documentNumber;
+    return _commonCapturedIdFields?.documentNumber;
   }
 
   DateResult? get dateOfExpiry {
-    return _dateOfExpiry;
+    return _commonCapturedIdFields?.dateOfExpiry;
   }
 
   DateResult? get dateOfIssue {
-    return _dateOfIssue;
+    return _commonCapturedIdFields?.dateOfIssue;
   }
 
   AamvaBarcodeResult? get aamvaBarcode {
@@ -303,5 +262,121 @@ class _ImageInfo {
     if (base64Image == null) return null;
 
     return Image.memory(base64Decode(base64Image));
+  }
+}
+
+@immutable
+class _CommonCapturedIdFields {
+  final String? _firstName;
+  final String? _lastName;
+  final String _fullName;
+  final String? _sex;
+  final DateResult? _dateOfBirth;
+  final String? _nationality;
+  final String? _address;
+  final DocumentType _documentType;
+  final String? _issuingCountryIso;
+  final String? _issuingCountry;
+  final String? _documentNumber;
+  final DateResult? _dateOfExpiry;
+  final DateResult? _dateOfIssue;
+
+  _CommonCapturedIdFields._(
+      this._firstName,
+      this._lastName,
+      this._fullName,
+      this._sex,
+      this._dateOfBirth,
+      this._nationality,
+      this._address,
+      this._documentType,
+      this._issuingCountryIso,
+      this._issuingCountry,
+      this._documentNumber,
+      this._dateOfExpiry,
+      this._dateOfIssue);
+
+  factory _CommonCapturedIdFields.fromJSON(Map<String, dynamic> json) {
+    DateResult? dateOfExpiry;
+    if (json.containsKey("dateOfExpiry") && json["dateOfExpiry"] != null) {
+      dateOfExpiry = DateResult.fromJSON(json["dateOfExpiry"] as Map<String, dynamic>);
+    }
+
+    DateResult? dateOfIssue;
+    if (json.containsKey("dateOfIssue") && json["dateOfIssue"] != null) {
+      dateOfIssue = DateResult.fromJSON(json["dateOfIssue"] as Map<String, dynamic>);
+    }
+
+    DateResult? dateOfBirth;
+    if (json.containsKey("dateOfBirth") && json["dateOfBirth"] != null) {
+      dateOfBirth = DateResult.fromJSON(json["dateOfBirth"] as Map<String, dynamic>);
+    }
+
+    return _CommonCapturedIdFields._(
+        json["firstName"] as String?,
+        json["lastName"] as String?,
+        json["fullName"] as String,
+        json["sex"] as String?,
+        dateOfBirth,
+        json["nationality"] as String?,
+        json["address"] as String?,
+        DocumentTypeDeserializer.fromJSON(json["documentType"] as String),
+        json["issuingCountryIso"] as String?,
+        json["issuingCountry"] as String?,
+        json["documentNumber"] as String?,
+        dateOfExpiry,
+        dateOfIssue);
+  }
+
+  String? get firstName {
+    return _firstName;
+  }
+
+  String? get lastName {
+    return _lastName;
+  }
+
+  String get fullName {
+    return _fullName;
+  }
+
+  String? get sex {
+    return _sex;
+  }
+
+  DateResult? get dateOfBirth {
+    return _dateOfBirth;
+  }
+
+  String? get nationality {
+    return _nationality;
+  }
+
+  String? get address {
+    return _address;
+  }
+
+  DocumentType get documentType {
+    return _documentType;
+  }
+
+  String? get issuingCountryIso {
+    return _issuingCountryIso;
+  }
+
+  String? get issuingCountry {
+    return _issuingCountry;
+  }
+
+  String? get documentNumber {
+    return _documentNumber;
+  }
+
+  DateResult? get dateOfExpiry {
+    return _dateOfExpiry;
+  }
+
+  DateResult? get dateOfIssue {
+    return _dateOfIssue;
   }
 }

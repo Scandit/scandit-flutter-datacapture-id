@@ -1,6 +1,6 @@
 name: scandit_flutter_datacapture_id
 description: Scandit Data Capture SDK for Flutter.
-version: 6.12.1
+version: 6.13.0
 homepage: https://scandit.com
 
 
@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   scandit_flutter_datacapture_core:
-    '>=6.12.1 <6.12.2'
+    '>=6.13.0 <6.13.1'
 
 dev_dependencies:
   flutter_test:
