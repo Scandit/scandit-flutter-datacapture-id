@@ -10,7 +10,7 @@ export 'src/aamva_viz_barcode_comparison_verifier.dart' show AamvaVizBarcodeComp
 export 'src/captured_id.dart' show CapturedId;
 export 'src/captured_result_type.dart' show CapturedResultType;
 export 'src/document_type.dart' show DocumentType;
-export 'src/id_capture.dart' show IdCapture, IdCaptureListener;
+export 'src/id_capture.dart' show IdCapture, IdCaptureListener, IdCaptureAdvancedListener;
 export 'src/id_capture_overlay.dart' show IdCaptureOverlay;
 export 'src/id_capture_session.dart' show IdCaptureSession, LocalizedOnlyId, RejectedId, IdCaptureError;
 export 'src/id_capture_settings.dart' show IdCaptureSettings;

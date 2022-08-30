@@ -27,6 +27,10 @@ public class ScanditFlutterDataCaptureId: NSObject {
         static let finishDidCaptureId = "finishDidCaptureId"
         static let reset = "reset"
         static let verify = "verify"
+        static let getLastFrameData = "getLastFrameData"
+        static let finishDidRejectId = "finishDidRejectId"
+        static let finishDidLocalizeId = "finishDidLocalizeId"
+        static let finishDidFail = "finishDidFail"
     }
 
     private let defaultsMethodChannel: FlutterMethodChannel
@@ -49,6 +53,12 @@ public class ScanditFlutterDataCaptureId: NSObject {
     }
 
     var idCapturedLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didCaptureId.rawValue)
+    
+    var didLocalizeIdLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didLocalizeId.rawValue)
+    
+    var didRejectIdLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didRejectId.rawValue)
+    
+    var errorDidHappenLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.errorDidHappen.rawValue)
 
     @objc
     public init(with messenger: FlutterBinaryMessenger) {
@@ -84,6 +94,14 @@ public class ScanditFlutterDataCaptureId: NSObject {
             reset(result: result)
         case FunctionNames.verify:
             verify(arguments: call.arguments, result: result)
+        case FunctionNames.getLastFrameData:
+            ScanditFlutterDataCaptureCore.getLastFrameData(reply: result)
+        case FunctionNames.finishDidFail:
+            finishDidFail(enabled: call.arguments as? Bool ?? false, result: result)
+        case FunctionNames.finishDidRejectId:
+            finishDidRejectId(enabled: call.arguments as? Bool ?? false, result: result)
+        case FunctionNames.finishDidLocalizeId:
+            finishDidLocalizeId(enabled: call.arguments as? Bool ?? false, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -107,6 +125,21 @@ public class ScanditFlutterDataCaptureId: NSObject {
 
     public func finishDidCaptureId(enabled: Bool?, result: FlutterResult) {
         idCapturedLock.unlock(value: enabled)
+        result(nil)
+    }
+    
+    public func finishDidRejectId(enabled: Bool?, result: FlutterResult) {
+        didRejectIdLock.unlock(value: enabled)
+        result(nil)
+    }
+    
+    public func finishDidLocalizeId(enabled: Bool?, result: FlutterResult) {
+        didLocalizeIdLock.unlock(value: enabled)
+        result(nil)
+    }
+    
+    public func finishDidFail(enabled: Bool?, result: FlutterResult) {
+        errorDidHappenLock.unlock(value: enabled)
         result(nil)
     }
 

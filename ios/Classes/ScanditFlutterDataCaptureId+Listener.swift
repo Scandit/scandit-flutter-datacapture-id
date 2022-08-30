@@ -5,34 +5,52 @@
  */
 
 import ScanditIdCapture
+import scandit_flutter_datacapture_core
 
 extension ScanditFlutterDataCaptureId: IdCaptureListener {
     public func idCapture(_ idCapture: IdCapture,
                           didCaptureIn session: IdCaptureSession,
-                          frameData: FrameData) {        
+                          frameData: FrameData) {
+        ScanditFlutterDataCaptureCore.lastFrame = frameData
         guard let value = idCapturedLock.wait(afterDoing: {
             return send(.didCaptureId, body: ["session": session.jsonString])
         }) else { return }
         self.idCapture?.isEnabled = value
+        ScanditFlutterDataCaptureCore.lastFrame = nil
     }
 
     public func idCapture(_ idCapture: IdCapture,
                           didLocalizeIn session: IdCaptureSession,
                           frameData: FrameData) {
-        send(.didLocalizeId, body: ["session": session.jsonString])
+        ScanditFlutterDataCaptureCore.lastFrame = frameData
+        guard let value = didLocalizeIdLock.wait(afterDoing: {
+            return send(.didLocalizeId, body: ["session": session.jsonString])
+        }) else { return }
+        self.idCapture?.isEnabled = value
+        ScanditFlutterDataCaptureCore.lastFrame = nil
     }
 
     public func idCapture(_ idCapture: IdCapture,
                           didFailWithError error: Error,
                           session: IdCaptureSession,
                           frameData: FrameData) {
-        send(.errorDidHappen, body: ["session": session.jsonString])
+        ScanditFlutterDataCaptureCore.lastFrame = frameData
+        guard let value = errorDidHappenLock.wait(afterDoing: {
+            return send(.errorDidHappen, body: ["session": session.jsonString])
+        }) else { return }
+        self.idCapture?.isEnabled = value
+        ScanditFlutterDataCaptureCore.lastFrame = nil
     }
 
     public func idCapture(_ idCapture: IdCapture,
                           didRejectIn session: IdCaptureSession,
                           frameData: FrameData) {
-        send(.didRejectId, body: ["session": session.jsonString])
+        ScanditFlutterDataCaptureCore.lastFrame = frameData
+        guard let value = didRejectIdLock.wait(afterDoing: {
+            return send(.didRejectId, body: ["session": session.jsonString])
+        }) else { return }
+        self.idCapture?.isEnabled = value
+        ScanditFlutterDataCaptureCore.lastFrame = nil
     }
 }
 

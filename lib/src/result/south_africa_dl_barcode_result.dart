@@ -54,7 +54,7 @@ class SouthAfricaDlBarcodeResult {
         json["documentCopy"] as int,
         professionalDrivingPermit,
         vehicleRestrictions,
-        json["driverRestrictionCodes"] as List<int>);
+        (json["driverRestrictionCodes"] as List<dynamic>).cast<int>().toList());
   }
 
   int get version {
