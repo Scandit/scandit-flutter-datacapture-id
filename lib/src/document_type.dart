@@ -57,6 +57,8 @@ enum DocumentType {
   veteranId,
   citizenshipCertificate,
   myNumberCard,
+  minorsPassport,
+  minorsPublicServicesCard,
 }
 
 extension DocumentTypeDeserializer on DocumentType {

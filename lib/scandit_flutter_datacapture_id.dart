@@ -22,6 +22,7 @@ export 'src/result/aamva_viz_barcode_comparison_result.dart'
     show AamvaVizBarcodeComparisonResult, ComparisonCheck, ComparisonCheckResult;
 export 'src/result/argentina_id_barcode_result.dart' show ArgentinaIdBarcodeResult;
 export 'src/result/colombia_id_barcode_result.dart' show ColombiaIdBarcodeResult;
+export 'src/result/colombia_dl_barcode_result.dart' show ColombiaDlBarcodeResult;
 export 'src/result/date_result.dart' show DateResult;
 export 'src/result/mrz_result.dart' show MrzResult;
 export 'src/result/south_africa_dl_barcode_result.dart'

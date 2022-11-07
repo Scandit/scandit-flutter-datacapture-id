@@ -8,6 +8,7 @@ enum IdDocumentType {
   aamvaBarcode,
   argentinaIdBarcode,
   colombiaIdBarcode,
+  colombiaDlBarcode,
   dlViz,
   idCardMrz,
   idCardViz,

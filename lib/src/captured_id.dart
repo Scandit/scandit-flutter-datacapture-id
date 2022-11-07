@@ -15,6 +15,7 @@ import 'id_image_type.dart';
 import 'result/aamva_barcode_result.dart';
 import 'result/argentina_id_barcode_result.dart';
 import 'result/colombia_id_barcode_result.dart';
+import 'result/colombia_dl_barcode_result.dart';
 import 'result/date_result.dart';
 import 'result/mrz_result.dart';
 import 'result/south_africa_dl_barcode_result.dart';
@@ -27,6 +28,7 @@ class CapturedId extends Serializable {
   final CapturedResultType _capturedResultType;
   final AamvaBarcodeResult? _aamvaBarcodeResult;
   final ColombiaIdBarcodeResult? _colombiaIdBarcodeResult;
+  final ColombiaDlBarcodeResult? _colombiaDlBarcodeResult;
   final ArgentinaIdBarcodeResult? _argentinaIdBarcodeResult;
   final SouthAfricaDlBarcodeResult? _southAfricaDlBarcodeResult;
   final SouthAfricaIdBarcodeResult? _southAfricaIdBarcodeResult;
@@ -42,6 +44,7 @@ class CapturedId extends Serializable {
       this._capturedResultType,
       this._aamvaBarcodeResult,
       this._colombiaIdBarcodeResult,
+      this._colombiaDlBarcodeResult,
       this._argentinaIdBarcodeResult,
       this._southAfricaDlBarcodeResult,
       this._southAfricaIdBarcodeResult,
@@ -67,6 +70,13 @@ class CapturedId extends Serializable {
       colombiaIdBarcodeResult =
           ColombiaIdBarcodeResult.fromJSON(json["colombiaIdBarcodeResult"] as Map<String, dynamic>);
       commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["colombiaIdBarcodeResult"]);
+    }
+
+    ColombiaDlBarcodeResult? colombiaDlBarcodeResult;
+    if (json.containsKey("colombiaDlBarcodeResult") && json["colombiaDlBarcodeResult"] != null) {
+      colombiaDlBarcodeResult =
+          ColombiaDlBarcodeResult.fromJSON(json["colombiaDlBarcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["colombiaDlBarcodeResult"]);
     }
 
     ArgentinaIdBarcodeResult? argentinaIdBarcodeResult;
@@ -123,6 +133,7 @@ class CapturedId extends Serializable {
         CapturedResultTypeDeserializer.fromJSON(json["capturedResultType"] as String),
         dlAamvaBarcodeResult,
         colombiaIdBarcodeResult,
+        colombiaDlBarcodeResult,
         argentinaIdBarcodeResult,
         southAfricaDlBarcodeResult,
         southAfricaIdBarcodeResult,
@@ -201,6 +212,10 @@ class CapturedId extends Serializable {
 
   ColombiaIdBarcodeResult? get colombiaIdBarcode {
     return _colombiaIdBarcodeResult;
+  }
+
+  ColombiaDlBarcodeResult? get colombiaDlBarcode {
+    return _colombiaDlBarcodeResult;
   }
 
   ArgentinaIdBarcodeResult? get argentinaIdBarcode {

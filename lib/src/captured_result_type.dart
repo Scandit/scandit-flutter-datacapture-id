@@ -8,6 +8,7 @@ enum CapturedResultType {
   aamvaBarcodeResult,
   argentinaIdBarcodeResult,
   colombiaIdBarcodeResult,
+  colombiaDlBarcodeResult,
   mrzResult,
   southAfricaDlBarcodeResult,
   southAfricaIdBarcodeResult,
