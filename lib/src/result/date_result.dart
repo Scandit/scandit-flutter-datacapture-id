@@ -38,4 +38,11 @@ class DateResult extends Serializable {
   Map<String, dynamic> toMap() {
     return {"day": _day, "month": _month, "year": _year};
   }
+
+  bool operator ==(Object other) {
+    return other is DateResult && other.day == day && other.month == month && other.year == year;
+  }
+
+  @override
+  int get hashCode => hashValues(day.hashCode, month.hashCode, year.hashCode);
 }
