@@ -40,24 +40,24 @@ public class ScanditFlutterDataCaptureId: NSObject {
     var eventSink: FlutterEventSink?
     var hasListeners = false
 
-    private var _idCapture: IdCapture?
+    private var idCaptureMode: IdCapture?
     var idCapture: IdCapture? {
         get {
-            return _idCapture
+            return idCaptureMode
         }
         set {
-            _idCapture?.removeListener(self)
-            _idCapture = newValue
-            _idCapture?.addListener(self)
+            idCaptureMode?.removeListener(self)
+            idCaptureMode = newValue
+            idCaptureMode?.addListener(self)
         }
     }
 
     var idCapturedLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didCaptureId.rawValue)
-    
+
     var didLocalizeIdLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didLocalizeId.rawValue)
-    
+
     var didRejectIdLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didRejectId.rawValue)
-    
+
     var errorDidHappenLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.errorDidHappen.rawValue)
 
     @objc
@@ -68,7 +68,7 @@ public class ScanditFlutterDataCaptureId: NSObject {
         listenerMethodChannel = FlutterMethodChannel(name: "\(prefix).method/id_capture_listener",
                                                      binaryMessenger: messenger)
         aamvaVizVerifierMethodChannel = FlutterMethodChannel(name: "\(prefix).method/aamva_viz_barcode_comparison_verifier",
-                                                     binaryMessenger: messenger)
+                                                             binaryMessenger: messenger)
         eventChannel = FlutterEventChannel(name: "\(prefix).event/id_capture_listener",
                                            binaryMessenger: messenger)
         super.init()
@@ -108,9 +108,13 @@ public class ScanditFlutterDataCaptureId: NSObject {
     }
 
     private func defaults(_ result: FlutterResult) {
-        let defaultsData = try! JSONSerialization.data(withJSONObject: defaults, options: [])
-        let jsonString = String(data: defaultsData, encoding: .utf8)
-        result(jsonString)
+        do {
+            let defaultsData = try JSONSerialization.data(withJSONObject: defaults, options: [])
+            let jsonString = String(data: defaultsData, encoding: .utf8)
+            result(jsonString)
+        } catch {
+            result(FlutterError(code: "-1", message: "Unable to load the defaults. \(error)", details: nil))
+        }
     }
 
     public func addListener(result: FlutterResult) {
@@ -127,17 +131,17 @@ public class ScanditFlutterDataCaptureId: NSObject {
         idCapturedLock.unlock(value: enabled)
         result(nil)
     }
-    
+
     public func finishDidRejectId(enabled: Bool?, result: FlutterResult) {
         didRejectIdLock.unlock(value: enabled)
         result(nil)
     }
-    
+
     public func finishDidLocalizeId(enabled: Bool?, result: FlutterResult) {
         didLocalizeIdLock.unlock(value: enabled)
         result(nil)
     }
-    
+
     public func finishDidFail(enabled: Bool?, result: FlutterResult) {
         errorDidHappenLock.unlock(value: enabled)
         result(nil)
@@ -147,13 +151,13 @@ public class ScanditFlutterDataCaptureId: NSObject {
         idCapture?.reset()
         result(nil)
     }
-    
+
     public func verify(arguments: Any?, result: FlutterResult) {
         guard let capturedIdJson = arguments as? String else {
             result(nil)
             return
         }
-        
+
         let capturedId = CapturedId(jsonString: capturedIdJson)
         result(AAMVAVizBarcodeComparisonVerifier().verify(capturedId).jsonString)
     }

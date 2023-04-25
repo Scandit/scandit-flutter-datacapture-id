@@ -18,30 +18,40 @@ extension ScanditFlutterDataCaptureId {
 extension ScanditFlutterDataCaptureId: IdCaptureDeserializerDelegate {
     public func idCaptureDeserializer(_ deserializer: IdCaptureDeserializer,
                                       didStartDeserializingMode mode: IdCapture,
-                                      from JSONValue: JSONValue) {}
+                                      from jsonValue: JSONValue) {
+        // not used in frameworks
+    }
 
     public func idCaptureDeserializer(_ deserializer: IdCaptureDeserializer,
                                       didFinishDeserializingMode mode: IdCapture,
-                                      from JSONValue: JSONValue) {
-        if JSONValue.containsKey("enabled") {
-            mode.isEnabled = JSONValue.bool(forKey: "enabled")
+                                      from jsonValue: JSONValue) {
+        if jsonValue.containsKey("enabled") {
+            mode.isEnabled = jsonValue.bool(forKey: "enabled")
         }
         idCapture = mode
     }
 
     public func idCaptureDeserializer(_ deserializer: IdCaptureDeserializer,
                                       didStartDeserializingSettings settings: IdCaptureSettings,
-                                      from JSONValue: JSONValue) {}
+                                      from jsonValue: JSONValue) {
+        // not used in frameworks
+    }
 
     public func idCaptureDeserializer(_ deserializer: IdCaptureDeserializer, didFinishDeserializingSettings settings:
                                       IdCaptureSettings,
-                                      from JSONValue: JSONValue) {}
+                                      from jsonValue: JSONValue) {
+        // not used in frameworks
+    }
 
     public func idCaptureDeserializer(_ deserializer: IdCaptureDeserializer,
                                       didStartDeserializingOverlay overlay: IdCaptureOverlay,
-                                      from JSONValue: JSONValue) {}
+                                      from jsonValue: JSONValue) {
+        // not used in frameworks
+    }
 
     public func idCaptureDeserializer(_ deserializer: IdCaptureDeserializer,
                                       didFinishDeserializingOverlay overlay: IdCaptureOverlay,
-                                      from JSONValue: JSONValue) {}
+                                      from jsonValue: JSONValue) {
+        // not used in frameworks
+    }
 }

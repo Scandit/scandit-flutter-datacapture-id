@@ -44,5 +44,7 @@ class DateResult extends Serializable {
   }
 
   @override
+  // Object.hash() was introduced in sdk 2.14 our current minimum is 2.12
+  // ignore: deprecated_member_use
   int get hashCode => hashValues(day.hashCode, month.hashCode, year.hashCode);
 }

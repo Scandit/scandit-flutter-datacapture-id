@@ -30,9 +30,9 @@ class SerializableIdCaptureDefaults(
                     IdCapture.createRecommendedCameraSettings()
                 ),
                 SerializableIdCaptureOverlayDefaults(
-                    SerializableBrushDefaults(IdCaptureOverlay.DEFAULT_CAPTURED_BRUSH),
-                    SerializableBrushDefaults(IdCaptureOverlay.DEFAULT_LOCALIZED_BRUSH),
-                    SerializableBrushDefaults(IdCaptureOverlay.DEFAULT_REJECTED_BRUSH)
+                    SerializableBrushDefaults(IdCaptureOverlay.defaultCapturedBrush()),
+                    SerializableBrushDefaults(IdCaptureOverlay.defaultLocalizedBrush()),
+                    SerializableBrushDefaults(IdCaptureOverlay.defaultRejectedBrush())
 
                 )
             ).toJson().toString()
