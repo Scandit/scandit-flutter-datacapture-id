@@ -1,7 +1,10 @@
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
 buildscript {
     ext {
-        sdk_version = "6.17.2"
-        kotlin_version = "1.6.21"
+        kotlin_version = "1.7.21"
         agp_version = "7.2.1"
     }
 
@@ -35,6 +38,9 @@ android {
 }
 
 dependencies {
-    api "com.scandit.datacapture:id:$sdk_version"
+    def sdk_version = "6.18.0"
+
+    println("Version of the native sdk used in this build: ${safeExtGet('global_sdk_version', sdk_version)}")
+    api "com.scandit.datacapture:id:${safeExtGet('global_sdk_version', sdk_version)}"
     implementation 'androidx.appcompat:appcompat:1.3.1'
 }

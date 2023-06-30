@@ -1,7 +1,7 @@
 package com.scandit.datacapture.flutter.id
 
 import androidx.annotation.NonNull
-import com.scandit.datacapture.flutter.core.utils.EventHandler
+import com.scandit.datacapture.flutter.core.utils.FlutterEmitter
 import com.scandit.datacapture.flutter.id.listeners.ScanditFlutterIdCaptureListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.BinaryMessenger
@@ -58,7 +58,7 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, MethodCallHandler 
         binaryMessenger: BinaryMessenger
     ) =
         ScanditFlutterIdCaptureListener(
-            EventHandler(
+            FlutterEmitter(
                 EventChannel(
                     binaryMessenger,
                     ScanditFlutterIdCaptureListener.CHANNEL_NAME

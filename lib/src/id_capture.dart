@@ -16,13 +16,14 @@ import 'id_capture_defaults.dart';
 abstract class IdCaptureListener {
   static const String _didCaptureId = "idCaptureListener-didCaptureId";
   static const String _didLocalizeId = "idCaptureListener-didLocalizeId";
-  static const String _didFail = "idCaptureListener-didFail";
   static const String _didRejectId = "idCaptureListener-didRejectId";
 
   void didCaptureId(IdCapture idCapture, IdCaptureSession session);
 
   void didRejectId(IdCapture idCapture, IdCaptureSession session);
 
+  @Deprecated(
+      "This method is no longer executed by the listener. See didRejectId for scenarios previously reported by this callback.")
   void didFailWithError(IdCapture idCapture, IdCaptureError error, IdCaptureSession session);
 
   void didLocalizeId(IdCapture idCapture, IdCaptureSession session);
@@ -151,7 +152,6 @@ class _IdCaptureListenerController {
   static const String _finishDidCaptureIdName = 'finishDidCaptureId';
   static const String _finishDidLocalizeIdName = 'finishDidLocalizeId';
   static const String _finishDidRejectIdName = 'finishDidRejectId';
-  static const String _finishDidFailName = 'finishDidFail';
 
   _IdCaptureListenerController.forIdCapture(this._idCapture);
 
@@ -190,13 +190,6 @@ class _IdCaptureListenerController {
             .invokeMethod(_finishDidRejectIdName, _idCapture.isEnabled)
             // ignore: unnecessary_lambdas
             .then((value) => null, onError: (error) => print(error));
-      } else if (eventName == IdCaptureListener._didFail) {
-        var error = IdCaptureError.fromJSON(eventJSON["error"]);
-        _notifyDidFailWithError(error, session);
-        _methodChannel
-            .invokeMethod(_finishDidFailName, _idCapture.isEnabled)
-            // ignore: unnecessary_lambdas
-            .then((value) => null, onError: (error) => print(error));
       }
     });
   }
@@ -204,17 +197,6 @@ class _IdCaptureListenerController {
   void unsubscribeListeners() {
     _idCaptureSubscription?.cancel();
     _methodChannel.invokeMethod(_removeIdCaptureListenerName).then((value) => null, onError: _onError);
-  }
-
-  void _notifyDidFailWithError(IdCaptureError error, IdCaptureSession session) {
-    _idCapture._isInCallback = true;
-    for (var listener in _idCapture._listeners) {
-      listener.didFailWithError(_idCapture, error, session);
-    }
-    for (var listener in _idCapture._advancedListeners) {
-      listener.didFailWithError(_idCapture, error, session, _getLastFrameData);
-    }
-    _idCapture._isInCallback = false;
   }
 
   void _notifyDidCaptureId(IdCaptureSession session) {

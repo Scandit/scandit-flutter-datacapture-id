@@ -10,7 +10,6 @@ enum ScanditFlutterDataCaptureIdEvent: String, CaseIterable {
     case didCaptureId = "idCaptureListener-didCaptureId"
     case didLocalizeId = "idCaptureListener-didLocalizeId"
     case didRejectId = "idCaptureListener-didRejectId"
-    case errorDidHappen = "idCaptureListener-didFail"
 }
 
 extension ScanditFlutterDataCaptureId {

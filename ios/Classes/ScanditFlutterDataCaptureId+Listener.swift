@@ -31,18 +31,6 @@ extension ScanditFlutterDataCaptureId: IdCaptureListener {
     }
 
     public func idCapture(_ idCapture: IdCapture,
-                          didFailWithError error: Error,
-                          session: IdCaptureSession,
-                          frameData: FrameData) {
-        ScanditFlutterDataCaptureCore.lastFrame = frameData
-        guard let value = errorDidHappenLock.wait(afterDoing: {
-            return send(.errorDidHappen, body: ["session": session.jsonString])
-        }) else { return }
-        self.idCapture?.isEnabled = value
-        ScanditFlutterDataCaptureCore.lastFrame = nil
-    }
-
-    public func idCapture(_ idCapture: IdCapture,
                           didRejectIn session: IdCaptureSession,
                           frameData: FrameData) {
         ScanditFlutterDataCaptureCore.lastFrame = frameData

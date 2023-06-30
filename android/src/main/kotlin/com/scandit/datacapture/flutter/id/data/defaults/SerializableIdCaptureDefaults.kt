@@ -1,23 +1,22 @@
 package com.scandit.datacapture.flutter.id.data.defaults
 
-import com.scandit.datacapture.flutter.core.data.SerializableData
-import com.scandit.datacapture.flutter.core.data.defaults.SerializableBrushDefaults
-import com.scandit.datacapture.flutter.core.data.defaults.SerializableCameraSettingsDefaults
+import com.scandit.datacapture.frameworks.core.data.SerializableData
+import com.scandit.datacapture.frameworks.core.data.defaults.BrushDefaults
+import com.scandit.datacapture.frameworks.core.data.defaults.CameraSettingsDefaults
 import com.scandit.datacapture.id.capture.IdCapture
 import com.scandit.datacapture.id.ui.overlay.IdCaptureOverlay
 import org.json.JSONObject
 
 class SerializableIdCaptureDefaults(
-    private val recommendedCameraSettings: SerializableCameraSettingsDefaults,
+    private val recommendedCameraSettings: CameraSettingsDefaults,
     private val idCaptureOverlayDefaults: SerializableIdCaptureOverlayDefaults
 ) : SerializableData {
 
-    override fun toJson(): JSONObject = JSONObject(
+    override fun toMap(): Map<String, Any?> =
         mapOf(
-            FIELD_RECOMMENDED_CAMERA_SETTINGS to recommendedCameraSettings.toJson(),
-            FIELD_ID_CAPTURE_OVERLAY to idCaptureOverlayDefaults.toJson()
+            FIELD_RECOMMENDED_CAMERA_SETTINGS to recommendedCameraSettings.toMap(),
+            FIELD_ID_CAPTURE_OVERLAY to idCaptureOverlayDefaults.toMap()
         )
-    )
 
     companion object {
         const val FIELD_RECOMMENDED_CAMERA_SETTINGS = "RecommendedCameraSettings"
@@ -25,17 +24,19 @@ class SerializableIdCaptureDefaults(
 
         @JvmStatic
         fun createDefaults(): String {
-            return SerializableIdCaptureDefaults(
-                SerializableCameraSettingsDefaults(
-                    IdCapture.createRecommendedCameraSettings()
-                ),
-                SerializableIdCaptureOverlayDefaults(
-                    SerializableBrushDefaults(IdCaptureOverlay.defaultCapturedBrush()),
-                    SerializableBrushDefaults(IdCaptureOverlay.defaultLocalizedBrush()),
-                    SerializableBrushDefaults(IdCaptureOverlay.defaultRejectedBrush())
+            return JSONObject(
+                SerializableIdCaptureDefaults(
+                    CameraSettingsDefaults.create(
+                        IdCapture.createRecommendedCameraSettings()
+                    ),
+                    SerializableIdCaptureOverlayDefaults(
+                        BrushDefaults.get(IdCaptureOverlay.defaultCapturedBrush()),
+                        BrushDefaults.get(IdCaptureOverlay.defaultLocalizedBrush()),
+                        BrushDefaults.get(IdCaptureOverlay.defaultRejectedBrush())
 
-                )
-            ).toJson().toString()
+                    )
+                ).toMap()
+            ).toString()
         }
     }
 }

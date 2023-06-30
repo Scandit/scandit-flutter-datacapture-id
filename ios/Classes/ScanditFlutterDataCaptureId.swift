@@ -30,7 +30,6 @@ public class ScanditFlutterDataCaptureId: NSObject {
         static let getLastFrameData = "getLastFrameData"
         static let finishDidRejectId = "finishDidRejectId"
         static let finishDidLocalizeId = "finishDidLocalizeId"
-        static let finishDidFail = "finishDidFail"
     }
 
     private let defaultsMethodChannel: FlutterMethodChannel
@@ -57,8 +56,6 @@ public class ScanditFlutterDataCaptureId: NSObject {
     var didLocalizeIdLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didLocalizeId.rawValue)
 
     var didRejectIdLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didRejectId.rawValue)
-
-    var errorDidHappenLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.errorDidHappen.rawValue)
 
     @objc
     public init(with messenger: FlutterBinaryMessenger) {
@@ -96,8 +93,6 @@ public class ScanditFlutterDataCaptureId: NSObject {
             verify(arguments: call.arguments, result: result)
         case FunctionNames.getLastFrameData:
             ScanditFlutterDataCaptureCore.getLastFrameData(reply: result)
-        case FunctionNames.finishDidFail:
-            finishDidFail(enabled: call.arguments as? Bool ?? false, result: result)
         case FunctionNames.finishDidRejectId:
             finishDidRejectId(enabled: call.arguments as? Bool ?? false, result: result)
         case FunctionNames.finishDidLocalizeId:
@@ -139,11 +134,6 @@ public class ScanditFlutterDataCaptureId: NSObject {
 
     public func finishDidLocalizeId(enabled: Bool?, result: FlutterResult) {
         didLocalizeIdLock.unlock(value: enabled)
-        result(nil)
-    }
-
-    public func finishDidFail(enabled: Bool?, result: FlutterResult) {
-        errorDidHappenLock.unlock(value: enabled)
         result(nil)
     }
 

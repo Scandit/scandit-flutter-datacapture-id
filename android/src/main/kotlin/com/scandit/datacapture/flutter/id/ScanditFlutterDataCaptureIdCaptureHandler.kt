@@ -1,10 +1,10 @@
 package com.scandit.datacapture.flutter.id
 
 import com.scandit.datacapture.core.json.JsonValue
-import com.scandit.datacapture.flutter.core.common.LastFrameDataHolder
-import com.scandit.datacapture.flutter.core.deserializers.Deserializers
 import com.scandit.datacapture.flutter.id.data.defaults.SerializableIdCaptureDefaults
 import com.scandit.datacapture.flutter.id.listeners.ScanditFlutterIdCaptureListener
+import com.scandit.datacapture.frameworks.core.deserialization.Deserializers
+import com.scandit.datacapture.frameworks.core.utils.LastFrameData
 import com.scandit.datacapture.id.capture.IdCapture
 import com.scandit.datacapture.id.capture.serialization.IdCaptureDeserializer
 import com.scandit.datacapture.id.capture.serialization.IdCaptureDeserializerListener
@@ -85,10 +85,6 @@ class ScanditFlutterDataCaptureIdCaptureHandler(
                 idCaptureListener.finishDidLocalizeId(call.arguments as Boolean)
                 result.success(null)
             }
-            "finishDidFail" -> {
-                idCaptureListener.finishDidFail(call.arguments as Boolean)
-                result.success(null)
-            }
             "getDefaults" ->
                 result.success(SerializableIdCaptureDefaults.createDefaults())
             "reset" -> {
@@ -99,7 +95,9 @@ class ScanditFlutterDataCaptureIdCaptureHandler(
                 val verificationResult = verify(call.arguments as String)
                 result.success(verificationResult.toJson())
             }
-            "getLastFrameData" -> LastFrameDataHolder.handleGetRequest(result)
+            "getLastFrameData" -> LastFrameData.getLastFrameDataJson {
+                result.success(it)
+            }
         }
     }
 

@@ -1,29 +1,26 @@
 package com.scandit.datacapture.flutter.id.listeners
 
 import com.scandit.datacapture.core.data.FrameData
-import com.scandit.datacapture.flutter.core.common.LastFrameDataHolder
-import com.scandit.datacapture.flutter.core.utils.EventHandler
 import com.scandit.datacapture.flutter.core.utils.EventSinkWithResult
+import com.scandit.datacapture.flutter.core.utils.FlutterEmitter
+import com.scandit.datacapture.frameworks.core.utils.LastFrameData
 import com.scandit.datacapture.id.capture.IdCapture
 import com.scandit.datacapture.id.capture.IdCaptureListener
 import com.scandit.datacapture.id.capture.IdCaptureSession
 import org.json.JSONObject
 
 class ScanditFlutterIdCaptureListener(
-    private val eventHandler: EventHandler,
+    private val flutterEmitter: FlutterEmitter,
     private val onIdCaptured: EventSinkWithResult<Boolean> =
         EventSinkWithResult(ON_ID_CAPTURED),
     private val onIdLocalized: EventSinkWithResult<Boolean> =
         EventSinkWithResult(ON_ID_LOCALIZED),
-    private val onError: EventSinkWithResult<Boolean> =
-        EventSinkWithResult(ON_ERROR),
     private val onIdRejected: EventSinkWithResult<Boolean> =
         EventSinkWithResult(ON_ID_REJECTED)
 ) : IdCaptureListener {
     companion object {
         private const val ON_ID_CAPTURED = "idCaptureListener-didCaptureId"
         private const val ON_ID_LOCALIZED = "idCaptureListener-didLocalizeId"
-        private const val ON_ERROR = "idCaptureListener-didFail"
         private const val ON_ID_REJECTED = "idCaptureListener-didRejectId"
 
         private const val FIELD_EVENT = "event"
@@ -34,11 +31,11 @@ class ScanditFlutterIdCaptureListener(
     }
 
     fun enableListener() {
-        eventHandler.enableListener()
+        flutterEmitter.enableListener()
     }
 
     fun disableListener() {
-        eventHandler.disableListener()
+        flutterEmitter.disableListener()
         onIdCaptured.onCancel()
     }
 
@@ -48,15 +45,6 @@ class ScanditFlutterIdCaptureListener(
 
     override fun onIdLocalized(mode: IdCapture, session: IdCaptureSession, data: FrameData) {
         emit(onIdLocalized, mode, ON_ID_LOCALIZED, session, data)
-    }
-
-    override fun onErrorEncountered(
-        mode: IdCapture,
-        error: Throwable,
-        session: IdCaptureSession,
-        data: FrameData
-    ) {
-        emit(onError, mode, ON_ERROR, session, data)
     }
 
     override fun onIdRejected(mode: IdCapture, session: IdCaptureSession, data: FrameData) {
@@ -74,8 +62,8 @@ class ScanditFlutterIdCaptureListener(
         session: IdCaptureSession,
         data: FrameData
     ) {
-        LastFrameDataHolder.frameData = data
-        eventHandler.getCurrentEventSink()?.let {
+        LastFrameData.frameData.set(data)
+        flutterEmitter.getCurrentEventSink()?.let {
             val params = JSONObject(
                 mapOf(
                     FIELD_EVENT to event,
@@ -85,7 +73,7 @@ class ScanditFlutterIdCaptureListener(
             mode.isEnabled =
                 eventSinkWithResult.emitForResult(it, params, mode.isEnabled)
         }
-        LastFrameDataHolder.frameData = null
+        LastFrameData.frameData.set(null)
     }
 
     fun finishDidRejectId(enabled: Boolean) {
@@ -94,9 +82,5 @@ class ScanditFlutterIdCaptureListener(
 
     fun finishDidLocalizeId(enabled: Boolean) {
         onIdLocalized.onResult(enabled)
-    }
-
-    fun finishDidFail(enabled: Boolean) {
-        onError.onResult(enabled)
     }
 }
