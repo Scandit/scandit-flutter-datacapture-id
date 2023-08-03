@@ -30,6 +30,8 @@ public class ScanditFlutterDataCaptureId: NSObject {
         static let getLastFrameData = "getLastFrameData"
         static let finishDidRejectId = "finishDidRejectId"
         static let finishDidLocalizeId = "finishDidLocalizeId"
+        static let addIdCaptureAsyncListener = "addIdCaptureAsyncListener"
+        static let removeIdCaptureAsyncListener = "removeIdCaptureAsyncListener"
     }
 
     private let defaultsMethodChannel: FlutterMethodChannel
@@ -38,6 +40,7 @@ public class ScanditFlutterDataCaptureId: NSObject {
     private let eventChannel: FlutterEventChannel
     var eventSink: FlutterEventSink?
     var hasListeners = false
+    var listenerCallbackTimeout = 2.0
 
     private var idCaptureMode: IdCapture?
     var idCapture: IdCapture? {
@@ -97,6 +100,10 @@ public class ScanditFlutterDataCaptureId: NSObject {
             finishDidRejectId(enabled: call.arguments as? Bool ?? false, result: result)
         case FunctionNames.finishDidLocalizeId:
             finishDidLocalizeId(enabled: call.arguments as? Bool ?? false, result: result)
+        case FunctionNames.addIdCaptureAsyncListener:
+            addIdCaptureAsyncListener(result: result)
+        case FunctionNames.removeIdCaptureAsyncListener:
+            removeIdCaptureAsyncListener(result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -121,6 +128,17 @@ public class ScanditFlutterDataCaptureId: NSObject {
         hasListeners = false
         result(nil)
     }
+    
+    public func addIdCaptureAsyncListener(result: FlutterResult) {
+        listenerCallbackTimeout = 10.0 * 60 // 10 minutes timeout
+        result(nil)
+    }
+
+    public func removeIdCaptureAsyncListener(result: FlutterResult) {
+        listenerCallbackTimeout = 2.0
+        result(nil)
+    }
+
 
     public func finishDidCaptureId(enabled: Bool?, result: FlutterResult) {
         idCapturedLock.unlock(value: enabled)

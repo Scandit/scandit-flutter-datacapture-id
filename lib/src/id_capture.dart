@@ -40,6 +40,14 @@ abstract class IdCaptureAdvancedListener {
   void didLocalizeId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
 }
 
+abstract class IdCaptureAdvancedAsyncListener {
+  Future<void> didCaptureId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
+
+  Future<void> didRejectId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
+
+  Future<void> didLocalizeId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
+}
+
 class IdCapture extends DataCaptureMode {
   late _IdCaptureListenerController _controller;
 
@@ -50,6 +58,8 @@ class IdCapture extends DataCaptureMode {
   final List<IdCaptureListener> _listeners = [];
 
   final List<IdCaptureAdvancedListener> _advancedListeners = [];
+
+  final List<IdCaptureAdvancedAsyncListener> _advancedAsyncListeners = [];
 
   final IdCaptureSettings _settings;
 
@@ -101,9 +111,21 @@ class IdCapture extends DataCaptureMode {
     _advancedListeners.add(listener);
   }
 
+  void addAdvancedAsyncListener(IdCaptureAdvancedAsyncListener listener) {
+    _checkAndSubscribeListeners();
+    if (_advancedAsyncListeners.contains(listener)) {
+      return;
+    }
+    _advancedAsyncListeners.add(listener);
+  }
+
   void _checkAndSubscribeListeners() {
-    if (_listeners.isEmpty && _advancedListeners.isEmpty) {
+    if (_listeners.isEmpty && _advancedListeners.isEmpty && _advancedAsyncListeners.isEmpty) {
       _controller.subscribeListeners();
+    }
+
+    if (_advancedAsyncListeners.isEmpty) {
+      _controller.addAsyncListener();
     }
   }
 
@@ -117,9 +139,17 @@ class IdCapture extends DataCaptureMode {
     _checkAndUnsubscribeListeners();
   }
 
+  void removeAdvancedAsyncListener(IdCaptureAdvancedAsyncListener listener) {
+    _advancedAsyncListeners.remove(listener);
+    _checkAndUnsubscribeListeners();
+  }
+
   void _checkAndUnsubscribeListeners() {
-    if (_listeners.isEmpty && _advancedListeners.isEmpty) {
+    if (_listeners.isEmpty && _advancedListeners.isEmpty && _advancedAsyncListeners.isEmpty) {
       _controller.unsubscribeListeners();
+    }
+    if (_advancedAsyncListeners.isEmpty) {
+      _controller.removeAsyncListener();
     }
   }
 
@@ -152,6 +182,8 @@ class _IdCaptureListenerController {
   static const String _finishDidCaptureIdName = 'finishDidCaptureId';
   static const String _finishDidLocalizeIdName = 'finishDidLocalizeId';
   static const String _finishDidRejectIdName = 'finishDidRejectId';
+  static const String _addIdCaptureAsyncListener = 'addIdCaptureAsyncListener';
+  static const String _removeIdCaptureAsyncListener = 'removeIdCaptureAsyncListener';
 
   _IdCaptureListenerController.forIdCapture(this._idCapture);
 
@@ -167,29 +199,34 @@ class _IdCaptureListenerController {
 
   void _setupIdCaptureSubscription() {
     _idCaptureSubscription = _eventChannel.receiveBroadcastStream().listen((event) {
-      if (_idCapture._listeners.isEmpty && _idCapture._advancedListeners.isEmpty) return;
+      if (_idCapture._listeners.isEmpty &&
+          _idCapture._advancedListeners.isEmpty &&
+          _idCapture._advancedAsyncListeners.isEmpty) return;
 
       var eventJSON = jsonDecode(event);
       var session = IdCaptureSession.fromJSON(jsonDecode(eventJSON["session"]));
       var eventName = eventJSON["event"] as String;
       if (eventName == IdCaptureListener._didCaptureId) {
-        _notifyDidCaptureId(session);
-        _methodChannel
-            .invokeMethod(_finishDidCaptureIdName, _idCapture.isEnabled)
-            // ignore: unnecessary_lambdas
-            .then((value) => null, onError: (error) => print(error));
+        _notifyDidCaptureId(session).then((value) {
+          _methodChannel
+              .invokeMethod(_finishDidCaptureIdName, _idCapture.isEnabled)
+              // ignore: unnecessary_lambdas
+              .then((value) => null, onError: (error) => print(error));
+        });
       } else if (eventName == IdCaptureListener._didLocalizeId) {
-        _notifyDidLocalizeId(session);
-        _methodChannel
-            .invokeMethod(_finishDidLocalizeIdName, _idCapture.isEnabled)
-            // ignore: unnecessary_lambdas
-            .then((value) => null, onError: (error) => print(error));
+        _notifyDidLocalizeId(session).then((value) {
+          _methodChannel
+              .invokeMethod(_finishDidLocalizeIdName, _idCapture.isEnabled)
+              // ignore: unnecessary_lambdas
+              .then((value) => null, onError: (error) => print(error));
+        });
       } else if (eventName == IdCaptureListener._didRejectId) {
-        _notifyDidRejectId(session);
-        _methodChannel
-            .invokeMethod(_finishDidRejectIdName, _idCapture.isEnabled)
-            // ignore: unnecessary_lambdas
-            .then((value) => null, onError: (error) => print(error));
+        _notifyDidRejectId(session).then((value) {
+          _methodChannel
+              .invokeMethod(_finishDidRejectIdName, _idCapture.isEnabled)
+              // ignore: unnecessary_lambdas
+              .then((value) => null, onError: (error) => print(error));
+        });
       }
     });
   }
@@ -199,7 +236,7 @@ class _IdCaptureListenerController {
     _methodChannel.invokeMethod(_removeIdCaptureListenerName).then((value) => null, onError: _onError);
   }
 
-  void _notifyDidCaptureId(IdCaptureSession session) {
+  Future<void> _notifyDidCaptureId(IdCaptureSession session) async {
     _idCapture._isInCallback = true;
     for (var listener in _idCapture._listeners) {
       listener.didCaptureId(_idCapture, session);
@@ -207,10 +244,13 @@ class _IdCaptureListenerController {
     for (var listener in _idCapture._advancedListeners) {
       listener.didCaptureId(_idCapture, session, _getLastFrameData);
     }
+    for (var listener in _idCapture._advancedAsyncListeners) {
+      await listener.didCaptureId(_idCapture, session, _getLastFrameData);
+    }
     _idCapture._isInCallback = false;
   }
 
-  void _notifyDidLocalizeId(IdCaptureSession session) {
+  Future<void> _notifyDidLocalizeId(IdCaptureSession session) async {
     _idCapture._isInCallback = true;
     for (var listener in _idCapture._listeners) {
       listener.didLocalizeId(_idCapture, session);
@@ -218,10 +258,13 @@ class _IdCaptureListenerController {
     for (var listener in _idCapture._advancedListeners) {
       listener.didLocalizeId(_idCapture, session, _getLastFrameData);
     }
+    for (var listener in _idCapture._advancedAsyncListeners) {
+      await listener.didLocalizeId(_idCapture, session, _getLastFrameData);
+    }
     _idCapture._isInCallback = false;
   }
 
-  void _notifyDidRejectId(IdCaptureSession session) {
+  Future<void> _notifyDidRejectId(IdCaptureSession session) async {
     _idCapture._isInCallback = true;
     for (var listener in _idCapture._listeners) {
       listener.didRejectId(_idCapture, session);
@@ -229,13 +272,14 @@ class _IdCaptureListenerController {
     for (var listener in _idCapture._advancedListeners) {
       listener.didRejectId(_idCapture, session, _getLastFrameData);
     }
+    for (var listener in _idCapture._advancedAsyncListeners) {
+      await listener.didRejectId(_idCapture, session, _getLastFrameData);
+    }
     _idCapture._isInCallback = false;
   }
 
   Future<FrameData> _getLastFrameData() {
-    return _methodChannel
-        .invokeMethod(_getLastFrameDataName)
-        .then((value) => getFrom(value as String), onError: _onError);
+    return _methodChannel.invokeMethod(_getLastFrameDataName).then((value) => getFrom(value));
   }
 
   DefaultFrameData getFrom(String response) {
@@ -252,5 +296,17 @@ class _IdCaptureListenerController {
     }
 
     throw error;
+  }
+
+  void addAsyncListener() {
+    _methodChannel
+        .invokeMethod(_addIdCaptureAsyncListener)
+        .then((value) => _setupIdCaptureSubscription(), onError: _onError);
+  }
+
+  void removeAsyncListener() {
+    _methodChannel
+        .invokeMethod(_removeIdCaptureAsyncListener)
+        .then((value) => _setupIdCaptureSubscription(), onError: _onError);
   }
 }

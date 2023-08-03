@@ -30,6 +30,9 @@ class ScanditFlutterIdCaptureListener(
             "com.scandit.datacapture.id.capture.event/id_capture_listener"
     }
 
+    private var eventForResultTimeout: Long = EventSinkWithResult.DEFAULT_TIMEOUT_MILLIS
+
+
     fun enableListener() {
         flutterEmitter.enableListener()
     }
@@ -37,6 +40,14 @@ class ScanditFlutterIdCaptureListener(
     fun disableListener() {
         flutterEmitter.disableListener()
         onIdCaptured.onCancel()
+    }
+
+    fun enableAsyncMode() {
+        eventForResultTimeout = -1L
+    }
+
+    fun disableAsyncMode() {
+        eventForResultTimeout = EventSinkWithResult.DEFAULT_TIMEOUT_MILLIS
     }
 
     override fun onIdCaptured(mode: IdCapture, session: IdCaptureSession, data: FrameData) {
@@ -71,7 +82,7 @@ class ScanditFlutterIdCaptureListener(
                 )
             ).toString()
             mode.isEnabled =
-                eventSinkWithResult.emitForResult(it, params, mode.isEnabled)
+                eventSinkWithResult.emitForResult(it, params, mode.isEnabled, eventForResultTimeout)
         }
         LastFrameData.frameData.set(null)
     }

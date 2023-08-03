@@ -1,6 +1,8 @@
 package com.scandit.datacapture.flutter.id
 
 import com.scandit.datacapture.core.json.JsonValue
+import com.scandit.datacapture.flutter.core.utils.Error
+import com.scandit.datacapture.flutter.core.utils.reject
 import com.scandit.datacapture.flutter.id.data.defaults.SerializableIdCaptureDefaults
 import com.scandit.datacapture.flutter.id.listeners.ScanditFlutterIdCaptureListener
 import com.scandit.datacapture.frameworks.core.deserialization.Deserializers
@@ -96,8 +98,22 @@ class ScanditFlutterDataCaptureIdCaptureHandler(
                 result.success(verificationResult.toJson())
             }
             "getLastFrameData" -> LastFrameData.getLastFrameDataJson {
+                if (it.isNullOrBlank()) {
+                    result.reject(Error(-1, "Frame is null, it might've been reused already."))
+                    return@getLastFrameDataJson
+                }
                 result.success(it)
             }
+            "addIdCaptureAsyncListener" -> {
+                idCaptureListener.enableAsyncMode()
+                result.success(null)
+            }
+
+            "removeIdCaptureAsyncListener" -> {
+                idCaptureListener.disableAsyncMode()
+                result.success(null)
+            }
+
         }
     }
 

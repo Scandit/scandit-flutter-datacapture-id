@@ -14,7 +14,7 @@ extension ScanditFlutterDataCaptureId: IdCaptureListener {
         ScanditFlutterDataCaptureCore.lastFrame = frameData
         guard let value = idCapturedLock.wait(afterDoing: {
             return send(.didCaptureId, body: ["session": session.jsonString])
-        }) else { return }
+        }, timeout: listenerCallbackTimeout) else { return }
         self.idCapture?.isEnabled = value
         ScanditFlutterDataCaptureCore.lastFrame = nil
     }
@@ -25,7 +25,7 @@ extension ScanditFlutterDataCaptureId: IdCaptureListener {
         ScanditFlutterDataCaptureCore.lastFrame = frameData
         guard let value = didLocalizeIdLock.wait(afterDoing: {
             return send(.didLocalizeId, body: ["session": session.jsonString])
-        }) else { return }
+        }, timeout: listenerCallbackTimeout) else { return }
         self.idCapture?.isEnabled = value
         ScanditFlutterDataCaptureCore.lastFrame = nil
     }
@@ -36,7 +36,7 @@ extension ScanditFlutterDataCaptureId: IdCaptureListener {
         ScanditFlutterDataCaptureCore.lastFrame = frameData
         guard let value = didRejectIdLock.wait(afterDoing: {
             return send(.didRejectId, body: ["session": session.jsonString])
-        }) else { return }
+        }, timeout: listenerCallbackTimeout) else { return }
         self.idCapture?.isEnabled = value
         ScanditFlutterDataCaptureCore.lastFrame = nil
     }
