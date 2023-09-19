@@ -7,9 +7,10 @@
 import Foundation
 
 enum ScanditFlutterDataCaptureIdEvent: String, CaseIterable {
-    case didCaptureId = "idCaptureListener-didCaptureId"
-    case didLocalizeId = "idCaptureListener-didLocalizeId"
-    case didRejectId = "idCaptureListener-didRejectId"
+    case didCaptureId = "IdCaptureListener.didCaptureId"
+    case didLocalizeId = "IdCaptureListener.didLocalizeId"
+    case didRejectId = "IdCaptureListener.didRejectId"
+    case didTimeout = "IdCaptureListener.didTimeout"
 }
 
 extension ScanditFlutterDataCaptureId {

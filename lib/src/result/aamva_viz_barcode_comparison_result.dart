@@ -8,17 +8,22 @@ import 'package:flutter/widgets.dart';
 
 import 'date_result.dart';
 
-enum ComparisonCheckResult { passed, failed, skipped }
+enum ComparisonCheckResult {
+  passed('passed'),
+  failed('failed'),
+  skipped('skipped');
+
+  const ComparisonCheckResult(this._name);
+
+  @override
+  String toString() => _name;
+
+  final String _name;
+}
 
 extension ComparisonCheckResultDeserializer on ComparisonCheckResult {
   static ComparisonCheckResult fromJSON(String jsonValue) {
-    return ComparisonCheckResult.values.firstWhere((element) => element.jsonValue == jsonValue);
-  }
-
-  String get jsonValue => _jsonValue();
-
-  String _jsonValue() {
-    return toString().split('.').last;
+    return ComparisonCheckResult.values.firstWhere((element) => element.toString() == jsonValue);
   }
 }
 
