@@ -8,7 +8,6 @@ import Flutter
 import Foundation
 import scandit_flutter_datacapture_core
 import ScanditIdCapture
-import ScanditFrameworksCore
 
 @objc
 public protocol ScanditFlutterDataCaptureIdProtocol {
@@ -20,7 +19,7 @@ public protocol ScanditFlutterDataCaptureIdProtocol {
 }
 
 @objc
-public class ScanditFlutterDataCaptureId: NSObject, DeserializationLifeCycleObserver {
+public class ScanditFlutterDataCaptureId: NSObject {
     private enum FunctionNames {
         static let getDefaults = "getDefaults"
         static let addListener = "addIdCaptureListener"
@@ -31,22 +30,17 @@ public class ScanditFlutterDataCaptureId: NSObject, DeserializationLifeCycleObse
         static let getLastFrameData = "getLastFrameData"
         static let finishDidRejectId = "finishDidRejectId"
         static let finishDidLocalizeId = "finishDidLocalizeId"
-        static let finishDidTimeout = "finishDidTimeout"
-        static let createAamvaBarcodeVerifier = "createAamvaBarcodeVerifier"
-        static let verifyCapturedIdBarcode = "verifyCapturedIdBarcode"
-        static let vizMrzComparisonVerifier = "vizMrzComparisonVerifier"
         static let addIdCaptureAsyncListener = "addIdCaptureAsyncListener"
         static let removeIdCaptureAsyncListener = "removeIdCaptureAsyncListener"
     }
 
-    private let methodChannel: FlutterMethodChannel
+    private let defaultsMethodChannel: FlutterMethodChannel
+    private let listenerMethodChannel: FlutterMethodChannel
+    private let aamvaVizVerifierMethodChannel: FlutterMethodChannel
     private let eventChannel: FlutterEventChannel
     var eventSink: FlutterEventSink?
     var hasListeners = false
     var listenerCallbackTimeout = 2.0
-    
-    private var context: DataCaptureContext?
-    var barcodeVerifier: AamvaBarcodeVerifier?
 
     private var idCaptureMode: IdCapture?
     var idCapture: IdCapture? {
@@ -66,24 +60,27 @@ public class ScanditFlutterDataCaptureId: NSObject, DeserializationLifeCycleObse
 
     var didRejectIdLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didRejectId.rawValue)
 
-    var didTimeoutLock = CallbackLock<Bool>(name: ScanditFlutterDataCaptureIdEvent.didTimeout.rawValue)
-
     @objc
     public init(with messenger: FlutterBinaryMessenger) {
         let prefix = "com.scandit.datacapture.id.capture"
-        methodChannel = FlutterMethodChannel(name: "\(prefix)/method_channel",
-                                             binaryMessenger: messenger)
-        eventChannel = FlutterEventChannel(name: "\(prefix)/event_channel",
+        defaultsMethodChannel = FlutterMethodChannel(name: "\(prefix).method/id_capture_defaults",
+                                                     binaryMessenger: messenger)
+        listenerMethodChannel = FlutterMethodChannel(name: "\(prefix).method/id_capture_listener",
+                                                     binaryMessenger: messenger)
+        aamvaVizVerifierMethodChannel = FlutterMethodChannel(name: "\(prefix).method/aamva_viz_barcode_comparison_verifier",
+                                                             binaryMessenger: messenger)
+        eventChannel = FlutterEventChannel(name: "\(prefix).event/id_capture_listener",
                                            binaryMessenger: messenger)
         super.init()
         registerDeserializer()
-        methodChannel.setMethodCallHandler(handleMethodCall(_:result:))
+        defaultsMethodChannel.setMethodCallHandler(handleMethodCall(_:result:))
+        listenerMethodChannel.setMethodCallHandler(handleMethodCall(_:result:))
+        aamvaVizVerifierMethodChannel.setMethodCallHandler(handleMethodCall(_:result:))
         eventChannel.setStreamHandler(self)
-        DeserializationLifeCycleDispatcher.shared.attach(observer: self)
     }
 
     @objc
-    public func handleMethodCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    public func handleMethodCall(_ call: FlutterMethodCall, result: FlutterResult) {
         switch call.method {
         case FunctionNames.getDefaults:
             defaults(result)
@@ -103,14 +100,6 @@ public class ScanditFlutterDataCaptureId: NSObject, DeserializationLifeCycleObse
             finishDidRejectId(enabled: call.arguments as? Bool ?? false, result: result)
         case FunctionNames.finishDidLocalizeId:
             finishDidLocalizeId(enabled: call.arguments as? Bool ?? false, result: result)
-        case FunctionNames.finishDidTimeout:
-            finishDidTimeout(enabled: call.arguments as? Bool ?? false, result: result)
-        case FunctionNames.createAamvaBarcodeVerifier:
-            createAamvaBarcodeVerifier(result: result)
-        case FunctionNames.verifyCapturedIdBarcode:
-            verifyCapturedIdBarcode(arguments: call.arguments, result: result)
-        case FunctionNames.vizMrzComparisonVerifier:
-            vizMrzComparisonVerifier(arguments: call.arguments, result: result)
         case FunctionNames.addIdCaptureAsyncListener:
             addIdCaptureAsyncListener(result: result)
         case FunctionNames.removeIdCaptureAsyncListener:
@@ -166,11 +155,6 @@ public class ScanditFlutterDataCaptureId: NSObject, DeserializationLifeCycleObse
         result(nil)
     }
 
-    public func finishDidTimeout(enabled: Bool?, result: FlutterResult) {
-        didTimeoutLock.unlock(value: enabled)
-        result(nil)
-    }
-
     public func reset(result: FlutterResult) {
         idCapture?.reset()
         result(nil)
@@ -186,50 +170,12 @@ public class ScanditFlutterDataCaptureId: NSObject, DeserializationLifeCycleObse
         result(AAMVAVizBarcodeComparisonVerifier().verify(capturedId).jsonString)
     }
 
-    func createAamvaBarcodeVerifier(result: FlutterResult) {
-        guard let context = self.context else {
-            return result(FlutterError(code: "-1", message: "Data Capture Context not available.", details: nil))
-        }
-        barcodeVerifier = AamvaBarcodeVerifier(context: context)
-        result(nil)
-    }
-
-    func verifyCapturedIdBarcode(arguments: Any?, result: @escaping FlutterResult) {
-        guard let capturedIdJson = arguments as? String else {
-            result(nil)
-            return
-        }
-        let capturedId = CapturedId(jsonString: capturedIdJson)
-        barcodeVerifier?.verify(capturedId, completionHandler: { verificationResult, error in
-            if error != nil {
-                result(FlutterError(code: "-1", message: "Erorr verifying the captured id.", details: nil))
-                return
-            }
-            result(verificationResult?.jsonString)
-        })
-    }
-    
-    public func vizMrzComparisonVerifier(arguments: Any?, result: FlutterResult) {
-        guard let capturedIdJson = arguments as? String else {
-            result(nil)
-            return
-        }
-
-        let capturedId = CapturedId(jsonString: capturedIdJson)
-        let jsonResult = VizMrzComparisonVerifier().verify(capturedId).jsonString
-        result(jsonResult)
-    }
-
-    
-    public func dataCaptureContext(deserialized context: DataCaptureContext?) {
-        self.context = context
-    }
-
     @objc
     public func dispose() {
-        methodChannel.setMethodCallHandler(nil)
+        defaultsMethodChannel.setMethodCallHandler(nil)
+        listenerMethodChannel.setMethodCallHandler(nil)
+        aamvaVizVerifierMethodChannel.setMethodCallHandler(nil)
         eventChannel.setStreamHandler(nil)
         idCapturedLock.reset()
-        DeserializationLifeCycleDispatcher.shared.detach(observer: self)
     }
 }

@@ -4,21 +4,16 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
-enum IdImageType {
-  face('face'),
-  idFront('idFront'),
-  idBack('idBack');
-
-  const IdImageType(this._name);
-
-  @override
-  String toString() => _name;
-
-  final String _name;
-}
+enum IdImageType { face, idFront, idBack }
 
 extension IdImageTypeDeserializer on IdImageType {
   static IdImageType fromJSON(String jsonValue) {
-    return IdImageType.values.firstWhere((element) => element.toString() == jsonValue);
+    return IdImageType.values.firstWhere((element) => element.jsonValue == jsonValue);
+  }
+
+  String get jsonValue => _jsonValue();
+
+  String _jsonValue() {
+    return toString().split('.').last;
   }
 }

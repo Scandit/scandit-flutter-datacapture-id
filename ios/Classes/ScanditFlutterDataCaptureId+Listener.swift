@@ -40,17 +40,6 @@ extension ScanditFlutterDataCaptureId: IdCaptureListener {
         self.idCapture?.isEnabled = value
         ScanditFlutterDataCaptureCore.lastFrame = nil
     }
-    
-    public func idCapture(_ idCapture: IdCapture,
-                          didTimeoutIn session: IdCaptureSession,
-                          frameData: FrameData) {
-        ScanditFlutterDataCaptureCore.lastFrame = frameData
-        guard let value = didTimeoutLock.wait(afterDoing: {
-            return send(.didTimeout, body: ["session": session.jsonString])
-        }, timeout: listenerCallbackTimeout) else { return }
-        self.idCapture?.isEnabled = value
-        ScanditFlutterDataCaptureCore.lastFrame = nil
-    }
 }
 
 extension ScanditFlutterDataCaptureId: FlutterStreamHandler {

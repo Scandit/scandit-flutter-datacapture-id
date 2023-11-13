@@ -5,72 +5,80 @@
  */
 
 enum DocumentType {
-  none('none'),
-  consularId('consularId'),
-  drivingLicense('drivingLicense'),
-  drivingLicensePublicServicesCard('drivingLicensePublicServicesCard'),
-  employmentPass('employmentPass'),
-  finCard('finCard'),
-  id('id'),
-  multipurposeId('multipurposeId'),
-  myKad('myKad'),
-  myKid('myKid'),
-  myPR('myPr'),
-  myTentera('myTentera'),
-  panCard('panCard'),
-  professionalId('professionalId'),
-  publicServicesCard('publicServicesCard'),
-  residencePermit('residencePermit'),
-  residentId('residentId'),
-  temporaryResidencePermit('temporaryResidencePermit'),
-  voterId('voterId'),
-  workPermit('workPermit'),
-  iKad('iKad'),
-  militaryId('militaryId'),
-  myKas('myKas'),
-  socialSecurityCard('socialSecurityCard'),
-  healthInsuranceCard('healthInsuranceCard'),
-  passport('passport'),
-  diplomaticPassport('diplomaticPassport'),
-  servicePassport('servicePassport'),
-  temporaryPassport('temporaryPassport'),
-  visa('visa'),
-  sPass('sPass'),
-  addressCard('addressCard'),
-  alienId('alienId'),
-  alienPassport('alienPassport'),
-  greenCard('greenCard'),
-  minorsId('minorsId'),
-  postalId('postalId'),
-  professionalDl('professionalDl'),
-  weaponPermit('weaponPermit'),
-  taxId('taxId'),
-  borderCrossingCard('borderCrossingCard'),
-  driverCard('driverCard'),
-  globalEntryCard('globalEntryCard'),
-  myPolis('myPolis'),
-  nexusCard('nexusCard'),
-  passportCard('passportCard'),
-  proofOfAgeCard('proofOfAgeCard'),
-  refugeeId('refugeeId'),
-  tribalId('tribalId'),
-  veteranId('veteranId'),
-  citizenshipCertificate('citizenshipCertificate'),
-  myNumberCard('myNumberCard'),
-  minorsPassport('minorsPassport'),
-  minorsPublicServicesCard('minorsPublicServicesCard'),
-  apecBusinessTravelCard('apecBusinessTravelCard');
-
-  const DocumentType(this._name);
-
-  @override
-  String toString() => _name;
-
-  final String _name;
+  none,
+  consularId,
+  drivingLicense,
+  drivingLicensePublicServicesCard,
+  employmentPass,
+  finCard,
+  id,
+  multipurposeId,
+  myKad,
+  myKid,
+  myPR,
+  myTentera,
+  panCard,
+  professionalId,
+  publicServicesCard,
+  residencePermit,
+  residentId,
+  temporaryResidencePermit,
+  voterId,
+  workPermit,
+  iKad,
+  militaryId,
+  myKas,
+  socialSecurityCard,
+  healthInsuranceCard,
+  passport,
+  diplomaticPassport,
+  servicePassport,
+  temporaryPassport,
+  visa,
+  sPass,
+  addressCard,
+  alienId,
+  alienPassport,
+  greenCard,
+  minorsId,
+  postalId,
+  professionalDl,
+  weaponPermit,
+  taxId,
+  borderCrossingCard,
+  driverCard,
+  globalEntryCard,
+  myPolis,
+  nexusCard,
+  passportCard,
+  proofOfAgeCard,
+  refugeeId,
+  tribalId,
+  veteranId,
+  citizenshipCertificate,
+  myNumberCard,
+  minorsPassport,
+  minorsPublicServicesCard,
 }
 
 extension DocumentTypeDeserializer on DocumentType {
   static DocumentType fromJSON(String jsonValue) {
-    return DocumentType.values.firstWhere((element) => element.toString() == jsonValue);
+    switch (jsonValue) {
+      case "myPr":
+        return DocumentType.myPR;
+      default:
+        return DocumentType.values.firstWhere((element) => element.jsonValue == jsonValue);
+    }
+  }
+
+  String get jsonValue => _jsonValue();
+
+  String _jsonValue() {
+    switch (this) {
+      case DocumentType.myPR:
+        return "myPr";
+      default:
+        return toString().split('.').last;
+    }
   }
 }

@@ -11,14 +11,12 @@ import 'package:flutter/services.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
 
 import '../scandit_flutter_datacapture_id.dart';
-import 'function_names.dart';
 import 'id_capture_defaults.dart';
 
 abstract class IdCaptureListener {
-  static const String _didCaptureId = "IdCaptureListener.didCaptureId";
-  static const String _didLocalizeId = "IdCaptureListener.didLocalizeId";
-  static const String _didRejectId = "IdCaptureListener.didRejectId";
-  static const String _didTimeout = "IdCaptureListener.didTimeout";
+  static const String _didCaptureId = "idCaptureListener-didCaptureId";
+  static const String _didLocalizeId = "idCaptureListener-didLocalizeId";
+  static const String _didRejectId = "idCaptureListener-didRejectId";
 
   void didCaptureId(IdCapture idCapture, IdCaptureSession session);
 
@@ -29,8 +27,6 @@ abstract class IdCaptureListener {
   void didFailWithError(IdCapture idCapture, IdCaptureError error, IdCaptureSession session);
 
   void didLocalizeId(IdCapture idCapture, IdCaptureSession session);
-
-  void didTimedOut(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
 }
 
 abstract class IdCaptureAdvancedListener {
@@ -38,22 +34,16 @@ abstract class IdCaptureAdvancedListener {
 
   void didRejectId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
 
-  @Deprecated(
-      "This method is no longer executed by the listener. See didRejectId for scenarios previously reported by this callback.")
   void didFailWithError(
       IdCapture idCapture, IdCaptureError error, IdCaptureSession session, Future<FrameData> getFrameData());
 
   void didLocalizeId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
-
-  void didTimedOut(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
 }
 
 abstract class IdCaptureAdvancedAsyncListener {
   Future<void> didCaptureId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
 
   Future<void> didRejectId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
-
-  Future<void> didTimedOut(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
 
   Future<void> didLocalizeId(IdCapture idCapture, IdCaptureSession session, Future<FrameData> getFrameData());
 }
@@ -71,7 +61,7 @@ class IdCapture extends DataCaptureMode {
 
   final List<IdCaptureAdvancedAsyncListener> _advancedAsyncListeners = [];
 
-  IdCaptureSettings _settings;
+  final IdCaptureSettings _settings;
 
   IdCapture._(DataCaptureContext? context, this._settings) {
     _controller = _IdCaptureListenerController.forIdCapture(this);
@@ -87,7 +77,7 @@ class IdCapture extends DataCaptureMode {
     var defaults = IdCaptureDefaults.cameraSettingsDefaults;
     return CameraSettings(defaults.preferredResolution, defaults.zoomFactor, defaults.focusRange,
         defaults.focusGestureStrategy, defaults.zoomGestureZoomFactor,
-        properties: defaults.properties, shouldPreferSmoothAutoFocus: defaults.shouldPreferSmoothAutoFocus);
+        shouldPreferSmoothAutoFocus: defaults.shouldPreferSmoothAutoFocus);
   }
 
   @override
@@ -167,11 +157,6 @@ class IdCapture extends DataCaptureMode {
     return _controller.reset();
   }
 
-  Future<void> applySettings(IdCaptureSettings settings) {
-    _settings = settings;
-    return didChange();
-  }
-
   Future<void> didChange() {
     if (context != null) {
       return context!.update();
@@ -186,21 +171,30 @@ class IdCapture extends DataCaptureMode {
 }
 
 class _IdCaptureListenerController {
-  final EventChannel _eventChannel = const EventChannel(IdCaptureFunctionNames.eventsChannelName);
-  final MethodChannel _methodChannel = MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+  final EventChannel _eventChannel = const EventChannel("com.scandit.datacapture.id.capture.event/id_capture_listener");
+  final MethodChannel _methodChannel = MethodChannel("com.scandit.datacapture.id.capture.method/id_capture_listener");
   final IdCapture _idCapture;
   StreamSubscription<dynamic>? _idCaptureSubscription;
+  static const String _getLastFrameDataName = 'getLastFrameData';
+  static const String _removeIdCaptureListenerName = 'removeIdCaptureListener';
+  static const String _addIdCaptureListenerName = 'addIdCaptureListener';
+  static const String _resetName = 'reset';
+  static const String _finishDidCaptureIdName = 'finishDidCaptureId';
+  static const String _finishDidLocalizeIdName = 'finishDidLocalizeId';
+  static const String _finishDidRejectIdName = 'finishDidRejectId';
+  static const String _addIdCaptureAsyncListener = 'addIdCaptureAsyncListener';
+  static const String _removeIdCaptureAsyncListener = 'removeIdCaptureAsyncListener';
 
   _IdCaptureListenerController.forIdCapture(this._idCapture);
 
   void subscribeListeners() {
     _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.addIdCaptureListenerName)
+        .invokeMethod(_addIdCaptureListenerName)
         .then((value) => _setupIdCaptureSubscription(), onError: _onError);
   }
 
   Future<void> reset() {
-    return _methodChannel.invokeMethod<void>(IdCaptureFunctionNames.resetName).onError(_onError);
+    return _methodChannel.invokeMethod<void>(_resetName).onError(_onError);
   }
 
   void _setupIdCaptureSubscription() {
@@ -215,28 +209,21 @@ class _IdCaptureListenerController {
       if (eventName == IdCaptureListener._didCaptureId) {
         _notifyDidCaptureId(session).then((value) {
           _methodChannel
-              .invokeMethod(IdCaptureFunctionNames.finishDidCaptureIdName, _idCapture.isEnabled)
+              .invokeMethod(_finishDidCaptureIdName, _idCapture.isEnabled)
               // ignore: unnecessary_lambdas
               .then((value) => null, onError: (error) => print(error));
         });
       } else if (eventName == IdCaptureListener._didLocalizeId) {
         _notifyDidLocalizeId(session).then((value) {
           _methodChannel
-              .invokeMethod(IdCaptureFunctionNames.finishDidLocalizeIdName, _idCapture.isEnabled)
+              .invokeMethod(_finishDidLocalizeIdName, _idCapture.isEnabled)
               // ignore: unnecessary_lambdas
               .then((value) => null, onError: (error) => print(error));
         });
       } else if (eventName == IdCaptureListener._didRejectId) {
         _notifyDidRejectId(session).then((value) {
           _methodChannel
-              .invokeMethod(IdCaptureFunctionNames.finishDidRejectIdName, _idCapture.isEnabled)
-              // ignore: unnecessary_lambdas
-              .then((value) => null, onError: (error) => print(error));
-        });
-      } else if (eventName == IdCaptureListener._didTimeout) {
-        _notifyDidTimeout(session).then((value) {
-          _methodChannel
-              .invokeMethod(IdCaptureFunctionNames.finishDidTimeoutName, _idCapture.isEnabled)
+              .invokeMethod(_finishDidRejectIdName, _idCapture.isEnabled)
               // ignore: unnecessary_lambdas
               .then((value) => null, onError: (error) => print(error));
         });
@@ -246,9 +233,7 @@ class _IdCaptureListenerController {
 
   void unsubscribeListeners() {
     _idCaptureSubscription?.cancel();
-    _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.removeIdCaptureListenerName)
-        .then((value) => null, onError: _onError);
+    _methodChannel.invokeMethod(_removeIdCaptureListenerName).then((value) => null, onError: _onError);
   }
 
   Future<void> _notifyDidCaptureId(IdCaptureSession session) async {
@@ -293,22 +278,8 @@ class _IdCaptureListenerController {
     _idCapture._isInCallback = false;
   }
 
-  Future<void> _notifyDidTimeout(IdCaptureSession session) async {
-    _idCapture._isInCallback = true;
-    for (var listener in _idCapture._listeners) {
-      listener.didTimedOut(_idCapture, session, _getLastFrameData);
-    }
-    for (var listener in _idCapture._advancedListeners) {
-      listener.didTimedOut(_idCapture, session, _getLastFrameData);
-    }
-    for (var listener in _idCapture._advancedAsyncListeners) {
-      await listener.didTimedOut(_idCapture, session, _getLastFrameData);
-    }
-    _idCapture._isInCallback = false;
-  }
-
   Future<FrameData> _getLastFrameData() {
-    return _methodChannel.invokeMethod(IdCaptureFunctionNames.getLastFrameDataName).then((value) => getFrom(value));
+    return _methodChannel.invokeMethod(_getLastFrameDataName).then((value) => getFrom(value));
   }
 
   DefaultFrameData getFrom(String response) {
@@ -329,13 +300,13 @@ class _IdCaptureListenerController {
 
   void addAsyncListener() {
     _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.addIdCaptureAsyncListener)
+        .invokeMethod(_addIdCaptureAsyncListener)
         .then((value) => _setupIdCaptureSubscription(), onError: _onError);
   }
 
   void removeAsyncListener() {
     _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.removeIdCaptureAsyncListener)
+        .invokeMethod(_removeIdCaptureAsyncListener)
         .then((value) => _setupIdCaptureSubscription(), onError: _onError);
   }
 }
