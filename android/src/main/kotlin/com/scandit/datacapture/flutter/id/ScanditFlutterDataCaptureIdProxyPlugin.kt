@@ -1,19 +1,17 @@
 package com.scandit.datacapture.flutter.id
 
-import androidx.annotation.NonNull
+import com.scandit.datacapture.flutter.core.extensions.getMethodChannel
 import com.scandit.datacapture.flutter.core.utils.FlutterEmitter
-import com.scandit.datacapture.flutter.id.listeners.ScanditFlutterIdCaptureListener
+import com.scandit.datacapture.frameworks.id.IdCaptureModule
+import com.scandit.datacapture.frameworks.id.listeners.FrameworksIdCaptureListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.common.MethodChannel
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /** ScanditFlutterDataCaptureIdProxyPlugin */
-class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, MethodCallHandler {
+class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin {
     companion object {
         @JvmStatic
         private val lock = ReentrantLock()
@@ -22,47 +20,37 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, MethodCallHandler 
         private var isPluginAttached = false
     }
 
-    private var scanditFlutterDataCaptureIdCapturePlugin:
-        ScanditFlutterDataCaptureIdCaptureHandler? = null
+    private var idCaptureModule: IdCaptureModule? = null
 
-    override fun onAttachedToEngine(
-        @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
-    ) {
+    private var idCaptureMethodChannel: MethodChannel? = null
+
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         lock.withLock {
-            if (isPluginAttached) return
-
-            scanditFlutterDataCaptureIdCapturePlugin = ScanditFlutterDataCaptureIdCaptureHandler(
-                provideScanditFlutterIdCaptureListener(
-                    flutterPluginBinding.binaryMessenger
+            val eventEmitter = FlutterEmitter(
+                EventChannel(
+                    binding.binaryMessenger,
+                    IdCaptureMethodHandler.EVENT_CHANNEL_NAME
                 )
             )
-            scanditFlutterDataCaptureIdCapturePlugin?.onAttachedToEngine(flutterPluginBinding)
+            idCaptureModule = IdCaptureModule(
+                FrameworksIdCaptureListener(eventEmitter)
+            ).also { module ->
+                module.onCreate(binding.applicationContext)
 
-            isPluginAttached = true
+                idCaptureMethodChannel = binding.getMethodChannel(
+                    IdCaptureMethodHandler.METHOD_CHANNEL_NAME
+                ).also {
+                    it.setMethodCallHandler(IdCaptureMethodHandler(module))
+                }
+            }
         }
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        result.notImplemented()
-    }
-
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         lock.withLock {
-            scanditFlutterDataCaptureIdCapturePlugin?.onDetachedFromEngine(binding)
-            scanditFlutterDataCaptureIdCapturePlugin = null
+            idCaptureModule?.onDestroy()
+            idCaptureMethodChannel?.setMethodCallHandler(null)
             isPluginAttached = false
         }
     }
-
-    private fun provideScanditFlutterIdCaptureListener(
-        binaryMessenger: BinaryMessenger
-    ) =
-        ScanditFlutterIdCaptureListener(
-            FlutterEmitter(
-                EventChannel(
-                    binaryMessenger,
-                    ScanditFlutterIdCaptureListener.CHANNEL_NAME
-                )
-            )
-        )
 }

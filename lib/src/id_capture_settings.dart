@@ -9,6 +9,8 @@ import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_cor
 import 'id_document_type.dart';
 import 'id_image_type.dart';
 import 'supported_sides.dart';
+import 'id_anonymization_mode.dart';
+import 'id_capture_defaults.dart';
 
 class IdCaptureSettings implements Serializable {
   final Map<String, dynamic> _properties = {};
@@ -38,12 +40,15 @@ class IdCaptureSettings implements Serializable {
     return _imageToResult.containsKey(type) ? _imageToResult[type] : false;
   }
 
+  IdAnonymizationMode anonymizationMode = IdCaptureDefaults.captureSettingsDefaults.anonymizationMode;
+
   @override
   Map<String, dynamic> toMap() {
     return {
-      "supportedDocuments": supportedDocuments.map((e) => e.jsonValue).toList(),
-      "imageToResult": _imageToResult.map((key, value) => MapEntry(key.jsonValue, value)),
-      "supportedSides": supportedSides.jsonValue
+      "supportedDocuments": supportedDocuments.map((e) => e.toString()).toList(),
+      "imageToResult": _imageToResult.map((key, value) => MapEntry(key.toString(), value)),
+      "supportedSides": supportedSides.toString(),
+      "anonymizationMode": anonymizationMode.name,
     };
   }
 }
