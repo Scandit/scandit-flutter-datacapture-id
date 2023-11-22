@@ -14,8 +14,8 @@ Pod::Spec.new do |s|
   s.swift_version           = "4.0"
   s.source_files            = "Classes/**/*.{h,m,swift}"
   s.requires_arc            = true
-  s.dependency 'ScanditIdCapture', '= 6.19.7'
-  s.dependency 'ScanditIDC', '= 6.19.7'
+  s.dependency 'ScanditIdCapture', '= 6.19.8'
+  s.dependency 'ScanditIDC', '= 6.19.8'
 
   s.dependency "Flutter"
   s.dependency "scandit_flutter_datacapture_core"
