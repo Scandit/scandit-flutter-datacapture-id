@@ -9,10 +9,10 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 import '../scandit_flutter_datacapture_id.dart';
-import 'function_names.dart';
 
 class AamvaVizBarcodeComparisonVerifier {
-  final MethodChannel _methodChannel = MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+  final MethodChannel _methodChannel =
+      MethodChannel('com.scandit.datacapture.id.capture.method/aamva_viz_barcode_comparison_verifier');
 
   AamvaVizBarcodeComparisonVerifier._();
 
@@ -22,8 +22,7 @@ class AamvaVizBarcodeComparisonVerifier {
 
   Future<AamvaVizBarcodeComparisonResult> verify(CapturedId capturedId) async {
     var encodedCapturedId = jsonEncode(capturedId.toMap());
-    var result =
-        await _methodChannel.invokeMethod(IdCaptureFunctionNames.aamvaVizBarcodeComparisonVerifier, encodedCapturedId);
+    var result = await _methodChannel.invokeMethod("verify", encodedCapturedId);
     var jsonResult = jsonDecode(result);
     return AamvaVizBarcodeComparisonResult.fromJSON(jsonResult);
   }
