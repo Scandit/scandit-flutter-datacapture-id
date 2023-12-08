@@ -10,7 +10,8 @@ export 'src/aamva_viz_barcode_comparison_verifier.dart' show AamvaVizBarcodeComp
 export 'src/captured_id.dart' show CapturedId;
 export 'src/captured_result_type.dart' show CapturedResultType;
 export 'src/document_type.dart' show DocumentType;
-export 'src/id_capture.dart' show IdCapture, IdCaptureListener, IdCaptureAdvancedListener;
+export 'src/id_capture.dart'
+    show IdCapture, IdCaptureListener, IdCaptureAdvancedListener, IdCaptureAdvancedAsyncListener;
 export 'src/id_capture_overlay.dart' show IdCaptureOverlay;
 export 'src/id_capture_session.dart' show IdCaptureSession, LocalizedOnlyId, RejectedId, IdCaptureError;
 export 'src/id_capture_settings.dart' show IdCaptureSettings;
@@ -32,3 +33,15 @@ export 'src/result/us_uniformed_barcode_result.dart' show UsUniformedServicesBar
 export 'src/result/viz_result.dart' show VizResult;
 export 'src/scandit_flutter_datacapture_id.dart' show ScanditFlutterDataCaptureId;
 export 'src/supported_sides.dart' show SupportedSides;
+export 'src/result/apec_business_travel_card_mrz_result.dart' show ApecBusinessTravelCardMrzResult;
+export 'src/result/china_exit_entry_permit_mrz_result.dart' show ChinaExitEntryPermitMrzResult;
+export 'src/result/china_mainland_travel_permit_mrz_result.dart' show ChinaMainlandTravelPermitMrzResult;
+export 'src/result/china_one_way_permit_back_mrz_result.dart' show ChinaOneWayPermitBackMrzResult;
+export 'src/result/china_one_way_permit_front_mrz_result.dart' show ChinaOneWayPermitFrontMrzResult;
+export 'src/result/us_visa_viz_result.dart' show UsVisaVizResult;
+export 'src/result/common-access-card-barcode-result.dart' show CommonAccessCardBarcodeResult;
+export 'src/id_anonymization_mode.dart' show IdAnonymizationMode;
+export 'src/result/aamva_barcode_verification_result.dart' show AamvaBarcodeVerificationResult;
+export 'src/aamva_barcode_verifier.dart' show AamvaBarcodeVerifier;
+export 'src/viz_mrz_comparison_verifier.dart'
+    show VizMrzComparisonVerifier, VizMrzComparisonCheck, VizMrzComparisonResult, VizMrzComparisonCheckResult;

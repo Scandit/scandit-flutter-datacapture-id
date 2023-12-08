@@ -38,6 +38,7 @@ class AamvaBarcodeResult {
   final String? _aliasGivenName;
   final String? _aliasSuffixName;
   final Map<String, String> _barcodeDataElements;
+  final bool _isRealId;
 
   AamvaBarcodeResult._(
       this._aamvaVersion,
@@ -67,7 +68,8 @@ class AamvaBarcodeResult {
       this._aliasFamilyName,
       this._aliasGivenName,
       this._aliasSuffixName,
-      this._barcodeDataElements);
+      this._barcodeDataElements,
+      this._isRealId);
 
   factory AamvaBarcodeResult.fromJSON(Map<String, dynamic> json) {
     DateResult? cardRevisionDate;
@@ -103,7 +105,8 @@ class AamvaBarcodeResult {
         json["aliasFamilyName"] as String?,
         json["aliasGivenName"] as String?,
         json["aliasSuffixName"] as String?,
-        (json["dictionary"] as Map<String, dynamic>).map((key, value) => MapEntry(key, value.toString())));
+        (json["dictionary"] as Map<String, dynamic>).map((key, value) => MapEntry(key, value.toString())),
+        json["isRealId"] as bool);
   }
 
   int get aamvaVersion {
@@ -216,5 +219,9 @@ class AamvaBarcodeResult {
 
   Map<String, String> get barcodeDataElements {
     return _barcodeDataElements;
+  }
+
+  bool get isRealId {
+    return _isRealId;
   }
 }

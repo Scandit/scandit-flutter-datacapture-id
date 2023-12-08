@@ -101,9 +101,9 @@ class IdCaptureOverlay extends DataCaptureOverlay {
   Map<String, dynamic> toMap() {
     var json = super.toMap();
     json.addAll({
-      "idLayout": _idLayout.jsonValue,
-      "idLayoutStyle": _idLayoutStyle.jsonValue,
-      "idLayoutLineStyle": _idLayoutLineStyle.jsonValue,
+      "idLayout": _idLayout.toString(),
+      "idLayoutStyle": _idLayoutStyle.toString(),
+      "idLayoutLineStyle": _idLayoutLineStyle.toString(),
       "capturedBrush": capturedBrush.toMap(),
       "localizedBrush": localizedBrush.toMap(),
       "rejectedBrush": rejectedBrush.toMap()
