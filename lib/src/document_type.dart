@@ -59,13 +59,7 @@ enum DocumentType {
   myNumberCard('myNumberCard'),
   minorsPassport('minorsPassport'),
   minorsPublicServicesCard('minorsPublicServicesCard'),
-  apecBusinessTravelCard('apecBusinessTravelCard'),
-  asylumRequest('asylumRequest'),
-  driverQualificationCard('driverQualificationCard'),
-  provisionalDl('provisionalDl'),
-  refugeePassport('refugeePassport'),
-  specialId('specialId'),
-  uniformedServicesId('uniformedServicesId');
+  apecBusinessTravelCard('apecBusinessTravelCard');
 
   const DocumentType(this._name);
 

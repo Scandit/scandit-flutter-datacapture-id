@@ -102,7 +102,7 @@ class IdCapture extends DataCaptureMode {
     if (_isInCallback) {
       return;
     }
-    _controller.setModeEnabledState(newValue);
+    didChange();
   }
 
   void addListener(IdCaptureListener listener) {
@@ -337,11 +337,5 @@ class _IdCaptureListenerController {
     _methodChannel
         .invokeMethod(IdCaptureFunctionNames.removeIdCaptureAsyncListener)
         .then((value) => _setupIdCaptureSubscription(), onError: _onError);
-  }
-
-  void setModeEnabledState(bool newValue) {
-    _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.setModeEnabledState, newValue)
-        .then((value) => null, onError: _onError);
   }
 }
