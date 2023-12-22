@@ -7,7 +7,7 @@
 import Flutter
 import scandit_flutter_datacapture_core
 import ScanditFrameworksId
- 
+
  class IdCaptureMethodHandler {
      private enum FunctionNames {
          static let getDefaults = "getDefaults"
@@ -25,6 +25,7 @@ import ScanditFrameworksId
          static let vizMrzComparisonVerifier = "vizMrzComparisonVerifier"
          static let addIdCaptureAsyncListener = "addIdCaptureAsyncListener"
          static let removeIdCaptureAsyncListener = "removeIdCaptureAsyncListener"
+         static let setModeEnabledState = "setModeEnabledState"
      }
 
      private let idModule: IdCaptureModule
@@ -87,6 +88,9 @@ import ScanditFrameworksId
          case FunctionNames.removeIdCaptureAsyncListener:
              idModule.removeAsyncListener()
              result(nil)
+         case FunctionNames.setModeEnabledState:
+            idModule.setModeEnabled(enabled: call.arguments as! Bool)
+            result(nil)
          default:
              result(FlutterMethodNotImplemented)
          }

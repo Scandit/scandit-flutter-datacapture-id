@@ -3,6 +3,7 @@ package com.scandit.datacapture.flutter.id
 import com.scandit.datacapture.flutter.core.utils.FlutterResult
 import com.scandit.datacapture.flutter.core.utils.rejectKotlinError
 import com.scandit.datacapture.frameworks.core.errors.FrameDataNullError
+import com.scandit.datacapture.frameworks.core.utils.DefaultLastFrameData
 import com.scandit.datacapture.frameworks.core.utils.LastFrameData
 import com.scandit.datacapture.frameworks.id.IdCaptureModule
 import io.flutter.plugin.common.MethodCall
@@ -10,7 +11,8 @@ import io.flutter.plugin.common.MethodChannel
 import org.json.JSONObject
 
 class IdCaptureMethodHandler(
-    private val idCaptureModule: IdCaptureModule
+    private val idCaptureModule: IdCaptureModule,
+    private val lastFrameData: LastFrameData = DefaultLastFrameData.getInstance()
 ) : MethodChannel.MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
@@ -82,13 +84,15 @@ class IdCaptureMethodHandler(
                     FlutterResult(result)
                 )
 
-            "getLastFrameData" -> LastFrameData.getLastFrameDataJson {
+            "getLastFrameData" -> lastFrameData.getLastFrameDataJson {
                 if (it.isNullOrBlank()) {
                     result.rejectKotlinError(FrameDataNullError())
                     return@getLastFrameDataJson
                 }
                 result.success(it)
             }
+
+            "setModeEnabledState" -> idCaptureModule.setModeEnabled(call.arguments as Boolean)
         }
     }
 
