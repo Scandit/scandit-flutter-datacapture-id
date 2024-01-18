@@ -63,6 +63,8 @@ class IdCapture extends DataCaptureMode {
 
   bool _enabled = true;
 
+  bool _isInCallback = false;
+
   final List<IdCaptureListener> _listeners = [];
 
   final List<IdCaptureAdvancedListener> _advancedListeners = [];
@@ -97,7 +99,10 @@ class IdCapture extends DataCaptureMode {
   @override
   set isEnabled(bool newValue) {
     _enabled = newValue;
-    _controller.setModeEnabledState(newValue);
+    if (_isInCallback) {
+      return;
+    }
+    didChange();
   }
 
   void addListener(IdCaptureListener listener) {
@@ -176,7 +181,7 @@ class IdCapture extends DataCaptureMode {
 
   @override
   Map<String, dynamic> toMap() {
-    return {'type': 'idCapture', "settings": _settings.toMap()};
+    return {'type': 'idCapture', 'enabled': _enabled, "settings": _settings.toMap()};
   }
 }
 
@@ -247,6 +252,7 @@ class _IdCaptureListenerController {
   }
 
   Future<void> _notifyDidCaptureId(IdCaptureSession session) async {
+    _idCapture._isInCallback = true;
     for (var listener in _idCapture._listeners) {
       listener.didCaptureId(_idCapture, session);
     }
@@ -256,9 +262,11 @@ class _IdCaptureListenerController {
     for (var listener in _idCapture._advancedAsyncListeners) {
       await listener.didCaptureId(_idCapture, session, _getLastFrameData);
     }
+    _idCapture._isInCallback = false;
   }
 
   Future<void> _notifyDidLocalizeId(IdCaptureSession session) async {
+    _idCapture._isInCallback = true;
     for (var listener in _idCapture._listeners) {
       listener.didLocalizeId(_idCapture, session);
     }
@@ -268,9 +276,11 @@ class _IdCaptureListenerController {
     for (var listener in _idCapture._advancedAsyncListeners) {
       await listener.didLocalizeId(_idCapture, session, _getLastFrameData);
     }
+    _idCapture._isInCallback = false;
   }
 
   Future<void> _notifyDidRejectId(IdCaptureSession session) async {
+    _idCapture._isInCallback = true;
     for (var listener in _idCapture._listeners) {
       listener.didRejectId(_idCapture, session);
     }
@@ -280,9 +290,11 @@ class _IdCaptureListenerController {
     for (var listener in _idCapture._advancedAsyncListeners) {
       await listener.didRejectId(_idCapture, session, _getLastFrameData);
     }
+    _idCapture._isInCallback = false;
   }
 
   Future<void> _notifyDidTimeout(IdCaptureSession session) async {
+    _idCapture._isInCallback = true;
     for (var listener in _idCapture._listeners) {
       listener.didTimedOut(_idCapture, session, _getLastFrameData);
     }
@@ -292,6 +304,7 @@ class _IdCaptureListenerController {
     for (var listener in _idCapture._advancedAsyncListeners) {
       await listener.didTimedOut(_idCapture, session, _getLastFrameData);
     }
+    _idCapture._isInCallback = false;
   }
 
   Future<FrameData> _getLastFrameData() {
@@ -324,11 +337,5 @@ class _IdCaptureListenerController {
     _methodChannel
         .invokeMethod(IdCaptureFunctionNames.removeIdCaptureAsyncListener)
         .then((value) => _setupIdCaptureSubscription(), onError: _onError);
-  }
-
-  void setModeEnabledState(bool newValue) {
-    _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.setModeEnabledState, newValue)
-        .then((value) => null, onError: _onError);
   }
 }

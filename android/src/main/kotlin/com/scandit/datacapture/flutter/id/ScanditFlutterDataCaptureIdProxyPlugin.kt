@@ -5,17 +5,13 @@ import com.scandit.datacapture.flutter.core.utils.FlutterEmitter
 import com.scandit.datacapture.frameworks.id.IdCaptureModule
 import com.scandit.datacapture.frameworks.id.listeners.FrameworksIdCaptureListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
-import java.lang.ref.WeakReference
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /** ScanditFlutterDataCaptureIdProxyPlugin */
-class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, ActivityAware {
+class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin {
     companion object {
         @JvmStatic
         private val lock = ReentrantLock()
@@ -28,73 +24,33 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, ActivityAware {
 
     private var idCaptureMethodChannel: MethodChannel? = null
 
-    private var flutterPluginBinding: WeakReference<FlutterPluginBinding?> = WeakReference(null)
-
-    override fun onAttachedToEngine(binding: FlutterPluginBinding) {
-        flutterPluginBinding = WeakReference(binding)
-    }
-
-    override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
-        flutterPluginBinding = WeakReference(null)
-    }
-
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        onAttached()
-    }
-
-    override fun onDetachedFromActivityForConfigChanges() {
-        onDetached()
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        onAttached()
-    }
-
-    override fun onDetachedFromActivity() {
-        onDetached()
-    }
-
-    private fun onAttached() {
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         lock.withLock {
-            if (isPluginAttached) return
-
-            val flutterBinding = flutterPluginBinding.get() ?: return
-
-            setupModule(flutterBinding)
-
-            isPluginAttached = true
-        }
-    }
-
-    private fun onDetached() {
-        lock.withLock {
-            disposeModule()
-            isPluginAttached = false
-        }
-    }
-
-    private fun setupModule(binding: FlutterPluginBinding) {
-        val eventEmitter = FlutterEmitter(
-            EventChannel(
-                binding.binaryMessenger,
-                IdCaptureMethodHandler.EVENT_CHANNEL_NAME
+            val eventEmitter = FlutterEmitter(
+                EventChannel(
+                    binding.binaryMessenger,
+                    IdCaptureMethodHandler.EVENT_CHANNEL_NAME
+                )
             )
-        )
-        idCaptureModule = IdCaptureModule(
-            FrameworksIdCaptureListener(eventEmitter)
-        ).also { module ->
-            module.onCreate(binding.applicationContext)
+            idCaptureModule = IdCaptureModule(
+                FrameworksIdCaptureListener(eventEmitter)
+            ).also { module ->
+                module.onCreate(binding.applicationContext)
 
-            idCaptureMethodChannel = binding.getMethodChannel(
-                IdCaptureMethodHandler.METHOD_CHANNEL_NAME
-            ).also {
-                it.setMethodCallHandler(IdCaptureMethodHandler(module))
+                idCaptureMethodChannel = binding.getMethodChannel(
+                    IdCaptureMethodHandler.METHOD_CHANNEL_NAME
+                ).also {
+                    it.setMethodCallHandler(IdCaptureMethodHandler(module))
+                }
             }
         }
     }
 
-    private fun disposeModule() {
-        idCaptureModule?.onDestroy()
-        idCaptureMethodChannel?.setMethodCallHandler(null)
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        lock.withLock {
+            idCaptureModule?.onDestroy()
+            idCaptureMethodChannel?.setMethodCallHandler(null)
+            isPluginAttached = false
+        }
     }
 }
