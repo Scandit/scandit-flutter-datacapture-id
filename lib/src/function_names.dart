@@ -22,4 +22,5 @@ abstract class IdCaptureFunctionNames {
   static const String finishDidLocalizeIdName = 'finishDidLocalizeId';
   static const String finishDidRejectIdName = 'finishDidRejectId';
   static const String finishDidTimeoutName = 'finishDidTimeout';
+  static const String setModeEnabledState = 'setModeEnabledState';
 }
