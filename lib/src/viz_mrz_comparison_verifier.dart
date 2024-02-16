@@ -89,7 +89,7 @@ class VizMrzComparisonResult {
         _StringComparisonCheck.fromJSON(json["documentNumbersMatch"]),
         _DateComparisonCheck.fromJSON(json["datesOfBirth"]),
         _DateComparisonCheck.fromJSON(json["datesOfExpiry"]),
-        _StringComparisonCheck.fromJSON(json["issuingCountriesIsoMatch"]),
+        _StringComparisonCheck.fromJSON(json["issuingCountryIsoMatch"]),
         json["resultDescription"] as String);
   }
 }

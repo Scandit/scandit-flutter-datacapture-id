@@ -26,6 +26,9 @@ import ScanditFrameworksId
          static let addIdCaptureAsyncListener = "addIdCaptureAsyncListener"
          static let removeIdCaptureAsyncListener = "removeIdCaptureAsyncListener"
          static let setModeEnabledState = "setModeEnabledState"
+         static let updateIdCaptureMode = "updateIdCaptureMode"
+         static let applyIdCaptureModeSettings = "applyIdCaptureModeSettings"
+         static let updateIdCaptureOverlay = "updateIdCaptureOverlay"
      }
 
      private let idModule: IdCaptureModule
@@ -91,6 +94,12 @@ import ScanditFrameworksId
          case FunctionNames.setModeEnabledState:
             idModule.setModeEnabled(enabled: call.arguments as! Bool)
             result(nil)
+         case FunctionNames.updateIdCaptureMode:
+             idModule.updateModeFromJson(modeJson: call.arguments as! String, result: FlutterFrameworkResult(reply: result))
+         case FunctionNames.applyIdCaptureModeSettings:
+             idModule.applyModeSettings(modeSettingsJson: call.arguments as! String, result: FlutterFrameworkResult(reply: result))
+         case FunctionNames.updateIdCaptureOverlay:
+             idModule.updateOverlay(overlayJson: call.arguments as! String, result: FlutterFrameworkResult(reply: result))
          default:
              result(FlutterMethodNotImplemented)
          }
