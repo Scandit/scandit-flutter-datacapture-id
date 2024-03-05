@@ -63,21 +63,3 @@ extension IdLayoutLineStyleDeserializer on IdLayoutLineStyle {
     return IdLayoutLineStyle.values.firstWhere((element) => element.toString() == jsonValue);
   }
 }
-
-enum TextHintPosition {
-  aboveViewfinder('aboveViewfinder'),
-  belowViewfinder('belowViewfinder');
-
-  const TextHintPosition(this._name);
-
-  @override
-  String toString() => _name;
-
-  final String _name;
-}
-
-extension TextHintPositionDeserializer on TextHintPosition {
-  static TextHintPosition fromJSON(String jsonValue) {
-    return TextHintPosition.values.firstWhere((element) => element.toString() == jsonValue);
-  }
-}

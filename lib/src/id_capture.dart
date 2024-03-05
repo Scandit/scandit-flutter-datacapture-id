@@ -71,8 +71,6 @@ class IdCapture extends DataCaptureMode {
 
   IdCaptureSettings _settings;
 
-  IdCaptureFeedback _feedback = IdCaptureFeedback.defaultFeedback;
-
   IdCapture._(DataCaptureContext? context, this._settings) {
     _controller = _IdCaptureListenerController.forIdCapture(this);
 
@@ -100,13 +98,6 @@ class IdCapture extends DataCaptureMode {
   set isEnabled(bool newValue) {
     _enabled = newValue;
     _controller.setModeEnabledState(newValue);
-  }
-
-  IdCaptureFeedback get feedback => _feedback;
-
-  set feedback(IdCaptureFeedback newValue) {
-    _feedback = newValue;
-    _controller.updateIdCaptureMode();
   }
 
   void addListener(IdCaptureListener listener) {
@@ -173,16 +164,19 @@ class IdCapture extends DataCaptureMode {
 
   Future<void> applySettings(IdCaptureSettings settings) {
     _settings = settings;
-    return _controller.applyNewSettings(settings);
+    return didChange();
+  }
+
+  Future<void> didChange() {
+    if (context != null) {
+      return context!.update();
+    }
+    return Future.value();
   }
 
   @override
   Map<String, dynamic> toMap() {
-    return {
-      'type': 'idCapture',
-      "settings": _settings.toMap(),
-      'feedback': _feedback.toMap(),
-    };
+    return {'type': 'idCapture', "settings": _settings.toMap()};
   }
 }
 
@@ -301,9 +295,12 @@ class _IdCaptureListenerController {
   }
 
   Future<FrameData> _getLastFrameData() {
-    return _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.getLastFrameDataName)
-        .then((value) => DefaultFrameData.fromJSON(Map<String, dynamic>.from(value as Map)), onError: _onError);
+    return _methodChannel.invokeMethod(IdCaptureFunctionNames.getLastFrameDataName).then((value) => getFrom(value));
+  }
+
+  DefaultFrameData getFrom(String response) {
+    final decoded = jsonDecode(response);
+    return DefaultFrameData.fromJSON(decoded);
   }
 
   void _onError(Object? error, StackTrace? stackTrace) {
@@ -332,18 +329,6 @@ class _IdCaptureListenerController {
   void setModeEnabledState(bool newValue) {
     _methodChannel
         .invokeMethod(IdCaptureFunctionNames.setModeEnabledState, newValue)
-        .then((value) => null, onError: _onError);
-  }
-
-  Future<void> applyNewSettings(IdCaptureSettings settings) {
-    return _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.applyIdCaptureModeSettings, jsonEncode(settings.toMap()))
-        .then((value) => null, onError: _onError);
-  }
-
-  Future<void> updateIdCaptureMode() {
-    return _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.updateIdCaptureMode, jsonEncode(_idCapture.toMap()))
         .then((value) => null, onError: _onError);
   }
 }

@@ -153,12 +153,12 @@ class AamvaVizBarcodeComparisonResult {
     return AamvaVizBarcodeComparisonResult._(
         json["checksPassed"] as bool,
         json["resultDescription"] as String,
-        _StringComparisonCheck.fromJSON(json["issuingCountryIsoMatch"]),
-        _StringComparisonCheck.fromJSON(json["issuingJurisdictionIsoMatch"]),
+        _StringComparisonCheck.fromJSON(json["issuingCountriesIsoMatch"]),
+        _StringComparisonCheck.fromJSON(json["issuingJuristictionsIsoMatch"]),
         _StringComparisonCheck.fromJSON(json["documentNumbersMatch"]),
         _StringComparisonCheck.fromJSON(json["fullNamesMatch"]),
-        _DateComparisonCheck.fromJSON(json["datesOfBirthMatch"]),
-        _DateComparisonCheck.fromJSON(json["datesOfExpiryMatch"]),
-        _DateComparisonCheck.fromJSON(json["datesOfIssueMatch"]));
+        _DateComparisonCheck.fromJSON(json["datesOfBirth"]),
+        _DateComparisonCheck.fromJSON(json["datesOfExpiry"]),
+        _DateComparisonCheck.fromJSON(json["datesOfIssue"]));
   }
 }

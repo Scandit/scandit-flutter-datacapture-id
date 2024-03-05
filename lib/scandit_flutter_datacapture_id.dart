@@ -17,7 +17,7 @@ export 'src/id_capture_session.dart' show IdCaptureSession, LocalizedOnlyId, Rej
 export 'src/id_capture_settings.dart' show IdCaptureSettings;
 export 'src/id_document_type.dart' show IdDocumentType;
 export 'src/id_image_type.dart' show IdImageType;
-export 'src/id_layout.dart' show IdLayout, IdLayoutStyle, IdLayoutLineStyle, TextHintPosition;
+export 'src/id_layout.dart' show IdLayout, IdLayoutStyle, IdLayoutLineStyle;
 export 'src/result/aamva_barcode_result.dart' show AamvaBarcodeResult;
 export 'src/result/aamva_viz_barcode_comparison_result.dart'
     show AamvaVizBarcodeComparisonResult, ComparisonCheck, ComparisonCheckResult;
@@ -45,4 +45,3 @@ export 'src/result/aamva_barcode_verification_result.dart' show AamvaBarcodeVeri
 export 'src/aamva_barcode_verifier.dart' show AamvaBarcodeVerifier;
 export 'src/viz_mrz_comparison_verifier.dart'
     show VizMrzComparisonVerifier, VizMrzComparisonCheck, VizMrzComparisonResult, VizMrzComparisonCheckResult;
-export 'src/id_capture_feedback.dart' show IdCaptureFeedback;

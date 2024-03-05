@@ -65,10 +65,7 @@ enum DocumentType {
   provisionalDl('provisionalDl'),
   refugeePassport('refugeePassport'),
   specialId('specialId'),
-  uniformedServicesId('uniformedServicesId'),
-  immigrantVisa('immigrantVisa'),
-  consularVoterId('consularVoterId'),
-  twicCard('twicCard');
+  uniformedServicesId('uniformedServicesId');
 
   const DocumentType(this._name);
 
