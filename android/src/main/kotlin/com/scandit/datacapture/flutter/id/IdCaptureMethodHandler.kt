@@ -16,83 +16,99 @@ class IdCaptureMethodHandler(
 ) : MethodChannel.MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "addIdCaptureListener" -> {
+            METHOD_ADD_LISTENER -> {
                 idCaptureModule.addListener()
                 result.success(null)
             }
 
-            "removeIdCaptureListener" -> {
+            METHOD_REMOVE_LISTENER -> {
                 idCaptureModule.removeListener()
                 result.success(null)
             }
 
-            "addIdCaptureAsyncListener" -> {
+            METHOD_ADD_ASYNC_LISTENER -> {
                 idCaptureModule.addAsyncListener()
                 result.success(null)
             }
 
-            "removeIdCaptureAsyncListener" -> {
+            METHOD_REMOVE_ASYNC_LISTENER -> {
                 idCaptureModule.removeAsyncListener()
                 result.success(null)
             }
 
-            "finishDidCaptureId" -> {
+            METHOD_FINISH_DID_CAPTURE -> {
                 idCaptureModule.finishDidCaptureId(call.arguments as Boolean)
                 result.success(null)
             }
 
-            "finishDidRejectId" -> {
+            METHOD_FINISH_DID_REJECT -> {
                 idCaptureModule.finishDidRejectId(call.arguments as Boolean)
                 result.success(null)
             }
 
-            "finishDidLocalizeId" -> {
+            METHOD_FINISH_DID_LOCALIZE -> {
                 idCaptureModule.finishDidLocalizeId(call.arguments as Boolean)
                 result.success(null)
             }
 
-            "finishDidTimeout" -> {
+            METHOD_FINISH_DID_TIMEOUT -> {
                 idCaptureModule.finishDidTimeout(call.arguments as Boolean)
                 result.success(null)
             }
 
-            "getDefaults" -> {
+            METHOD_GET_DEFAULTS -> {
                 val defaults = idCaptureModule.getDefaults()
                 result.success(JSONObject(defaults).toString())
             }
 
-            "reset" -> {
+            METHOD_RESET -> {
                 idCaptureModule.resetMode()
                 result.success(null)
             }
 
-            "verify" ->
+            METHOD_VERIFY ->
                 idCaptureModule.verifyCaptureId(call.arguments as String, FlutterResult(result))
 
-            "createAamvaBarcodeVerifier" ->
+            METHOD_CREATE_AAMVA_BARCODE_VERIFIER ->
                 idCaptureModule.createContextForBarcodeVerification(FlutterResult(result))
 
-            "verifyCapturedIdBarcode" ->
+            METHOD_VERIFY_CAPTURED_ID_BARCODE ->
                 idCaptureModule.verifyCapturedIdBarcode(
                     call.arguments as String,
                     FlutterResult(result)
                 )
 
-            "vizMrzComparisonVerifier" ->
+            METHOD_VIZ_MRZ_COMPARISON_VERIFIER ->
                 idCaptureModule.vizMrzVerification(
                     call.arguments as String,
                     FlutterResult(result)
                 )
 
-            "getLastFrameData" -> lastFrameData.getLastFrameDataJson {
-                if (it.isNullOrBlank()) {
+            METHOD_GET_LAST_FRAME -> lastFrameData.getLastFrameDataBytes {
+                if (it == null) {
                     result.rejectKotlinError(FrameDataNullError())
-                    return@getLastFrameDataJson
+                    return@getLastFrameDataBytes
                 }
                 result.success(it)
             }
 
-            "setModeEnabledState" -> idCaptureModule.setModeEnabled(call.arguments as Boolean)
+            METHOD_SET_ENABLED_STATE -> idCaptureModule.setModeEnabled(call.arguments as Boolean)
+
+            METHOD_UPDATE_MODE -> idCaptureModule.updateModeFromJson(
+                call.arguments as String,
+                FlutterResult(result)
+            )
+
+            METHOD_APPLY_SETTINGS -> idCaptureModule.applyModeSettings(
+                call.arguments as String,
+                FlutterResult(result)
+            )
+
+            METHOD_UPDATE_OVERLAY -> idCaptureModule.updateOverlay(
+                call.arguments as String,
+                FlutterResult(result)
+            )
+
         }
     }
 
@@ -101,5 +117,25 @@ class IdCaptureMethodHandler(
             "com.scandit.datacapture.id.capture/event_channel"
         const val METHOD_CHANNEL_NAME =
             "com.scandit.datacapture.id.capture/method_channel"
+
+        private const val METHOD_UPDATE_OVERLAY = "updateIdCaptureOverlay"
+        private const val METHOD_APPLY_SETTINGS = "applyIdCaptureModeSettings"
+        private const val METHOD_UPDATE_MODE = "updateIdCaptureMode"
+        private const val METHOD_SET_ENABLED_STATE = "setModeEnabledState"
+        private const val METHOD_GET_LAST_FRAME = "getLastFrameData"
+        private const val METHOD_VIZ_MRZ_COMPARISON_VERIFIER = "vizMrzComparisonVerifier"
+        private const val METHOD_VERIFY_CAPTURED_ID_BARCODE = "verifyCapturedIdBarcode"
+        private const val METHOD_CREATE_AAMVA_BARCODE_VERIFIER = "createAamvaBarcodeVerifier"
+        private const val METHOD_VERIFY = "verify"
+        private const val METHOD_RESET = "reset"
+        private const val METHOD_GET_DEFAULTS = "getDefaults"
+        private const val METHOD_FINISH_DID_TIMEOUT = "finishDidTimeout"
+        private const val METHOD_FINISH_DID_LOCALIZE = "finishDidLocalizeId"
+        private const val METHOD_FINISH_DID_REJECT = "finishDidRejectId"
+        private const val METHOD_FINISH_DID_CAPTURE = "finishDidCaptureId"
+        private const val METHOD_REMOVE_ASYNC_LISTENER = "removeIdCaptureAsyncListener"
+        private const val METHOD_ADD_ASYNC_LISTENER = "addIdCaptureAsyncListener"
+        private const val METHOD_ADD_LISTENER = "addIdCaptureListener"
+        private const val METHOD_REMOVE_LISTENER = "removeIdCaptureListener"
     }
 }

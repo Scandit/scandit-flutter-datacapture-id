@@ -23,4 +23,7 @@ abstract class IdCaptureFunctionNames {
   static const String finishDidRejectIdName = 'finishDidRejectId';
   static const String finishDidTimeoutName = 'finishDidTimeout';
   static const String setModeEnabledState = 'setModeEnabledState';
+  static const String applyIdCaptureModeSettings = 'applyIdCaptureModeSettings';
+  static const String updateIdCaptureOverlay = 'updateIdCaptureOverlay';
+  static const String updateIdCaptureMode = 'updateIdCaptureMode';
 }
