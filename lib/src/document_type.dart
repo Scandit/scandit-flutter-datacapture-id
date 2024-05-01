@@ -68,7 +68,12 @@ enum DocumentType {
   uniformedServicesId('uniformedServicesId'),
   immigrantVisa('immigrantVisa'),
   consularVoterId('consularVoterId'),
-  twicCard('twicCard');
+  twicCard('twicCard'),
+  exitEntryPermit('exitEntryPermit'),
+  mainlandTravelPermitTaiwan('mainlandTravelPermitTaiwan'),
+  nbiClearance('nbiClearance'),
+  proofOfRegistration('proofOfRegistration'),
+  temporaryProtectionPermit('temporaryProtectionPermit');
 
   const DocumentType(this._name);
 
