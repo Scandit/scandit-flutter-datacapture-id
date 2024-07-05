@@ -42,6 +42,8 @@ class IdCaptureSettings implements Serializable {
 
   IdAnonymizationMode anonymizationMode = IdCaptureDefaults.captureSettingsDefaults.anonymizationMode;
 
+  bool rejectVoidedIds = IdCaptureDefaults.captureSettingsDefaults.rejectVoidedIds;
+
   @override
   Map<String, dynamic> toMap() {
     return {
@@ -49,6 +51,7 @@ class IdCaptureSettings implements Serializable {
       "imageToResult": _imageToResult.map((key, value) => MapEntry(key.toString(), value)),
       "supportedSides": supportedSides.toString(),
       "anonymizationMode": anonymizationMode.name,
+      "rejectVoidedIds": rejectVoidedIds
     };
   }
 }

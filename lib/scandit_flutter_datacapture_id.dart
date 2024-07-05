@@ -46,3 +46,4 @@ export 'src/aamva_barcode_verifier.dart' show AamvaBarcodeVerifier;
 export 'src/viz_mrz_comparison_verifier.dart'
     show VizMrzComparisonVerifier, VizMrzComparisonCheck, VizMrzComparisonResult, VizMrzComparisonCheckResult;
 export 'src/id_capture_feedback.dart' show IdCaptureFeedback;
+export 'src/rejection_reson.dart' show RejectionReason;

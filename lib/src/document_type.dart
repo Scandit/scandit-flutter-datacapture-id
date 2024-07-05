@@ -70,6 +70,7 @@ enum DocumentType {
   consularVoterId('consularVoterId'),
   twicCard('twicCard'),
   exitEntryPermit('exitEntryPermit'),
+  mainlandTravelPermitHongKongMacau('mainlandTravelPermitHongKongMacau'),
   mainlandTravelPermitTaiwan('mainlandTravelPermitTaiwan'),
   nbiClearance('nbiClearance'),
   proofOfRegistration('proofOfRegistration'),

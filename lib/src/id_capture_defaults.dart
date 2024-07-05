@@ -60,12 +60,16 @@ class IdCaptureOverlayDefaults {
 
 class IdCaptureSettingsDefaults {
   final IdAnonymizationMode anonymizationMode;
+  final bool rejectVoidedIds;
 
-  IdCaptureSettingsDefaults(this.anonymizationMode);
+  IdCaptureSettingsDefaults(this.anonymizationMode, this.rejectVoidedIds);
 
   factory IdCaptureSettingsDefaults.fromJSON(Map<String, dynamic> json) {
     var anonymizationMode = IdAnonymizationModeDeserializer.fromJSON(json["anonymizationMode"] as String);
-    return IdCaptureSettingsDefaults(anonymizationMode);
+    return IdCaptureSettingsDefaults(
+      anonymizationMode,
+      json["rejectVoidedIds"] as bool,
+    );
   }
 }
 
