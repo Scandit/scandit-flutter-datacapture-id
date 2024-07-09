@@ -7,7 +7,6 @@
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
 
 import '../scandit_flutter_datacapture_id.dart';
-import 'rejection_reson.dart';
 
 class IdCaptureSession {
   CapturedId? _newlyCapturedId;
@@ -67,22 +66,13 @@ class LocalizedOnlyId {
 class RejectedId {
   Quadrilateral _location;
 
-  RejectionReason _rejectionReason;
-
-  RejectedId._(this._location, this._rejectionReason);
+  RejectedId._(this._location);
 
   RejectedId.fromJSON(Map<String, dynamic> json)
-      : this._(
-          Quadrilateral.fromJSON(json["location"] as Map<String, dynamic>),
-          RejectionReasonDeserializer.fromJSON(json['rejectionReason']),
-        );
+      : this._(Quadrilateral.fromJSON(json["location"] as Map<String, dynamic>));
 
   Quadrilateral get location {
     return _location;
-  }
-
-  RejectionReason get rejectionReason {
-    return _rejectionReason;
   }
 }
 
