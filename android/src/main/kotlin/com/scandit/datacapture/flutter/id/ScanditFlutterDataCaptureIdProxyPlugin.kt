@@ -2,6 +2,7 @@ package com.scandit.datacapture.flutter.id
 
 import com.scandit.datacapture.flutter.core.extensions.getMethodChannel
 import com.scandit.datacapture.flutter.core.utils.FlutterEmitter
+import com.scandit.datacapture.frameworks.core.locator.DefaultServiceLocator
 import com.scandit.datacapture.frameworks.id.IdCaptureModule
 import com.scandit.datacapture.frameworks.id.listeners.FrameworksIdCaptureListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -24,7 +25,7 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, ActivityAware {
         private var isPluginAttached = false
     }
 
-    private var idCaptureModule: IdCaptureModule? = null
+    private val serviceLocator = DefaultServiceLocator.getInstance()
 
     private var idCaptureMethodChannel: MethodChannel? = null
 
@@ -32,10 +33,12 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, ActivityAware {
 
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
         flutterPluginBinding = WeakReference(binding)
+        onAttached()
     }
 
     override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
         flutterPluginBinding = WeakReference(null)
+        onDetached()
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -56,7 +59,9 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, ActivityAware {
 
     private fun onAttached() {
         lock.withLock {
-            if (isPluginAttached) return
+            if (isPluginAttached) {
+                disposeModule()
+            }
 
             val flutterBinding = flutterPluginBinding.get() ?: return
 
@@ -80,7 +85,7 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, ActivityAware {
                 IdCaptureMethodHandler.EVENT_CHANNEL_NAME
             )
         )
-        idCaptureModule = IdCaptureModule(
+        val idCaptureModule = IdCaptureModule(
             FrameworksIdCaptureListener(eventEmitter)
         ).also { module ->
             module.onCreate(binding.applicationContext)
@@ -91,10 +96,11 @@ class ScanditFlutterDataCaptureIdProxyPlugin : FlutterPlugin, ActivityAware {
                 it.setMethodCallHandler(IdCaptureMethodHandler(module))
             }
         }
+        serviceLocator.register(idCaptureModule)
     }
 
     private fun disposeModule() {
-        idCaptureModule?.onDestroy()
+        serviceLocator.remove(IdCaptureModule::class.java.name)?.onDestroy()
         idCaptureMethodChannel?.setMethodCallHandler(null)
     }
 }

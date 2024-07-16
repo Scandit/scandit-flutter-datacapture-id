@@ -108,7 +108,6 @@ class IdCaptureMethodHandler(
                 call.arguments as String,
                 FlutterResult(result)
             )
-
         }
     }
 
