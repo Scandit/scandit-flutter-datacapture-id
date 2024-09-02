@@ -4,8 +4,6 @@
  * Copyright (C) 2022- Scandit AG. All rights reserved.
  */
 
-import 'dart:convert';
-
 import 'package:flutter/widgets.dart';
 
 import 'date_result.dart';
@@ -120,7 +118,6 @@ class AamvaVizBarcodeComparisonResult {
   final ComparisonCheck<DateResult> _datesOfBirthMatch;
   final ComparisonCheck<DateResult> _datesOfExpiryMatch;
   final ComparisonCheck<DateResult> _datesOfIssueMatch;
-  final String? _frontMismatchImageBase64Encoded;
   final String _resultDescription;
 
   AamvaVizBarcodeComparisonResult._(
@@ -132,8 +129,7 @@ class AamvaVizBarcodeComparisonResult {
       this._fullNamesMatch,
       this._datesOfBirthMatch,
       this._datesOfExpiryMatch,
-      this._datesOfIssueMatch,
-      this._frontMismatchImageBase64Encoded);
+      this._datesOfIssueMatch);
 
   bool get checksPassed => _checksPassed;
 
@@ -153,12 +149,6 @@ class AamvaVizBarcodeComparisonResult {
 
   String get resultDescription => _resultDescription;
 
-  Image? get frontMismatchImage {
-    final base64EncodedImage = _frontMismatchImageBase64Encoded;
-    if (base64EncodedImage == null) return null;
-    return Image.memory(base64Decode(base64EncodedImage));
-  }
-
   factory AamvaVizBarcodeComparisonResult.fromJSON(Map<String, dynamic> json) {
     return AamvaVizBarcodeComparisonResult._(
         json["checksPassed"] as bool,
@@ -169,7 +159,6 @@ class AamvaVizBarcodeComparisonResult {
         _StringComparisonCheck.fromJSON(json["fullNamesMatch"]),
         _DateComparisonCheck.fromJSON(json["datesOfBirthMatch"]),
         _DateComparisonCheck.fromJSON(json["datesOfExpiryMatch"]),
-        _DateComparisonCheck.fromJSON(json["datesOfIssueMatch"]),
-        json["frontMismatchImage"] as String?);
+        _DateComparisonCheck.fromJSON(json["datesOfIssueMatch"]));
   }
 }
