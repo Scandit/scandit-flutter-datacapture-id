@@ -141,6 +141,11 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
                 assert call.arguments() != null;
                 getSharedModule().updateOverlay(call.arguments(), new FlutterResult(result));
                 break;
+
+            case "updateFeedback":
+                assert call.arguments() != null;
+                getSharedModule().updateFeedback(call.arguments(), new FlutterResult(result));
+                break;
         }
     }
 

@@ -7,6 +7,7 @@
 import Flutter
 import scandit_flutter_datacapture_core
 import ScanditFrameworksId
+import ScanditFrameworksCore
 
  class IdCaptureMethodHandler {
      private enum FunctionNames {
@@ -29,6 +30,7 @@ import ScanditFrameworksId
          static let updateIdCaptureMode = "updateIdCaptureMode"
          static let applyIdCaptureModeSettings = "applyIdCaptureModeSettings"
          static let updateIdCaptureOverlay = "updateIdCaptureOverlay"
+         static let updateFeedback = "updateFeedback"
      }
 
      private let idModule: IdCaptureModule
@@ -62,7 +64,9 @@ import ScanditFrameworksId
              idModule.verifyCapturedIdAamvaViz(jsonString: jsonString,
                                                result: FlutterFrameworkResult(reply: result))
          case FunctionNames.getLastFrameData:
-             ScanditFlutterDataCaptureCore.getLastFrameData(reply: result)
+             LastFrameData.shared.getLastFrameDataBytes {
+                 result($0)
+             }
          case FunctionNames.finishDidRejectId:
              idModule.finishDidRejectId(enabled: call.arguments as? Bool ?? false)
          case FunctionNames.finishDidLocalizeId:
@@ -100,6 +104,8 @@ import ScanditFrameworksId
              idModule.applyModeSettings(modeSettingsJson: call.arguments as! String, result: FlutterFrameworkResult(reply: result))
          case FunctionNames.updateIdCaptureOverlay:
              idModule.updateOverlay(overlayJson: call.arguments as! String, result: FlutterFrameworkResult(reply: result))
+         case FunctionNames.updateFeedback:
+             idModule.updateFeedback(feedbackJson: call.arguments as! String, result: FlutterFrameworkResult(reply: result))
          default:
              result(FlutterMethodNotImplemented)
          }

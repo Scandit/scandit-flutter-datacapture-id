@@ -106,7 +106,7 @@ class IdCapture extends DataCaptureMode {
 
   set feedback(IdCaptureFeedback newValue) {
     _feedback = newValue;
-    _controller.updateIdCaptureMode();
+    _controller.updateFeedback(newValue);
   }
 
   void addListener(IdCaptureListener listener) {
@@ -345,5 +345,9 @@ class _IdCaptureListenerController {
     return _methodChannel
         .invokeMethod(IdCaptureFunctionNames.updateIdCaptureMode, jsonEncode(_idCapture.toMap()))
         .then((value) => null, onError: _onError);
+  }
+
+  Future<void> updateFeedback(IdCaptureFeedback feedback) {
+    return _methodChannel.invokeMethod(IdCaptureFunctionNames.updateFeedback, jsonEncode(feedback.toMap()));
   }
 }

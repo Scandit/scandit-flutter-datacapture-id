@@ -26,4 +26,5 @@ abstract class IdCaptureFunctionNames {
   static const String applyIdCaptureModeSettings = 'applyIdCaptureModeSettings';
   static const String updateIdCaptureOverlay = 'updateIdCaptureOverlay';
   static const String updateIdCaptureMode = 'updateIdCaptureMode';
+  static const String updateFeedback = 'updateFeedback';
 }

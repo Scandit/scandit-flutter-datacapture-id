@@ -74,7 +74,13 @@ enum DocumentType {
   mainlandTravelPermitTaiwan('mainlandTravelPermitTaiwan'),
   nbiClearance('nbiClearance'),
   proofOfRegistration('proofOfRegistration'),
-  temporaryProtectionPermit('temporaryProtectionPermit');
+  municipalId('municipalId'),
+  temporaryProtectionPermit('temporaryProtectionPermit'),
+  afghanCitizenCard('afghanCitizenCard'),
+  eid('eid'),
+  pass('pass'),
+  sisId('sisId'),
+  medicalMarijuanaCard('medicalMarijuanaCard');
 
   const DocumentType(this._name);
 
