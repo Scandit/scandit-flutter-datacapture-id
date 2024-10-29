@@ -80,7 +80,13 @@ enum DocumentType {
   eid('eid'),
   pass('pass'),
   sisId('sisId'),
-  medicalMarijuanaCard('medicalMarijuanaCard');
+  medicalMarijuanaCard('medicalMarijuanaCard'),
+  asicCard('asicCard'),
+  bidoonCard('bidoonCard'),
+  interimHealthInsuranceCard('interimHealthInsuranceCard'),
+  nonVoterId('nonVoterId'),
+  reciprocalHealthInsuranceCard('reciprocalHealthInsuranceCard'),
+  vehicleRegistration('vehicleRegistration');
 
   const DocumentType(this._name);
 

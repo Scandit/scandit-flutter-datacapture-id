@@ -100,7 +100,7 @@ public class ScanditFlutterDataCaptureIdProxyPlugin implements FlutterPlugin, Ac
     private void setupModules(@NonNull FlutterPlugin.FlutterPluginBinding binding) {
         lock.lock();
         try {
-            IdCaptureModule idCaptureModule = (IdCaptureModule) serviceLocator.remove(IdCaptureModule.class.getName());
+            IdCaptureModule idCaptureModule = (IdCaptureModule) serviceLocator.resolve(IdCaptureModule.class.getName());
             if (idCaptureModule != null) return;
 
             idCaptureModule = IdCaptureModule.create(
