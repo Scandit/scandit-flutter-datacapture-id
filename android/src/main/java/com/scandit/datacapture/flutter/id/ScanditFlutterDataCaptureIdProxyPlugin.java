@@ -55,12 +55,12 @@ public class ScanditFlutterDataCaptureIdProxyPlugin implements FlutterPlugin, Ac
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        // NOOP
+        disposeEventChannels();
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        // NOOP
+        onAttachedToActivity(binding);
     }
 
     @Override

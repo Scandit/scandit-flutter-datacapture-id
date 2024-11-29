@@ -34,7 +34,7 @@ class AamvaBarcodeVerifier {
 }
 
 class _AamvaBarcodeVerifierController {
-  final MethodChannel _methodChannel = MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+  final MethodChannel _methodChannel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
 
   Future<void> create() {
     return _methodChannel.invokeMethod(IdCaptureFunctionNames.createAamvaBarcodeVerifier);

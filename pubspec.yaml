@@ -1,6 +1,6 @@
 name: scandit_flutter_datacapture_id
 description: This plugin implements the ID capture capabilities of the Scandit Data Capture SDK.
-version: 6.28.1
+version: 7.0.0
 homepage: https://scandit.com
 
 
@@ -13,13 +13,13 @@ dependencies:
   flutter:
     sdk: flutter
   scandit_flutter_datacapture_core:
-    '>=6.28.1 <6.28.2'
+    '>=7.0.0 <7.0.1'
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^0.3.0
-  linter: ^1.30.0
+  mocktail: 1.0.4
+  flutter_lints: 4.0.0
 
 flutter:
   plugin:
