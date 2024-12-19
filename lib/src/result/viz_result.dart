@@ -4,9 +4,9 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 
-import '../supported_sides.dart';
+import '../captured_sides.dart';
 
 @immutable
 class VizResult {
@@ -24,14 +24,20 @@ class VizResult {
   final String? _issuingJurisdiction;
   final String? _issuingJurisdictionIso;
   final String? _issuingAuthority;
-  final SupportedSides _capturedSides;
+  final CapturedSides _capturedSides;
   final bool _isBackSideCaptureSupported;
   final String? _bloodType;
   final String? _sponsor;
   final String? _mothersName;
   final String? _fathersName;
+  final String? _visaNumber;
+  final String? _passportNumber;
+  final String? _firstName;
+  final String? _lastName;
+  final String? _secondaryLastName;
+  final String _fullName;
 
-  VizResult._(
+  const VizResult._(
       this._additionalNameInformation,
       this._additionalAddressInformation,
       this._placeOfBirth,
@@ -51,7 +57,13 @@ class VizResult {
       this._bloodType,
       this._sponsor,
       this._mothersName,
-      this._fathersName);
+      this._fathersName,
+      this._visaNumber,
+      this._passportNumber,
+      this._firstName,
+      this._lastName,
+      this._secondaryLastName,
+      this._fullName);
 
   VizResult.fromJSON(Map<String, dynamic> json)
       : this._(
@@ -69,12 +81,18 @@ class VizResult {
           json['issuingJurisdiction'] as String?,
           json['issuingJurisdictionIso'] as String?,
           json['issuingAuthority'] as String?,
-          SupportedSidesDeserializer.fromJSON(json['capturedSides']),
+          CapturedSidesDeserializer.fromJSON(json['capturedSides']),
           json['isBackSideCaptureSupported'] as bool,
           json['bloodType'] as String?,
           json['sponsor'] as String?,
           json['mothersName'] as String?,
           json['fathersName'] as String?,
+          json["visaNumber"] as String?,
+          json["passportNumber"] as String?,
+          json['firstName'] as String?,
+          json['lastName'] as String?,
+          json['secondaryLastName'] as String?,
+          json['fullName'] as String,
         );
 
   String? get additionalNameInformation {
@@ -133,7 +151,7 @@ class VizResult {
     return _issuingAuthority;
   }
 
-  SupportedSides get capturedSides {
+  CapturedSides get capturedSides {
     return _capturedSides;
   }
 
@@ -155,5 +173,29 @@ class VizResult {
 
   String? get fathersName {
     return _fathersName;
+  }
+
+  String? get visaNumber {
+    return _visaNumber;
+  }
+
+  String? get passportNumber {
+    return _passportNumber;
+  }
+
+  String? get firstName {
+    return _firstName;
+  }
+
+  String? get lastName {
+    return _lastName;
+  }
+
+  String? get secondaryLastName {
+    return _secondaryLastName;
+  }
+
+  String get fullName {
+    return _fullName;
   }
 }

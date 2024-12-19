@@ -5,9 +5,11 @@
  */
 
 enum RejectionReason {
-  documentTypeNotEnabled('documentTypeNotEnabled'),
-  incorrectBarcodeFormat('incorrectBarcodeFormat'),
-  documentVoided('documentVoided');
+  notAcceptedDocumentType('notAcceptedDocumentType'),
+  invalidFormat('invalidFormat'),
+  documentVoided('documentVoided'),
+  timeout('timeout'),
+  singleImageNotRecognized('singleImageNotRecognized');
 
   const RejectionReason(this._name);
 
