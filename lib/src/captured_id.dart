@@ -4,241 +4,60 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
-import 'dart:convert';
-
 import 'package:flutter/widgets.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+import 'package:scandit_flutter_datacapture_id/src/id_images.dart';
 
-import 'captured_result_type.dart';
-import 'document_type.dart';
-import 'id_image_type.dart';
-import 'result/aamva_barcode_result.dart';
-import 'result/apec_business_travel_card_mrz_result.dart';
-import 'result/argentina_id_barcode_result.dart';
-import 'result/china_exit_entry_permit_mrz_result.dart';
-import 'result/china_mainland_travel_permit_mrz_result.dart';
-import 'result/china_one_way_permit_back_mrz_result.dart';
-import 'result/china_one_way_permit_front_mrz_result.dart';
-import 'result/colombia_id_barcode_result.dart';
-import 'result/colombia_dl_barcode_result.dart';
-import 'result/common-access-card-barcode-result.dart';
+import 'id_capture_document.dart';
+import 'id_capture_region.dart';
+import 'region_specific_subtypes.dart';
+import 'result/barcode_result.dart';
 import 'result/date_result.dart';
 import 'result/mrz_result.dart';
-import 'result/south_africa_dl_barcode_result.dart';
-import 'result/south_africa_id_barcode_result.dart';
-import 'result/us_uniformed_barcode_result.dart';
-import 'result/us_visa_viz_result.dart';
 import 'result/viz_result.dart';
 
 @immutable
 class CapturedId extends Serializable {
-  final CapturedResultType _capturedResultType;
-  final AamvaBarcodeResult? _aamvaBarcodeResult;
-  final ColombiaIdBarcodeResult? _colombiaIdBarcodeResult;
-  final ColombiaDlBarcodeResult? _colombiaDlBarcodeResult;
-  final ArgentinaIdBarcodeResult? _argentinaIdBarcodeResult;
-  final SouthAfricaDlBarcodeResult? _southAfricaDlBarcodeResult;
-  final SouthAfricaIdBarcodeResult? _southAfricaIdBarcodeResult;
   final MrzResult? _mrzResult;
-  final UsUniformedServicesBarcodeResult? _usUniformedServicesBarcodeResult;
   final VizResult? _vizResult;
-  final ChinaMainlandTravelPermitMrzResult? _chinaMainlandTravelPermitMrz;
-  final ChinaExitEntryPermitMrzResult? _chinaExitEntryPermitMrz;
-  final ChinaOneWayPermitBackMrzResult? _chinaOneWayPermitBackMrz;
-  final ChinaOneWayPermitFrontMrzResult? _chinaOneWayPermitFrontMrz;
-  final ApecBusinessTravelCardMrzResult? _apecBusinessTravelCardMrz;
-  final UsVisaVizResult? _usVisaVizResult;
-  final CommonAccessCardBarcodeResult? _commonAccessCardBarcode;
-  final _ImageInfo _imagesForTypes;
-  final Set<CapturedResultType> _capturedResultTypes;
   final Map<String, dynamic> _json;
   final _CommonCapturedIdFields? _commonCapturedIdFields;
+  final BarcodeResult? _barcodeResult;
+  final IdImages _images;
 
   final bool? _isExpired;
   final int? _age;
 
-  CapturedId._(
-      this._capturedResultType,
-      this._aamvaBarcodeResult,
-      this._colombiaIdBarcodeResult,
-      this._colombiaDlBarcodeResult,
-      this._argentinaIdBarcodeResult,
-      this._southAfricaDlBarcodeResult,
-      this._southAfricaIdBarcodeResult,
-      this._mrzResult,
-      this._usUniformedServicesBarcodeResult,
-      this._vizResult,
-      this._chinaMainlandTravelPermitMrz,
-      this._chinaExitEntryPermitMrz,
-      this._chinaOneWayPermitBackMrz,
-      this._chinaOneWayPermitFrontMrz,
-      this._apecBusinessTravelCardMrz,
-      this._usVisaVizResult,
-      this._commonAccessCardBarcode,
-      this._imagesForTypes,
-      this._capturedResultTypes,
-      this._commonCapturedIdFields,
-      this._age,
-      this._isExpired,
-      this._json);
+  CapturedId._(this._mrzResult, this._vizResult, this._barcodeResult, this._commonCapturedIdFields, this._age,
+      this._isExpired, this._images, this._json);
 
   factory CapturedId.fromJSON(Map<String, dynamic> json) {
     _CommonCapturedIdFields? commonCapturedIdFields;
 
-    AamvaBarcodeResult? dlAamvaBarcodeResult;
-    if (json.containsKey("aamvaBarcodeResult") && json["aamvaBarcodeResult"] != null) {
-      dlAamvaBarcodeResult = AamvaBarcodeResult.fromJSON(json["aamvaBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["aamvaBarcodeResult"], commonCapturedIdFields);
-    }
-
-    ColombiaIdBarcodeResult? colombiaIdBarcodeResult;
-    if (json.containsKey("colombiaIdBarcodeResult") && json["colombiaIdBarcodeResult"] != null) {
-      colombiaIdBarcodeResult =
-          ColombiaIdBarcodeResult.fromJSON(json["colombiaIdBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["colombiaIdBarcodeResult"], commonCapturedIdFields);
-    }
-
-    ColombiaDlBarcodeResult? colombiaDlBarcodeResult;
-    if (json.containsKey("colombiaDlBarcodeResult") && json["colombiaDlBarcodeResult"] != null) {
-      colombiaDlBarcodeResult =
-          ColombiaDlBarcodeResult.fromJSON(json["colombiaDlBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["colombiaDlBarcodeResult"], commonCapturedIdFields);
-    }
-
-    ArgentinaIdBarcodeResult? argentinaIdBarcodeResult;
-    if (json.containsKey("argentinaIdBarcodeResult") && json["argentinaIdBarcodeResult"] != null) {
-      argentinaIdBarcodeResult =
-          ArgentinaIdBarcodeResult.fromJSON(json["argentinaIdBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["argentinaIdBarcodeResult"], commonCapturedIdFields);
-    }
-
-    SouthAfricaDlBarcodeResult? southAfricaDlBarcodeResult;
-    if (json.containsKey("southAfricaDlBarcodeResult") && json["southAfricaDlBarcodeResult"] != null) {
-      southAfricaDlBarcodeResult =
-          SouthAfricaDlBarcodeResult.fromJSON(json["southAfricaDlBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["southAfricaDlBarcodeResult"], commonCapturedIdFields);
-    }
-
-    SouthAfricaIdBarcodeResult? southAfricaIdBarcodeResult;
-    if (json.containsKey("southAfricaIdBarcodeResult") && json["southAfricaIdBarcodeResult"] != null) {
-      southAfricaIdBarcodeResult =
-          SouthAfricaIdBarcodeResult.fromJSON(json["southAfricaIdBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["southAfricaIdBarcodeResult"], commonCapturedIdFields);
-    }
-
     MrzResult? mrzResult;
-    if (json.containsKey("mrzResult") && json["mrzResult"] != null) {
+    if (json["mrzResult"] != null) {
       mrzResult = MrzResult.fromJSON(json["mrzResult"] as Map<String, dynamic>);
       commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["mrzResult"], commonCapturedIdFields);
     }
 
-    UsUniformedServicesBarcodeResult? usUniformedServicesBarcodeResult;
-    if (json.containsKey("usUniformedServicesBarcodeResult") && json["usUniformedServicesBarcodeResult"] != null) {
-      usUniformedServicesBarcodeResult =
-          UsUniformedServicesBarcodeResult.fromJSON(json["usUniformedServicesBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["usUniformedServicesBarcodeResult"], commonCapturedIdFields);
-    }
-
     VizResult? vizResult;
-    if (json.containsKey("vizResult") && json["vizResult"] != null) {
+    if (json["vizResult"] != null) {
       vizResult = VizResult.fromJSON(json["vizResult"] as Map<String, dynamic>);
       commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["vizResult"], commonCapturedIdFields);
     }
 
-    ChinaMainlandTravelPermitMrzResult? chinaMainlandTravelPermitMrz;
-    if (json.containsKey("chinaMainlandTravelPermitMrzResult") && json["chinaMainlandTravelPermitMrzResult"] != null) {
-      chinaMainlandTravelPermitMrz = ChinaMainlandTravelPermitMrzResult.fromJSON(
-          json["chinaMainlandTravelPermitMrzResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["chinaMainlandTravelPermitMrzResult"], commonCapturedIdFields);
+    BarcodeResult? barcodeResult;
+    if (json["barcodeResult"] != null) {
+      barcodeResult = BarcodeResult.fromJSON(json["barcodeResult"] as Map<String, dynamic>);
+      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["barcodeResult"], commonCapturedIdFields);
     }
 
-    ChinaExitEntryPermitMrzResult? chinaExitEntryPermitMrz;
-    if (json.containsKey("chinaExitEntryPermitMrzResult") && json["chinaExitEntryPermitMrzResult"] != null) {
-      chinaExitEntryPermitMrz =
-          ChinaExitEntryPermitMrzResult.fromJSON(json["chinaExitEntryPermitMrzResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["chinaExitEntryPermitMrzResult"], commonCapturedIdFields);
-    }
+    var images = (json["imageInfo"] != null)
+        ? IdImages.fromJSON(json["imageInfo"] as Map<String, dynamic>)
+        : IdImages.fromJSON({});
 
-    ChinaOneWayPermitBackMrzResult? chinaOneWayPermitBackMrz;
-    if (json.containsKey("chinaOneWayPermitBackMrzResult") && json["chinaOneWayPermitBackMrzResult"] != null) {
-      chinaOneWayPermitBackMrz =
-          ChinaOneWayPermitBackMrzResult.fromJSON(json["chinaOneWayPermitBackMrzResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["chinaOneWayPermitBackMrzResult"], commonCapturedIdFields);
-    }
-
-    ChinaOneWayPermitFrontMrzResult? chinaOneWayPermitFrontMrz;
-    if (json.containsKey("chinaOneWayPermitFrontMrzResult") && json["chinaOneWayPermitFrontMrzResult"] != null) {
-      chinaOneWayPermitFrontMrz =
-          ChinaOneWayPermitFrontMrzResult.fromJSON(json["chinaOneWayPermitFrontMrzResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["chinaOneWayPermitFrontMrzResult"], commonCapturedIdFields);
-    }
-
-    ApecBusinessTravelCardMrzResult? apecBusinessTravelCardMrz;
-    if (json.containsKey("apecBusinessTravelCardMrzResult") && json["apecBusinessTravelCardMrzResult"] != null) {
-      apecBusinessTravelCardMrz =
-          ApecBusinessTravelCardMrzResult.fromJSON(json["apecBusinessTravelCardMrzResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["apecBusinessTravelCardMrzResult"], commonCapturedIdFields);
-    }
-
-    UsVisaVizResult? usVisaVizResult;
-    if (json.containsKey("usVisaVizResult") && json["usVisaVizResult"] != null) {
-      usVisaVizResult = UsVisaVizResult.fromJSON(json["usVisaVizResult"] as Map<String, dynamic>);
-      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["usVisaVizResult"], commonCapturedIdFields);
-    }
-
-    CommonAccessCardBarcodeResult? commonAccessCardBarcodeResult;
-    if (json.containsKey("commonAccessCardBarcodeResult") && json["commonAccessCardBarcodeResult"] != null) {
-      commonAccessCardBarcodeResult =
-          CommonAccessCardBarcodeResult.fromJSON(json["commonAccessCardBarcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields =
-          _CommonCapturedIdFields.fromJSON(json["commonAccessCardBarcodeResult"], commonCapturedIdFields);
-    }
-
-    var imageInfo = (json.containsKey("imageInfo") && json["imageInfo"] != null)
-        ? _ImageInfo.fromJSON(json["imageInfo"] as Map<String, dynamic>)
-        : _ImageInfo._({});
-
-    var capturedResultTypes = (json['capturedResultTypes'] as List<dynamic>)
-        .map((e) => CapturedResultTypeDeserializer.fromJSON(e as String))
-        .toList()
-        .cast<CapturedResultType>()
-        .toSet();
-
-    return CapturedId._(
-        CapturedResultTypeDeserializer.fromJSON(json["capturedResultType"] as String),
-        dlAamvaBarcodeResult,
-        colombiaIdBarcodeResult,
-        colombiaDlBarcodeResult,
-        argentinaIdBarcodeResult,
-        southAfricaDlBarcodeResult,
-        southAfricaIdBarcodeResult,
-        mrzResult,
-        usUniformedServicesBarcodeResult,
-        vizResult,
-        chinaMainlandTravelPermitMrz,
-        chinaExitEntryPermitMrz,
-        chinaOneWayPermitBackMrz,
-        chinaOneWayPermitFrontMrz,
-        apecBusinessTravelCardMrz,
-        usVisaVizResult,
-        commonAccessCardBarcodeResult,
-        imageInfo,
-        capturedResultTypes,
-        commonCapturedIdFields,
-        json["age"] as int?,
-        json["isExpired"] as bool?,
-        json);
+    return CapturedId._(mrzResult, vizResult, barcodeResult, commonCapturedIdFields, json["age"] as int?,
+        json["isExpired"] as bool?, images, json);
   }
 
   String? get firstName {
@@ -269,25 +88,32 @@ class CapturedId extends Serializable {
     return _commonCapturedIdFields?.address;
   }
 
-  CapturedResultType get capturedResultType {
-    return _capturedResultType;
-  }
-
-  Set<CapturedResultType> get capturedResultTypes {
-    return _capturedResultTypes;
-  }
-
-  DocumentType get documentType {
-    return _commonCapturedIdFields?.documentType ?? DocumentType.none;
+  IdCaptureDocument? get document {
+    return _commonCapturedIdFields?.document;
   }
 
   String? get issuingCountryIso {
     return _commonCapturedIdFields?.issuingCountryIso;
   }
 
-  String? get issuingCountry {
-    return _commonCapturedIdFields?.issuingCountry;
+  IdCaptureRegion get issuingCountry {
+    return _commonCapturedIdFields?.issuingCountry ?? IdCaptureRegion.any;
   }
+
+  bool isIdCard() => document?.isIdCard == true;
+
+  bool isDriverLicense() => document?.isDriverLicense == true;
+
+  bool isHealthInsuranceCard() => document?.isHealthInsuranceCard == true;
+
+  bool isPassport() => document?.isPassport == true;
+
+  bool isRegionSpecific(RegionSpecificSubtype subtype) =>
+      document?.isRegionSpecific == true && (document as RegionSpecific).subtype == subtype;
+
+  bool isResidencePermit() => document?.isResidencePermit == true;
+
+  bool isVisaIcao() => document?.isVisaIcao == true;
 
   String? get documentNumber {
     return _commonCapturedIdFields?.documentNumber;
@@ -305,73 +131,19 @@ class CapturedId extends Serializable {
     return _commonCapturedIdFields?.dateOfIssue;
   }
 
-  AamvaBarcodeResult? get aamvaBarcode {
-    return _aamvaBarcodeResult;
-  }
-
-  ColombiaIdBarcodeResult? get colombiaIdBarcode {
-    return _colombiaIdBarcodeResult;
-  }
-
-  ColombiaDlBarcodeResult? get colombiaDlBarcode {
-    return _colombiaDlBarcodeResult;
-  }
-
-  ArgentinaIdBarcodeResult? get argentinaIdBarcode {
-    return _argentinaIdBarcodeResult;
-  }
-
-  SouthAfricaDlBarcodeResult? get southAfricaDlBarcode {
-    return _southAfricaDlBarcodeResult;
-  }
-
-  SouthAfricaIdBarcodeResult? get southAfricaIdBarcode {
-    return _southAfricaIdBarcodeResult;
-  }
-
   MrzResult? get mrz {
     return _mrzResult;
-  }
-
-  UsUniformedServicesBarcodeResult? get usUniformedServicesBarcode {
-    return _usUniformedServicesBarcodeResult;
   }
 
   VizResult? get viz {
     return _vizResult;
   }
 
-  ChinaMainlandTravelPermitMrzResult? get chinaMainlandTravelPermitMrz {
-    return _chinaMainlandTravelPermitMrz;
+  BarcodeResult? get barcode {
+    return _barcodeResult;
   }
 
-  ChinaExitEntryPermitMrzResult? get chinaExitEntryPermitMrz {
-    return _chinaExitEntryPermitMrz;
-  }
-
-  ChinaOneWayPermitBackMrzResult? get chinaOneWayPermitBackMrz {
-    return _chinaOneWayPermitBackMrz;
-  }
-
-  ChinaOneWayPermitFrontMrzResult? get chinaOneWayPermitFrontMrz {
-    return _chinaOneWayPermitFrontMrz;
-  }
-
-  ApecBusinessTravelCardMrzResult? get apecBusinessTravelCardMrz {
-    return _apecBusinessTravelCardMrz;
-  }
-
-  UsVisaVizResult? get usVisaViz {
-    return _usVisaVizResult;
-  }
-
-  CommonAccessCardBarcodeResult? get commonAccessCardBarcode {
-    return _commonAccessCardBarcode;
-  }
-
-  Image? getImageForType(IdImageType imageType) {
-    return _imagesForTypes.getImageForType(imageType);
-  }
+  IdImages get images => _images;
 
   int? get age {
     return _age;
@@ -387,34 +159,6 @@ class CapturedId extends Serializable {
   }
 }
 
-@immutable
-class _ImageInfo {
-  final Map<IdImageType, String> _imagesForTypes;
-
-  _ImageInfo._(this._imagesForTypes);
-
-  factory _ImageInfo.fromJSON(Map<String, dynamic> json) {
-    var imagesForTypes = <IdImageType, String>{};
-    if (json.containsKey("face") && json["face"] != null) {
-      imagesForTypes[IdImageType.face] = json["face"];
-    }
-    if (json.containsKey("idBack") && json["idBack"] != null) {
-      imagesForTypes[IdImageType.idBack] = json["idBack"];
-    }
-    if (json.containsKey("idFront") && json["idFront"] != null) {
-      imagesForTypes[IdImageType.idFront] = json["idFront"];
-    }
-    return _ImageInfo._(imagesForTypes);
-  }
-
-  Image? getImageForType(IdImageType imageType) {
-    var base64Image = _imagesForTypes[imageType];
-    if (base64Image == null) return null;
-
-    return Image.memory(base64Decode(base64Image));
-  }
-}
-
 class _CommonCapturedIdFields {
   String? _firstName;
   String? _lastName;
@@ -423,9 +167,9 @@ class _CommonCapturedIdFields {
   DateResult? _dateOfBirth;
   String? _nationality;
   String? _address;
-  DocumentType _documentType;
+  IdCaptureDocument? _document;
   String? _issuingCountryIso;
-  String? _issuingCountry;
+  IdCaptureRegion _issuingCountry;
   String? _documentNumber;
   String? _documentAdditionalNumber;
   DateResult? _dateOfExpiry;
@@ -439,7 +183,7 @@ class _CommonCapturedIdFields {
       this._dateOfBirth,
       this._nationality,
       this._address,
-      this._documentType,
+      this._document,
       this._issuingCountryIso,
       this._issuingCountry,
       this._documentNumber,
@@ -471,68 +215,53 @@ class _CommonCapturedIdFields {
     var address = json["address"] as String?;
 
     var issuingCountryIso = json["issuingCountryIso"] as String?;
-    var issuingCountry = json["issuingCountry"] as String?;
+
     var documentNumber = json["documentNumber"] as String?;
+
     var documentAdditionalNumber = json["documentAdditionalNumber"] as String?;
 
+    var issuingCountry = IdCaptureRegionDeserializer.fromJSON(json['issuingCountry']);
+
+    IdCaptureDocument? document;
+
+    if (json['documentType'] != null) {
+      document = _CommonCapturedIdFields._getDocument(issuingCountry, json['documentType'], json['documentSubtype']);
+    }
+
     if (existingInstance != null) {
-      if (existingInstance._firstName == null) {
-        existingInstance._firstName = firstName;
-      }
-      if (existingInstance._lastName == null) {
-        existingInstance._lastName = lastName;
-      }
+      existingInstance._firstName ??= firstName;
+      existingInstance._lastName ??= lastName;
       if (existingInstance._fullName.isEmpty) {
         existingInstance._fullName = fullName;
       }
-      if (existingInstance._sex == null) {
-        existingInstance._sex = sex;
-      }
-      if (existingInstance._dateOfBirth == null) {
-        existingInstance._dateOfBirth = dateOfBirth;
-      }
-      if (existingInstance._nationality == null) {
-        existingInstance._nationality = nationality;
-      }
-      if (existingInstance._address == null) {
-        existingInstance._address = address;
-      }
-      if (existingInstance._issuingCountryIso == null) {
-        existingInstance._issuingCountryIso = issuingCountryIso;
-      }
-      if (existingInstance._issuingCountry == null) {
-        existingInstance._issuingCountry = issuingCountry;
-      }
-      if (existingInstance._documentNumber == null) {
-        existingInstance._documentNumber = documentNumber;
-      }
-      if (existingInstance._documentAdditionalNumber == null) {
-        existingInstance._documentAdditionalNumber = documentAdditionalNumber;
-      }
-      if (existingInstance._dateOfExpiry == null) {
-        existingInstance._dateOfExpiry = dateOfExpiry;
-      }
-      if (existingInstance._dateOfIssue == null) {
-        existingInstance._dateOfIssue = dateOfIssue;
-      }
+      existingInstance._sex ??= sex;
+      existingInstance._dateOfBirth ??= dateOfBirth;
+      existingInstance._nationality ??= nationality;
+      existingInstance._address ??= address;
+      existingInstance._issuingCountryIso ??= issuingCountryIso;
+      existingInstance._documentNumber ??= documentNumber;
+      existingInstance._documentAdditionalNumber ??= documentAdditionalNumber;
+      existingInstance._dateOfExpiry ??= dateOfExpiry;
+      existingInstance._dateOfIssue ??= dateOfIssue;
       return existingInstance;
     }
 
     return _CommonCapturedIdFields._(
-        firstName,
-        lastName,
-        fullName,
-        sex,
-        dateOfBirth,
-        nationality,
-        address,
-        DocumentTypeDeserializer.fromJSON(json["documentType"] as String),
-        issuingCountryIso,
-        issuingCountry,
-        documentNumber,
-        documentAdditionalNumber,
-        dateOfExpiry,
-        dateOfIssue);
+      firstName,
+      lastName,
+      fullName,
+      sex,
+      dateOfBirth,
+      nationality,
+      address,
+      document,
+      issuingCountryIso,
+      issuingCountry,
+      documentNumber,
+      documentAdditionalNumber,
+      dateOfExpiry,
+      dateOfIssue,
+    );
   }
 
   String? get firstName {
@@ -563,15 +292,15 @@ class _CommonCapturedIdFields {
     return _address;
   }
 
-  DocumentType get documentType {
-    return _documentType;
+  IdCaptureDocument? get document {
+    return _document;
   }
 
   String? get issuingCountryIso {
     return _issuingCountryIso;
   }
 
-  String? get issuingCountry {
+  IdCaptureRegion get issuingCountry {
     return _issuingCountry;
   }
 
@@ -589,5 +318,36 @@ class _CommonCapturedIdFields {
 
   DateResult? get dateOfIssue {
     return _dateOfIssue;
+  }
+
+  static IdCaptureDocument _getDocument(
+      IdCaptureRegion issuingCountry, String documentTypeJson, String? documentSubtype) {
+    var documentType = IdCaptureDocumentTypeDeserializer.fromJSON(documentTypeJson);
+
+    RegionSpecificSubtype? subtype;
+
+    if (documentSubtype != null) {
+      subtype = RegionSpecificSubtypeDeserializer.fromJSON(documentSubtype);
+    }
+
+    switch (documentType) {
+      case IdCaptureDocumentType.driverLicense:
+        return DriverLicense(issuingCountry);
+      case IdCaptureDocumentType.healthInsuranceCard:
+        return HealthInsuranceCard(issuingCountry);
+      case IdCaptureDocumentType.idCard:
+        return IdCard(issuingCountry);
+      case IdCaptureDocumentType.passport:
+        return Passport(issuingCountry);
+      case IdCaptureDocumentType.regionSpecific:
+        if (subtype == null) {
+          throw ArgumentError("Document subtype is required for region specific documents.", "documentSubtype");
+        }
+        return RegionSpecific(subtype);
+      case IdCaptureDocumentType.residencePermit:
+        return ResidencePermit(issuingCountry);
+      case IdCaptureDocumentType.visaIcao:
+        return VisaIcao(issuingCountry);
+    }
   }
 }
