@@ -8,8 +8,12 @@ package com.scandit.datacapture.flutter.id;
 import androidx.annotation.NonNull;
 
 import com.scandit.datacapture.flutter.core.utils.FlutterResult;
+import com.scandit.datacapture.flutter.core.utils.ResultUtils;
 import com.scandit.datacapture.frameworks.core.FrameworkModule;
+import com.scandit.datacapture.frameworks.core.errors.FrameDataNullError;
 import com.scandit.datacapture.frameworks.core.locator.ServiceLocator;
+import com.scandit.datacapture.frameworks.core.utils.DefaultLastFrameData;
+import com.scandit.datacapture.frameworks.core.utils.LastFrameData;
 import com.scandit.datacapture.frameworks.id.IdCaptureModule;
 
 import io.flutter.plugin.common.MethodCall;
@@ -23,20 +27,36 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
     public static final String METHOD_CHANNEL_NAME = "com.scandit.datacapture.id.capture/method_channel";
 
     private final ServiceLocator<FrameworkModule> serviceLocator;
+    private final LastFrameData lastFrameData;
 
     public IdCaptureMethodHandler(ServiceLocator<FrameworkModule> serviceLocator) {
+        this(serviceLocator, DefaultLastFrameData.getInstance());
+    }
+
+    public IdCaptureMethodHandler(ServiceLocator<FrameworkModule> serviceLocator, LastFrameData lastFrameData) {
         this.serviceLocator = serviceLocator;
+        this.lastFrameData = lastFrameData;
     }
 
     @Override
     public void onMethodCall(MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {
             case "addIdCaptureListener":
-                getSharedModule().addAsyncListener();
+                getSharedModule().addListener();
                 result.success(null);
                 break;
 
             case "removeIdCaptureListener":
+                getSharedModule().removeListener();
+                result.success(null);
+                break;
+
+            case "addIdCaptureAsyncListener":
+                getSharedModule().addAsyncListener();
+                result.success(null);
+                break;
+
+            case "removeIdCaptureAsyncListener":
                 getSharedModule().removeAsyncListener();
                 result.success(null);
                 break;
@@ -51,6 +71,16 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
                 result.success(null);
                 break;
 
+            case "finishDidLocalizeId":
+                getSharedModule().finishDidLocalizeId(Boolean.TRUE.equals(call.arguments()));
+                result.success(null);
+                break;
+
+            case "finishDidTimeout":
+                getSharedModule().finishDidTimeout(Boolean.TRUE.equals(call.arguments()));
+                result.success(null);
+                break;
+
             case "getDefaults":
                 result.success(new JSONObject(getSharedModule().getDefaults()).toString());
                 break;
@@ -58,6 +88,11 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
             case "reset":
                 getSharedModule().resetMode();
                 result.success(null);
+                break;
+
+            case "verify":
+                assert call.arguments() != null;
+                getSharedModule().verifyCaptureId(call.arguments(), new FlutterResult(result));
                 break;
 
             case "createAamvaBarcodeVerifier":
@@ -71,9 +106,21 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
                         new FlutterResult(result)
                 );
                 break;
-                
+
+            case "vizMrzComparisonVerifier":
+                assert call.arguments() != null;
+                getSharedModule().vizMrzVerification(call.arguments(), new FlutterResult(result));
+                break;
+
             case "getLastFrameData":
-                result.success(null);
+                lastFrameData.getLastFrameDataBytes(bytes -> {
+                    if (bytes == null) {
+                        ResultUtils.rejectKotlinError(result, new FrameDataNullError());
+                    } else {
+                        result.success(bytes);
+                    }
+                    return null;
+                });
                 break;
 
             case "setModeEnabledState":
