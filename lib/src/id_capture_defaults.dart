@@ -15,7 +15,7 @@ import 'id_anonymization_mode.dart';
 // ignore: avoid_classes_with_only_static_members
 class IdCaptureDefaults {
   static bool _isInitialized = false;
-  static MethodChannel channel = MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+  static MethodChannel channel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
   static late IdCaptureOverlayDefaults _idCaptureOverlayDefaults;
   static late CameraSettingsDefaults _cameraSettingsDefaults;
   static late IdCaptureSettingsDefaults _captureSettingsDefaults;
@@ -61,14 +61,16 @@ class IdCaptureOverlayDefaults {
 class IdCaptureSettingsDefaults {
   final IdAnonymizationMode anonymizationMode;
   final bool rejectVoidedIds;
+  final bool decodeBackOfEuropeanDrivingLicense;
 
-  IdCaptureSettingsDefaults(this.anonymizationMode, this.rejectVoidedIds);
+  IdCaptureSettingsDefaults(this.anonymizationMode, this.rejectVoidedIds, this.decodeBackOfEuropeanDrivingLicense);
 
   factory IdCaptureSettingsDefaults.fromJSON(Map<String, dynamic> json) {
     var anonymizationMode = IdAnonymizationModeDeserializer.fromJSON(json["anonymizationMode"] as String);
     return IdCaptureSettingsDefaults(
       anonymizationMode,
       json["rejectVoidedIds"] as bool,
+      json["decodeBackOfEuropeDrivingLicense"] as bool? ?? false,
     );
   }
 }
@@ -76,15 +78,13 @@ class IdCaptureSettingsDefaults {
 class IdCaptureFeedbackDefaults {
   final Feedback idCaptured;
   final Feedback idRejected;
-  final Feedback idCaptureTimeout;
 
-  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected, this.idCaptureTimeout);
+  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected);
 
   factory IdCaptureFeedbackDefaults.fromJSON(Map<String, dynamic> json) {
     return IdCaptureFeedbackDefaults(
       feedbackFromJson(json, 'idCaptured'),
       feedbackFromJson(json, 'idRejected'),
-      feedbackFromJson(json, 'idCaptureTimeout'),
     );
   }
 
