@@ -19,6 +19,8 @@ class IdCaptureOverlay extends DataCaptureOverlay {
   final IdCapture _idCapture;
   late _IdCaptureOverlayController _controller;
 
+  IdLayout _idLayout = IdLayout.auto;
+
   String? _frontSideTextHint;
   String? _backSideTextHint;
   bool _showTextHints = true;
@@ -104,14 +106,19 @@ class IdCaptureOverlay extends DataCaptureOverlay {
     _controller.update();
   }
 
-  Future<void> setFrontSideTextHint(String text) {
-    _frontSideTextHint = text;
-    return _controller.update();
+  void setIdLayout(IdLayout idLayout) {
+    _idLayout = idLayout;
+    _controller.update();
   }
 
-  Future<void> setBackSideTextHint(String text) {
+  void setFrontSideTextHint(String text) {
     _frontSideTextHint = text;
-    return _controller.update();
+    _controller.update();
+  }
+
+  void setBackSideTextHint(String text) {
+    _frontSideTextHint = text;
+    _controller.update();
   }
 
   TextHintPosition get textHintPosition {
@@ -136,6 +143,7 @@ class IdCaptureOverlay extends DataCaptureOverlay {
   Map<String, dynamic> toMap() {
     var json = super.toMap();
     json.addAll({
+      'idLayout': _idLayout.toString(),
       'idLayoutStyle': _idLayoutStyle.toString(),
       'idLayoutLineStyle': _idLayoutLineStyle.toString(),
       'capturedBrush': capturedBrush.toMap(),
@@ -158,7 +166,7 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 class _IdCaptureOverlayController {
   late final MethodChannel _methodChannel = _getChannel();
 
-  final IdCaptureOverlay _overlay;
+  IdCaptureOverlay _overlay;
 
   _IdCaptureOverlayController(this._overlay);
 
@@ -167,6 +175,6 @@ class _IdCaptureOverlayController {
   }
 
   MethodChannel _getChannel() {
-    return const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+    return MethodChannel(IdCaptureFunctionNames.methodsChannelName);
   }
 }

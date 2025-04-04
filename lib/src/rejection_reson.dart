@@ -5,17 +5,9 @@
  */
 
 enum RejectionReason {
-  notAcceptedDocumentType('notAcceptedDocumentType'),
-  invalidFormat('invalidFormat'),
-  documentVoided('documentVoided'),
-  timeout('timeout'),
-  singleImageNotRecognized('singleImageNotRecognized'),
-  documentExpired('documentExpired'),
-  documentExpiresSoon('documentExpiresSoon'),
-  notRealIdCompliant('notRealIdCompliant'),
-  holderUnderage('holderUnderage'),
-  forgedAamvaBarcode('forgedAamvaBarcode'),
-  inconsistentData('inconsistentData');
+  documentTypeNotEnabled('documentTypeNotEnabled'),
+  incorrectBarcodeFormat('incorrectBarcodeFormat'),
+  documentVoided('documentVoided');
 
   const RejectionReason(this._name);
 
