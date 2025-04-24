@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.homepage                = pubspec["homepage"]
   s.license                 = { :file => "../LICENSE" }
   s.author                  = { "Scandit" => "support@scandit.com" }
-  s.platforms               = { :ios => "13.0" }
+  s.platforms               = { :ios => "14.0" }
   s.source                  = { :path => "." }
   s.swift_version           = "4.0"
   s.source_files            = "Classes/**/*.{h,m,swift}"
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.dependency "Flutter"
   s.dependency "scandit_flutter_datacapture_core", "= #{version}"
-  s.dependency "scandit-datacapture-frameworks-id", '= 6.28.5'
+  s.dependency "scandit-datacapture-frameworks-id", '= 7.2.1'
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES", "VALID_ARCHS[sdk=iphonesimulator*]" => "x86_64" }
