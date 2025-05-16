@@ -42,3 +42,4 @@ export 'src/result/vehicle_restriction.dart' show VehicleRestriction;
 export 'src/region_specific_subtypes.dart' show RegionSpecificSubtype;
 export 'src/id_side.dart' show IdSide;
 export 'src/id_images.dart' show IdImages;
+export 'src/aamva_barcode_verification_status.dart' show AamvaBarcodeVerificationStatus;
