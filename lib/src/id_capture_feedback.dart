@@ -36,6 +36,15 @@ class IdCaptureFeedback implements Serializable {
     _update();
   }
 
+  Feedback _idCaptureTimeout = IdCaptureDefaults.idCaptureFeedbackDefaults.idCaptureTimeout;
+
+  Feedback get idCaptureTimeout => _idCaptureTimeout;
+
+  set idCaptureTimeout(Feedback newValue) {
+    _idCaptureTimeout = newValue;
+    _update();
+  }
+
   void _update() {
     _controller.updateFeedback();
   }
@@ -47,12 +56,13 @@ class IdCaptureFeedback implements Serializable {
     return {
       'idCaptured': idCaptured.toMap(),
       'idRejected': idRejected.toMap(),
+      'idCaptureTimeout': idCaptureTimeout.toMap(),
     };
   }
 }
 
 class _IdCaptureFeedbackController {
-  final MethodChannel _methodChannel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+  final MethodChannel _methodChannel = MethodChannel(IdCaptureFunctionNames.methodsChannelName);
   final IdCaptureFeedback _feedback;
 
   _IdCaptureFeedbackController(this._feedback);

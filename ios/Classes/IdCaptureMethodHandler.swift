@@ -16,10 +16,16 @@ import ScanditFrameworksCore
          static let removeListener = "removeIdCaptureListener"
          static let finishDidCaptureId = "finishDidCaptureId"
          static let reset = "reset"
+         static let verify = "verify"
          static let getLastFrameData = "getLastFrameData"
          static let finishDidRejectId = "finishDidRejectId"
+         static let finishDidLocalizeId = "finishDidLocalizeId"
+         static let finishDidTimeout = "finishDidTimeout"
          static let createAamvaBarcodeVerifier = "createAamvaBarcodeVerifier"
          static let verifyCapturedIdBarcode = "verifyCapturedIdBarcode"
+         static let vizMrzComparisonVerifier = "vizMrzComparisonVerifier"
+         static let addIdCaptureAsyncListener = "addIdCaptureAsyncListener"
+         static let removeIdCaptureAsyncListener = "removeIdCaptureAsyncListener"
          static let setModeEnabledState = "setModeEnabledState"
          static let updateIdCaptureMode = "updateIdCaptureMode"
          static let applyIdCaptureModeSettings = "applyIdCaptureModeSettings"
@@ -39,10 +45,10 @@ import ScanditFrameworksCore
          case FunctionNames.getDefaults:
              defaults(result)
          case FunctionNames.addListener:
-             idModule.addAsyncListener()
+             idModule.addListener()
              result(nil)
          case FunctionNames.removeListener:
-             idModule.removeAsyncListener()
+             idModule.removeListener()
              result(nil)
          case FunctionNames.finishDidCaptureId:
              idModule.finishDidCaptureId(enabled: call.arguments as? Bool ?? false)
@@ -50,10 +56,23 @@ import ScanditFrameworksCore
          case FunctionNames.reset:
              idModule.resetMode()
              result(nil)
+         case FunctionNames.verify:
+             guard let jsonString = call.arguments as? String else {
+                 result(FlutterError(code: "-2", message: "Invalid json passed", details: nil))
+                 return
+             }
+             idModule.verifyCapturedIdAamvaViz(jsonString: jsonString,
+                                               result: FlutterFrameworkResult(reply: result))
          case FunctionNames.getLastFrameData:
-             result(nil)
+             LastFrameData.shared.getLastFrameDataBytes {
+                 result($0)
+             }
          case FunctionNames.finishDidRejectId:
              idModule.finishDidRejectId(enabled: call.arguments as? Bool ?? false)
+         case FunctionNames.finishDidLocalizeId:
+             idModule.finishDidLocalizeId(enabled: call.arguments as? Bool ?? false)
+         case FunctionNames.finishDidTimeout:
+             idModule.finishTimeout(enabled: call.arguments as? Bool ?? false)
          case FunctionNames.createAamvaBarcodeVerifier:
              idModule.createAamvaBarcodeVerifier(result: FlutterFrameworkResult(reply: result))
          case FunctionNames.verifyCapturedIdBarcode:
@@ -63,6 +82,19 @@ import ScanditFrameworksCore
              }
              idModule.verifyCapturedIdWithCloud(jsonString: jsonString,
                                                 result: FlutterFrameworkResult(reply: result))
+         case FunctionNames.vizMrzComparisonVerifier:
+             guard let jsonString = call.arguments as? String else {
+                 result(FlutterError(code: "-2", message: "Invalid json passed", details: nil))
+                 return
+             }
+             idModule.verifyCaptureIdMrzViz(jsonString: jsonString,
+                                            result: FlutterFrameworkResult(reply: result))
+         case FunctionNames.addIdCaptureAsyncListener:
+             idModule.addAsyncListener()
+             result(nil)
+         case FunctionNames.removeIdCaptureAsyncListener:
+             idModule.removeAsyncListener()
+             result(nil)
          case FunctionNames.setModeEnabledState:
             idModule.setModeEnabled(enabled: call.arguments as! Bool)
             result(nil)
