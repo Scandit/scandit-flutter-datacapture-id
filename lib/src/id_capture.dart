@@ -134,7 +134,14 @@ class _IdCaptureListenerController {
       var eventJSON = jsonDecode(event);
       var eventName = eventJSON["event"] as String;
       if (eventName == IdCaptureListener._didCaptureId) {
-        var capturedId = CapturedId.fromJSON(jsonDecode(eventJSON["id"]));
+        final decodedId = jsonDecode(eventJSON["id"]);
+
+        if (eventJSON["imageInfo"] != null) {
+          final idImagesJson = eventJSON["imageInfo"] as Map<String, dynamic>;
+          decodedId["imageInfo"] = idImagesJson;
+        }
+
+        var capturedId = CapturedId.fromJSON(decodedId);
         _notifyDidCaptureId(capturedId).then((value) {
           _methodChannel
               .invokeMethod(IdCaptureFunctionNames.finishDidCaptureIdName, _idCapture.isEnabled)

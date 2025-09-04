@@ -5,8 +5,10 @@
  */
 
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:scandit_flutter_datacapture_id/src/id_side.dart';
 
 class IdImages {
@@ -54,7 +56,7 @@ class IdImages {
   Image? get face {
     if (_frontFace != null) return _frontFace;
     if (_frontFaceImageEncoded != null) {
-      _frontFace = Image.memory(base64Decode(_frontFaceImageEncoded));
+      _frontFace = _createImageFromSource(_frontFaceImageEncoded);
     }
     return _frontFace;
   }
@@ -64,7 +66,7 @@ class IdImages {
   Image? get frame {
     if (_frontFrame != null) return _frontFrame;
     if (_frontFrameEncoded != null) {
-      _frontFrame = Image.memory(base64Decode(_frontFrameEncoded));
+      _frontFrame = _createImageFromSource(_frontFrameEncoded);
     }
     return _frontFrame;
   }
@@ -78,13 +80,13 @@ class IdImages {
       case IdSide.front:
         if (_frontCropped != null) return _frontCropped;
         if (_croppedDocumentFrontFrameEncoded != null) {
-          _frontCropped = Image.memory(base64Decode(_croppedDocumentFrontFrameEncoded));
+          _frontCropped = _createImageFromSource(_croppedDocumentFrontFrameEncoded);
         }
         return _frontCropped;
       case IdSide.back:
         if (_backCropped != null) return _backCropped;
         if (_croppedDocumentBackFrameEncoded != null) {
-          _backCropped = Image.memory(base64Decode(_croppedDocumentBackFrameEncoded));
+          _backCropped = _createImageFromSource(_croppedDocumentBackFrameEncoded);
         }
         return _backCropped;
     }
@@ -97,15 +99,80 @@ class IdImages {
       case IdSide.front:
         if (_frontFrame != null) return _frontFrame;
         if (_frontFrameEncoded != null) {
-          _frontFrame = Image.memory(base64Decode(_frontFrameEncoded));
+          _frontFrame = _createImageFromSource(_frontFrameEncoded);
         }
         return _frontFrame;
       case IdSide.back:
         if (_backFrame != null) return _backFrame;
         if (_backFrameEncoded != null) {
-          _backFrame = Image.memory(base64Decode(_backFrameEncoded));
+          _backFrame = _createImageFromSource(_backFrameEncoded);
         }
         return _backFrame;
+    }
+  }
+
+  /// Creates an Image widget from either a base64-encoded string or a file path.
+  ///
+  /// Automatically detects the source type:
+  /// - If the source starts with common file path patterns (/), treats it as a file path
+  /// - If the source contains base64 padding (=) or is valid base64, treats it as base64
+  /// - Optimizes loading with error handling for both cases
+  Image? _createImageFromSource(String? source) {
+    if (source == null || source.isEmpty) return null;
+
+    try {
+      if (_isFilePath(source)) {
+        // Normalize potential file:// URIs
+        String path = source;
+        if (source.startsWith('file://')) {
+          try {
+            path = Uri.parse(source).toFilePath();
+          } catch (_) {
+            path = source.replaceFirst('file://', '');
+          }
+        }
+        final file = File(path);
+        if (file.existsSync()) {
+          return Image.file(
+            file,
+            errorBuilder: (context, error, stackTrace) {
+              // Fallback to base64 if file loading fails
+              return _createImageFromBase64(source);
+            },
+          );
+        }
+      }
+
+      // Try as base64
+      return _createImageFromBase64(source);
+    } catch (e) {
+      // Return null if both methods fail
+      return null;
+    }
+  }
+
+  /// Determines if a string represents a file path
+  bool _isFilePath(String source) {
+    // Check for common file path patterns
+    return source.startsWith('/') ||
+        source.startsWith('file://') ||
+        source.contains('\\') || // Windows paths
+        (source.length > 1 && source[1] == ':'); // Windows drive letters
+  }
+
+  /// Creates an Image from base64 string with error handling
+  Image _createImageFromBase64(String base64String) {
+    try {
+      final bytes = base64Decode(base64String);
+      return Image.memory(
+        bytes,
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+      );
+    } on FormatException {
+      return Image(
+        image: MemoryImage(Uint8List.fromList([0])),
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+      );
     }
   }
 }
