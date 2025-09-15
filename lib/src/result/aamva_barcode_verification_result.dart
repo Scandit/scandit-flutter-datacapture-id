@@ -7,6 +7,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:scandit_flutter_datacapture_id/src/aamva_barcode_verification_status.dart';
 
+@Deprecated('AamvaBarcodeVerifier has been deprecated. Use IdCaptureSettings.rejectForgedAamvaBarcodes.')
 @immutable
 class AamvaBarcodeVerificationResult {
   final bool _allChecksPassed;
