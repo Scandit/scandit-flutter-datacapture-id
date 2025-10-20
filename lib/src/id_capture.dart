@@ -150,14 +150,7 @@ class _IdCaptureListenerController extends BaseController {
       var eventJSON = jsonDecode(event);
       var eventName = eventJSON["event"] as String;
       if (eventName == IdCaptureListener._didCaptureId) {
-        final decodedId = jsonDecode(eventJSON["id"]);
-
-        if (eventJSON["imageInfo"] != null) {
-          final idImagesJson = eventJSON["imageInfo"] as Map<String, dynamic>;
-          decodedId["imageInfo"] = idImagesJson;
-        }
-
-        var capturedId = CapturedId.fromJSON(decodedId);
+        final capturedId = _parseCapturedId(eventJSON);
         _notifyDidCaptureId(capturedId).then((value) {
           methodChannel
               .invokeMethod(IdCaptureFunctionNames.finishDidCaptureIdName, _idCapture.isEnabled)
@@ -165,10 +158,7 @@ class _IdCaptureListenerController extends BaseController {
               .then((value) => null, onError: (error) => developer.log(error));
         });
       } else if (eventName == IdCaptureListener._didRejectId) {
-        CapturedId? capturedId;
-        if (eventJSON["id"] != null) {
-          capturedId = CapturedId.fromJSON(jsonDecode(eventJSON["id"]));
-        }
+        CapturedId? capturedId = eventJSON["id"] != null ? _parseCapturedId(eventJSON) : null;
         var rejectionReson = RejectionReasonDeserializer.fromJSON(eventJSON['rejectionReason']);
         _notifyDidRejectId(capturedId, rejectionReson).then((value) {
           methodChannel
@@ -185,6 +175,17 @@ class _IdCaptureListenerController extends BaseController {
     methodChannel
         .invokeMethod(IdCaptureFunctionNames.removeIdCaptureListenerName)
         .then((value) => null, onError: onError);
+  }
+
+  CapturedId _parseCapturedId(Map<String, dynamic> eventJSON) {
+    final decodedId = jsonDecode(eventJSON["id"]);
+
+    if (eventJSON["imageInfo"] != null) {
+      final idImagesJson = eventJSON["imageInfo"] as Map<String, dynamic>;
+      decodedId["imageInfo"] = idImagesJson;
+    }
+
+    return CapturedId.fromJSON(decodedId);
   }
 
   Future<void> _notifyDidCaptureId(CapturedId capturedId) async {
