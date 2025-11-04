@@ -8,12 +8,6 @@ abstract class IdCaptureFunctionNames {
   static const String methodsChannelName = 'com.scandit.datacapture.id.capture/method_channel';
   static const String eventsChannelName = 'com.scandit.datacapture.id.capture/event_channel';
 
-  static const String createAamvaBarcodeVerifier = 'createAamvaBarcodeVerifier';
-  static const String verifyCapturedIdBarcode = 'verifyCapturedIdBarcode';
-  static const String aamvaVizBarcodeComparisonVerifier = 'verify';
-  static const String vizMrzComparisonVerifier = 'vizMrzComparisonVerifier';
-  static const String addIdCaptureAsyncListener = 'addIdCaptureAsyncListener';
-  static const String removeIdCaptureAsyncListener = 'removeIdCaptureAsyncListener';
   static const String getLastFrameDataName = 'getLastFrameData';
   static const String removeIdCaptureListenerName = 'removeIdCaptureListener';
   static const String addIdCaptureListenerName = 'addIdCaptureListener';

@@ -28,8 +28,7 @@ public class ScanditFlutterDataCaptureId: NSObject, FlutterPlugin {
         let eventChannel = FlutterEventChannel(name: "\(prefix)/event_channel",
                                                binaryMessenger: registrar.messenger())
         let emitter = FlutterEventEmitter(eventChannel: eventChannel)
-        let idCaptureListener = FrameworksIdCaptureListener(emitter: emitter)
-        let idModule = IdCaptureModule(idCaptureListener: idCaptureListener)
+        let idModule = IdCaptureModule(emitter: emitter)
         let methodCallHandler = IdCaptureMethodHandler(idModule: idModule)
         idModule.didStart()
 

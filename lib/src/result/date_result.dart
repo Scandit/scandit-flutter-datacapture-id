@@ -4,7 +4,7 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
 
 @immutable
@@ -30,11 +30,6 @@ class DateResult extends Serializable {
     return _year;
   }
 
-  @Deprecated("Use [localDate] or [utcDate] instead.")
-  DateTime get date {
-    return DateTime.utc(year, month, day);
-  }
-
   DateTime get localDate {
     return utcDate.toLocal();
   }
@@ -48,6 +43,7 @@ class DateResult extends Serializable {
     return {"day": _day, "month": _month, "year": _year};
   }
 
+  @override
   bool operator ==(Object other) {
     return other is DateResult && other.day == day && other.month == month && other.year == year;
   }
@@ -55,5 +51,5 @@ class DateResult extends Serializable {
   @override
   // Object.hash() was introduced in sdk 2.14 our current minimum is 2.12
   // ignore: deprecated_member_use
-  int get hashCode => hashValues(day.hashCode, month.hashCode, year.hashCode);
+  int get hashCode => Object.hash(day, month, year);
 }

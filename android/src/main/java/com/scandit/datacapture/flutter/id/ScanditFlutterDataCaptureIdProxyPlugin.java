@@ -6,46 +6,42 @@
 package com.scandit.datacapture.flutter.id;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
-import com.scandit.datacapture.flutter.core.extensions.MethodChannelExtensions;
+import com.scandit.datacapture.flutter.core.BaseFlutterPlugin;
 import com.scandit.datacapture.flutter.core.utils.FlutterEmitter;
 import com.scandit.datacapture.frameworks.core.FrameworkModule;
-import com.scandit.datacapture.frameworks.core.locator.DefaultServiceLocator;
 import com.scandit.datacapture.frameworks.core.locator.ServiceLocator;
 import com.scandit.datacapture.frameworks.id.IdCaptureModule;
 import com.scandit.datacapture.frameworks.id.listeners.FrameworksIdCaptureListener;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodChannel;
 
-import java.lang.ref.WeakReference;
-import java.util.concurrent.locks.ReentrantLock;
-
-public class ScanditFlutterDataCaptureIdProxyPlugin implements FlutterPlugin, ActivityAware {
-    private static final ReentrantLock lock = new ReentrantLock();
-
+public class ScanditFlutterDataCaptureIdProxyPlugin extends BaseFlutterPlugin implements FlutterPlugin, ActivityAware {
     private final static FlutterEmitter idEmitter = new FlutterEmitter(IdCaptureMethodHandler.EVENT_CHANNEL_NAME);
 
-    private final ServiceLocator<FrameworkModule> serviceLocator = DefaultServiceLocator.getInstance();
-
-    private WeakReference<FlutterPlugin.FlutterPluginBinding> flutterPluginBinding = new WeakReference<>(null);
-
-    private MethodChannel idCaptureMethodChannel;
+    private static final AtomicInteger activePluginInstances = new AtomicInteger(0);
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-        flutterPluginBinding = new WeakReference<>(binding);
-        setupModules(binding);
-        setupMethodChannels(binding);
+        activePluginInstances.incrementAndGet();
+        super.onAttachedToEngine(binding);
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        flutterPluginBinding = new WeakReference<>(null);
-        disposeMethodChannels();
-        disposeModules();
+        activePluginInstances.decrementAndGet();
+        super.onDetachedFromEngine(binding);
+    }
+
+    @Override
+    protected int getActivePluginInstanceCount() {
+        return activePluginInstances.get();
     }
 
     @Override
@@ -55,12 +51,12 @@ public class ScanditFlutterDataCaptureIdProxyPlugin implements FlutterPlugin, Ac
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        // NOOP
+        disposeEventChannels();
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        // NOOP
+        onAttachedToActivity(binding);
     }
 
     @Override
@@ -68,61 +64,43 @@ public class ScanditFlutterDataCaptureIdProxyPlugin implements FlutterPlugin, Ac
         disposeEventChannels();
     }
 
-    private void setupMethodChannels(@NonNull FlutterPlugin.FlutterPluginBinding binding) {
-        idCaptureMethodChannel = MethodChannelExtensions.getMethodChannel(
+    @Override
+    protected void setupMethodChannels(FlutterPluginBinding binding, ServiceLocator<FrameworkModule> serviceLocator) {
+        MethodChannel channel = createChannel(
                 binding,
                 IdCaptureMethodHandler.METHOD_CHANNEL_NAME
         );
-        idCaptureMethodChannel.setMethodCallHandler(new IdCaptureMethodHandler(serviceLocator));
+        channel.setMethodCallHandler(new IdCaptureMethodHandler(serviceLocator));
+        registerChannel(channel);
     }
 
-    private void disposeMethodChannels() {
-        if (idCaptureMethodChannel != null) {
-            idCaptureMethodChannel.setMethodCallHandler(null);
-            idCaptureMethodChannel = null;
-        }
+    @Override
+    protected void setupModules(FlutterPlugin.FlutterPluginBinding binding) {
+        IdCaptureModule idCaptureModule = resolveModule(IdCaptureModule.class);
+        if (idCaptureModule != null) return;
+
+        idCaptureModule = IdCaptureModule.create(idEmitter);
+        idCaptureModule.onCreate(binding.getApplicationContext());
+
+        registerModule(idCaptureModule);
     }
 
     private void setupEventChannels() {
-        FlutterPluginBinding binding = flutterPluginBinding.get();
+        FlutterPluginBinding binding = getCurrentBinding();
         if (binding != null) {
             idEmitter.addChannel(binding.getBinaryMessenger());
         }
     }
 
     private void disposeEventChannels() {
-        FlutterPluginBinding binding = flutterPluginBinding.get();
+        FlutterPluginBinding binding = getCurrentBinding();
         if (binding != null) {
             idEmitter.removeChannel(binding.getBinaryMessenger());
         }
     }
 
-    private void setupModules(@NonNull FlutterPlugin.FlutterPluginBinding binding) {
-        lock.lock();
-        try {
-            IdCaptureModule idCaptureModule = (IdCaptureModule) serviceLocator.resolve(IdCaptureModule.class.getName());
-            if (idCaptureModule != null) return;
-
-            idCaptureModule = IdCaptureModule.create(
-                    FrameworksIdCaptureListener.create(idEmitter)
-            );
-            idCaptureModule.onCreate(binding.getApplicationContext());
-
-            serviceLocator.register(idCaptureModule);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private void disposeModules() {
-        lock.lock();
-        try {
-            IdCaptureModule idCaptureModule = (IdCaptureModule) serviceLocator.remove(IdCaptureModule.class.getName());
-            if (idCaptureModule != null) {
-                idCaptureModule.onDestroy();
-            }
-        } finally {
-            lock.unlock();
-        }
+    @VisibleForTesting
+    public static void resetActiveInstances() {
+        activePluginInstances.set(0);
     }
 }

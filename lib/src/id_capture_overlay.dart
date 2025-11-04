@@ -6,20 +6,19 @@
 
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+// ignore: implementation_imports
+import 'package:scandit_flutter_datacapture_core/src/internal/base_controller.dart';
+import 'package:scandit_flutter_datacapture_id/src/id_capture.dart';
 
-import 'function_names.dart';
-import 'id_capture.dart';
-import 'id_capture_defaults.dart';
+import 'internal/function_names.dart';
+import 'internal/id_capture_defaults.dart';
 import 'id_layout.dart';
 
 class IdCaptureOverlay extends DataCaptureOverlay {
-  // ignore: unused_field
-  final IdCapture _idCapture;
-  late _IdCaptureOverlayController _controller;
-
-  IdLayout _idLayout = IdLayout.auto;
+  DataCaptureView? _view;
+  _IdCaptureOverlayController? _controller;
+  final IdCapture _mode;
 
   String? _frontSideTextHint;
   String? _backSideTextHint;
@@ -28,18 +27,29 @@ class IdCaptureOverlay extends DataCaptureOverlay {
   TextHintPosition _textHintPosition = TextHintPosition.aboveViewfinder;
 
   @override
-  DataCaptureView? view;
+  DataCaptureView? get view => _view;
 
-  IdCaptureOverlay._(this._idCapture, this.view) : super('idCapture') {
-    view?.addOverlay(this);
-    _controller = _IdCaptureOverlayController(this);
+  @override
+  set view(DataCaptureView? newValue) {
+    if (newValue == null) {
+      _view = null;
+      _controller = null;
+      return;
+    }
+
+    _view = newValue;
+    _controller ??= _IdCaptureOverlayController(this);
   }
 
-  IdCaptureOverlay.withIdCaptureForView(IdCapture idCapture, DataCaptureView? view) : this._(idCapture, view);
+  IdCaptureOverlay._(this._mode) : super('idCapture');
 
-  IdCaptureOverlay.withIdCapture(IdCapture idCapture) : this.withIdCaptureForView(idCapture, null);
+  IdCaptureOverlay(IdCapture mode) : this._(mode);
 
-  IdLayoutStyle _idLayoutStyle = IdLayoutStyle.rounded;
+  IdLayoutStyle _idLayoutStyle = defaultIdLayoutStyle;
+
+  static IdLayoutStyle get defaultIdLayoutStyle {
+    return IdCaptureDefaults.idCaptureOverlayDefaults.idLayoutStyle;
+  }
 
   IdLayoutStyle get idLayoutStyle {
     return _idLayoutStyle;
@@ -47,10 +57,14 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
   set idLayoutStyle(IdLayoutStyle newValue) {
     _idLayoutStyle = newValue;
-    _controller.update();
+    _controller?.update();
   }
 
-  IdLayoutLineStyle _idLayoutLineStyle = IdLayoutLineStyle.light;
+  IdLayoutLineStyle _idLayoutLineStyle = defaultIdLayoutLineStyle;
+
+  static IdLayoutLineStyle get defaultIdLayoutLineStyle {
+    return IdCaptureDefaults.idCaptureOverlayDefaults.idLayoutLineStyle;
+  }
 
   IdLayoutLineStyle get idLayoutLineStyle {
     return _idLayoutLineStyle;
@@ -58,7 +72,7 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
   set idLayoutLineStyle(IdLayoutLineStyle newValue) {
     _idLayoutLineStyle = newValue;
-    _controller.update();
+    _controller?.update();
   }
 
   static Brush get defaultCapturedBrush {
@@ -73,7 +87,7 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
   set capturedBrush(Brush newValue) {
     _capturedBrush = newValue;
-    _controller.update();
+    _controller?.update();
   }
 
   static Brush get defaultLocalizedBrush {
@@ -88,7 +102,7 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
   set localizedBrush(Brush newValue) {
     _localizedBrush = newValue;
-    _controller.update();
+    _controller?.update();
   }
 
   static Brush get defaultRejectedBrush {
@@ -103,22 +117,17 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
   set rejectedBrush(Brush newValue) {
     _rejectedBrush = newValue;
-    _controller.update();
+    _controller?.update();
   }
 
-  void setIdLayout(IdLayout idLayout) {
-    _idLayout = idLayout;
-    _controller.update();
-  }
-
-  void setFrontSideTextHint(String text) {
+  Future<void> setFrontSideTextHint(String text) {
     _frontSideTextHint = text;
-    _controller.update();
+    return _controller?.update() ?? Future.value();
   }
 
-  void setBackSideTextHint(String text) {
+  Future<void> setBackSideTextHint(String text) {
     _frontSideTextHint = text;
-    _controller.update();
+    return _controller?.update() ?? Future.value();
   }
 
   TextHintPosition get textHintPosition {
@@ -127,7 +136,7 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
   set textHintPosition(TextHintPosition newValue) {
     _textHintPosition = newValue;
-    _controller.update();
+    _controller?.update();
   }
 
   bool get showTextHints {
@@ -136,14 +145,13 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
   set showTextHints(bool newValue) {
     _showTextHints = newValue;
-    _controller.update();
+    _controller?.update();
   }
 
   @override
   Map<String, dynamic> toMap() {
     var json = super.toMap();
     json.addAll({
-      'idLayout': _idLayout.toString(),
       'idLayoutStyle': _idLayoutStyle.toString(),
       'idLayoutLineStyle': _idLayoutLineStyle.toString(),
       'capturedBrush': capturedBrush.toMap(),
@@ -159,22 +167,20 @@ class IdCaptureOverlay extends DataCaptureOverlay {
     if (_backSideTextHint != null) {
       json['backSideTextHint'] = _backSideTextHint;
     }
+    json['modeId'] = _mode.toMap()['modeId'];
     return json;
   }
 }
 
-class _IdCaptureOverlayController {
-  late final MethodChannel _methodChannel = _getChannel();
+class _IdCaptureOverlayController extends BaseController {
+  final IdCaptureOverlay _overlay;
 
-  IdCaptureOverlay _overlay;
-
-  _IdCaptureOverlayController(this._overlay);
+  _IdCaptureOverlayController(this._overlay) : super(IdCaptureFunctionNames.methodsChannelName);
 
   Future<void> update() {
-    return _methodChannel.invokeMethod(IdCaptureFunctionNames.updateIdCaptureOverlay, jsonEncode(_overlay.toMap()));
-  }
-
-  MethodChannel _getChannel() {
-    return MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+    return methodChannel.invokeMethod(
+      IdCaptureFunctionNames.updateIdCaptureOverlay,
+      jsonEncode(_overlay.toMap()),
+    );
   }
 }

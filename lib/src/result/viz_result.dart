@@ -4,9 +4,11 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:scandit_flutter_datacapture_id/src/driving_license_details.dart';
 
-import '../supported_sides.dart';
+import '../captured_sides.dart';
+import 'date_result.dart';
 
 @immutable
 class VizResult {
@@ -24,136 +26,240 @@ class VizResult {
   final String? _issuingJurisdiction;
   final String? _issuingJurisdictionIso;
   final String? _issuingAuthority;
-  final SupportedSides _capturedSides;
+  final CapturedSides _capturedSides;
   final bool _isBackSideCaptureSupported;
   final String? _bloodType;
   final String? _sponsor;
   final String? _mothersName;
   final String? _fathersName;
+  final String? _visaNumber;
+  final String? _passportNumber;
+  final String? _firstName;
+  final String? _lastName;
+  final String? _fullName;
+  final String? _sex;
+  final DateResult? _dateOfBirth;
+  final String? _nationality;
+  final String? _address;
+  final String? _documentNumber;
+  final DateResult? _dateOfExpiry;
+  final DateResult? _dateOfIssue;
+  final String? _vehicleOwner;
+  final DrivingLicenseDetails? _drivingLicenseDetails;
 
-  VizResult._(
-      this._additionalNameInformation,
-      this._additionalAddressInformation,
-      this._placeOfBirth,
-      this._race,
-      this._religion,
-      this._profession,
-      this._maritalStatus,
-      this._residentialStatus,
-      this._employer,
-      this._personalIdNumber,
-      this._documentAdditionalNumber,
-      this._issuingJurisdiction,
-      this._issuingJurisdictionIso,
-      this._issuingAuthority,
-      this._capturedSides,
-      this._isBackSideCaptureSupported,
-      this._bloodType,
-      this._sponsor,
-      this._mothersName,
-      this._fathersName);
+  const VizResult._({
+    required String? additionalNameInformation,
+    required String? additionalAddressInformation,
+    required String? placeOfBirth,
+    required String? race,
+    required String? religion,
+    required String? profession,
+    required String? maritalStatus,
+    required String? residentialStatus,
+    required String? employer,
+    required String? personalIdNumber,
+    required String? documentAdditionalNumber,
+    required String? issuingJurisdiction,
+    required String? issuingJurisdictionIso,
+    required String? issuingAuthority,
+    required CapturedSides capturedSides,
+    required bool isBackSideCaptureSupported,
+    required String? bloodType,
+    required String? sponsor,
+    required String? mothersName,
+    required String? fathersName,
+    required String? visaNumber,
+    required String? passportNumber,
+    required String? firstName,
+    required String? lastName,
+    required String? fullName,
+    required String? sex,
+    required DateResult? dateOfBirth,
+    required String? nationality,
+    required String? address,
+    required String? documentNumber,
+    required DateResult? dateOfExpiry,
+    required DateResult? dateOfIssue,
+    required String? vehicleOwner,
+    required DrivingLicenseDetails? drivingLicenseDetails,
+  })  : _additionalNameInformation = additionalNameInformation,
+        _additionalAddressInformation = additionalAddressInformation,
+        _placeOfBirth = placeOfBirth,
+        _race = race,
+        _religion = religion,
+        _profession = profession,
+        _maritalStatus = maritalStatus,
+        _residentialStatus = residentialStatus,
+        _employer = employer,
+        _personalIdNumber = personalIdNumber,
+        _documentAdditionalNumber = documentAdditionalNumber,
+        _issuingJurisdiction = issuingJurisdiction,
+        _issuingJurisdictionIso = issuingJurisdictionIso,
+        _issuingAuthority = issuingAuthority,
+        _capturedSides = capturedSides,
+        _isBackSideCaptureSupported = isBackSideCaptureSupported,
+        _bloodType = bloodType,
+        _sponsor = sponsor,
+        _mothersName = mothersName,
+        _fathersName = fathersName,
+        _visaNumber = visaNumber,
+        _passportNumber = passportNumber,
+        _firstName = firstName,
+        _lastName = lastName,
+        _fullName = fullName,
+        _sex = sex,
+        _dateOfBirth = dateOfBirth,
+        _nationality = nationality,
+        _address = address,
+        _documentNumber = documentNumber,
+        _dateOfExpiry = dateOfExpiry,
+        _dateOfIssue = dateOfIssue,
+        _vehicleOwner = vehicleOwner,
+        _drivingLicenseDetails = drivingLicenseDetails;
 
-  VizResult.fromJSON(Map<String, dynamic> json)
-      : this._(
-          json['additionalNameInformation'] as String?,
-          json['additionalAddressInformation'] as String?,
-          json['placeOfBirth'] as String?,
-          json['race'] as String?,
-          json['religion'] as String?,
-          json['profession'] as String?,
-          json['maritalStatus'] as String?,
-          json['residentialStatus'] as String?,
-          json['employer'] as String?,
-          json['personalIdNumber'] as String?,
-          json['documentAdditionalNumber'] as String?,
-          json['issuingJurisdiction'] as String?,
-          json['issuingJurisdictionIso'] as String?,
-          json['issuingAuthority'] as String?,
-          SupportedSidesDeserializer.fromJSON(json['capturedSides']),
-          json['isBackSideCaptureSupported'] as bool,
-          json['bloodType'] as String?,
-          json['sponsor'] as String?,
-          json['mothersName'] as String?,
-          json['fathersName'] as String?,
-        );
+  factory VizResult.fromJSON(Map<String, dynamic> json) {
+    final additionalNameInformation = json['additionalNameInformation'] as String?;
+    final additionalAddressInformation = json['additionalAddressInformation'] as String?;
+    final placeOfBirth = json['placeOfBirth'] as String?;
+    final race = json['race'] as String?;
+    final religion = json['religion'] as String?;
+    final profession = json['profession'] as String?;
+    final maritalStatus = json['maritalStatus'] as String?;
+    final residentialStatus = json['residentialStatus'] as String?;
+    final employer = json['employer'] as String?;
+    final personalIdNumber = json['personalIdNumber'] as String?;
+    final documentAdditionalNumber = json['documentAdditionalNumber'] as String?;
+    final issuingJurisdiction = json['issuingJurisdiction'] as String?;
+    final issuingJurisdictionIso = json['issuingJurisdictionIso'] as String?;
+    final issuingAuthority = json['issuingAuthority'] as String?;
+    final capturedSides = CapturedSidesDeserializer.fromJSON(json['capturedSides']);
+    final isBackSideCaptureSupported = json['isBackSideCaptureSupported'] as bool;
+    final bloodType = json['bloodType'] as String?;
+    final sponsor = json['sponsor'] as String?;
+    final mothersName = json['mothersName'] as String?;
+    final fathersName = json['fathersName'] as String?;
+    final visaNumber = json['visaNumber'] as String?;
+    final passportNumber = json['passportNumber'] as String?;
+    final firstName = json['firstName'] as String?;
+    final lastName = json['lastName'] as String?;
+    final fullName = json['fullName'] as String?;
+    final sex = json['sex']?.toString();
+    final dateOfBirth = json['dateOfBirth'] != null ? DateResult.fromJSON(json['dateOfBirth']) : null;
+    final nationality = json['nationality']?.toString();
+    final address = json['address']?.toString();
+    final documentNumber = json['documentNumber']?.toString();
+    final dateOfExpiry = json['dateOfExpiry'] != null ? DateResult.fromJSON(json['dateOfExpiry']) : null;
+    final dateOfIssue = json['dateOfIssue'] != null ? DateResult.fromJSON(json['dateOfIssue']) : null;
+    final vehicleOwner = json['vehicleOwner'] as String?;
 
-  String? get additionalNameInformation {
-    return _additionalNameInformation;
+    DrivingLicenseDetails? drivingLicenseDetails;
+    if (json['drivingLicenseDetails'] != null) {
+      drivingLicenseDetails = DrivingLicenseDetails.fromJSON(json['drivingLicenseDetails']);
+    }
+
+    return VizResult._(
+      additionalNameInformation: additionalNameInformation,
+      additionalAddressInformation: additionalAddressInformation,
+      placeOfBirth: placeOfBirth,
+      race: race,
+      religion: religion,
+      profession: profession,
+      maritalStatus: maritalStatus,
+      residentialStatus: residentialStatus,
+      employer: employer,
+      personalIdNumber: personalIdNumber,
+      documentAdditionalNumber: documentAdditionalNumber,
+      issuingJurisdiction: issuingJurisdiction,
+      issuingJurisdictionIso: issuingJurisdictionIso,
+      issuingAuthority: issuingAuthority,
+      capturedSides: capturedSides,
+      isBackSideCaptureSupported: isBackSideCaptureSupported,
+      bloodType: bloodType,
+      sponsor: sponsor,
+      mothersName: mothersName,
+      fathersName: fathersName,
+      visaNumber: visaNumber,
+      passportNumber: passportNumber,
+      firstName: firstName,
+      lastName: lastName,
+      fullName: fullName,
+      sex: sex,
+      dateOfBirth: dateOfBirth,
+      nationality: nationality,
+      address: address,
+      documentNumber: documentNumber,
+      dateOfExpiry: dateOfExpiry,
+      dateOfIssue: dateOfIssue,
+      vehicleOwner: vehicleOwner,
+      drivingLicenseDetails: drivingLicenseDetails,
+    );
   }
 
-  String? get additionalAddressInformation {
-    return _additionalAddressInformation;
-  }
+  String? get additionalNameInformation => _additionalNameInformation;
 
-  String? get placeOfBirth {
-    return _placeOfBirth;
-  }
+  String? get additionalAddressInformation => _additionalAddressInformation;
 
-  String? get race {
-    return _race;
-  }
+  String? get placeOfBirth => _placeOfBirth;
 
-  String? get religion {
-    return _religion;
-  }
+  String? get race => _race;
 
-  String? get profession {
-    return _profession;
-  }
+  String? get religion => _religion;
 
-  String? get maritalStatus {
-    return _maritalStatus;
-  }
+  String? get profession => _profession;
 
-  String? get residentialStatus {
-    return _residentialStatus;
-  }
+  String? get maritalStatus => _maritalStatus;
 
-  String? get employer {
-    return _employer;
-  }
+  String? get residentialStatus => _residentialStatus;
 
-  String? get personalIdNumber {
-    return _personalIdNumber;
-  }
+  String? get employer => _employer;
 
-  String? get documentAdditionalNumber {
-    return _documentAdditionalNumber;
-  }
+  String? get personalIdNumber => _personalIdNumber;
 
-  String? get issuingJurisdiction {
-    return _issuingJurisdiction;
-  }
+  String? get documentAdditionalNumber => _documentAdditionalNumber;
 
-  String? get issuingJurisdictionIso {
-    return _issuingJurisdictionIso;
-  }
+  String? get issuingJurisdiction => _issuingJurisdiction;
 
-  String? get issuingAuthority {
-    return _issuingAuthority;
-  }
+  String? get issuingJurisdictionIso => _issuingJurisdictionIso;
 
-  SupportedSides get capturedSides {
-    return _capturedSides;
-  }
+  String? get issuingAuthority => _issuingAuthority;
 
-  bool get isBackSideCaptureSupported {
-    return _isBackSideCaptureSupported;
-  }
+  CapturedSides get capturedSides => _capturedSides;
 
-  String? get bloodType {
-    return _bloodType;
-  }
+  bool get isBackSideCaptureSupported => _isBackSideCaptureSupported;
 
-  String? get sponsor {
-    return _sponsor;
-  }
+  String? get bloodType => _bloodType;
 
-  String? get mothersName {
-    return _mothersName;
-  }
+  String? get sponsor => _sponsor;
 
-  String? get fathersName {
-    return _fathersName;
-  }
+  String? get mothersName => _mothersName;
+
+  String? get fathersName => _fathersName;
+
+  String? get visaNumber => _visaNumber;
+
+  String? get passportNumber => _passportNumber;
+
+  String? get firstName => _firstName;
+
+  String? get lastName => _lastName;
+
+  String? get fullName => _fullName;
+
+  String? get sex => _sex;
+
+  DateResult? get dateOfBirth => _dateOfBirth;
+
+  String? get nationality => _nationality;
+
+  String? get address => _address;
+
+  String? get documentNumber => _documentNumber;
+
+  DateResult? get dateOfExpiry => _dateOfExpiry;
+
+  DateResult? get dateOfIssue => _dateOfIssue;
+
+  String? get vehicleOwner => _vehicleOwner;
+
+  DrivingLicenseDetails? get drivingLicenseDetails => _drivingLicenseDetails;
 }
