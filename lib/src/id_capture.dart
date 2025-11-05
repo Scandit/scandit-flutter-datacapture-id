@@ -6,10 +6,14 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as developer;
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+// ignore: implementation_imports
+import 'package:scandit_flutter_datacapture_core/src/internal/base_controller.dart';
+
 import 'package:scandit_flutter_datacapture_id/src/rejection_reson.dart';
 
 import '../scandit_flutter_datacapture_id.dart';
@@ -36,21 +40,33 @@ class IdCapture extends DataCaptureMode {
 
   IdCaptureFeedback _feedback = IdCaptureFeedback.defaultFeedback;
 
-  IdCapture._(DataCaptureContext? context, this._settings) {
-    _controller = _IdCaptureListenerController.forIdCapture(this);
+  final _modeId = Random().nextInt(0x7FFFFFFF);
 
-    context?.addMode(this);
+  IdCapture._(DataCaptureContext? context, this._settings) {
+    _controller = _IdCaptureListenerController(this);
+
+    context?.setMode(this);
   }
 
+  IdCapture(IdCaptureSettings settings) : this._(null, settings);
+
+  @Deprecated('Use constructor IdCapture(IdCaptureSettings settings) instead.')
   IdCapture.forContext(DataCaptureContext context, IdCaptureSettings settings) : this._(context, settings);
 
-  static CameraSettings get recommendedCameraSettings => _recommendedCameraSettings();
+  @Deprecated('Use createRecommendedCameraSettings() instead.')
+  static CameraSettings get recommendedCameraSettings => createRecommendedCameraSettings();
 
-  static CameraSettings _recommendedCameraSettings() {
+  static CameraSettings createRecommendedCameraSettings() {
     var defaults = IdCaptureDefaults.cameraSettingsDefaults;
-    return CameraSettings(defaults.preferredResolution, defaults.zoomFactor, defaults.focusRange,
-        defaults.focusGestureStrategy, defaults.zoomGestureZoomFactor,
-        properties: defaults.properties, shouldPreferSmoothAutoFocus: defaults.shouldPreferSmoothAutoFocus);
+    return CameraSettings(
+      defaults.preferredResolution,
+      defaults.zoomFactor,
+      defaults.focusRange,
+      defaults.focusGestureStrategy,
+      defaults.zoomGestureZoomFactor,
+      properties: defaults.properties,
+      shouldPreferSmoothAutoFocus: defaults.shouldPreferSmoothAutoFocus,
+    );
   }
 
   @override
@@ -105,26 +121,26 @@ class IdCapture extends DataCaptureMode {
       'type': 'idCapture',
       "settings": _settings.toMap(),
       'feedback': _feedback.toMap(),
+      'modeId': _modeId,
     };
   }
 }
 
-class _IdCaptureListenerController {
+class _IdCaptureListenerController extends BaseController {
   final EventChannel _eventChannel = const EventChannel(IdCaptureFunctionNames.eventsChannelName);
-  final MethodChannel _methodChannel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
   final IdCapture _idCapture;
   StreamSubscription<dynamic>? _idCaptureSubscription;
 
-  _IdCaptureListenerController.forIdCapture(this._idCapture);
+  _IdCaptureListenerController(this._idCapture) : super(IdCaptureFunctionNames.methodsChannelName);
 
   void subscribeListeners() {
-    _methodChannel
+    methodChannel
         .invokeMethod(IdCaptureFunctionNames.addIdCaptureListenerName)
-        .then((value) => _setupIdCaptureSubscription(), onError: _onError);
+        .then((value) => _setupIdCaptureSubscription(), onError: onError);
   }
 
   Future<void> reset() {
-    return _methodChannel.invokeMethod<void>(IdCaptureFunctionNames.resetName).onError(_onError);
+    return methodChannel.invokeMethod<void>(IdCaptureFunctionNames.resetName).onError(onError);
   }
 
   void _setupIdCaptureSubscription() {
@@ -134,24 +150,21 @@ class _IdCaptureListenerController {
       var eventJSON = jsonDecode(event);
       var eventName = eventJSON["event"] as String;
       if (eventName == IdCaptureListener._didCaptureId) {
-        var capturedId = CapturedId.fromJSON(jsonDecode(eventJSON["id"]));
+        final capturedId = _parseCapturedId(eventJSON);
         _notifyDidCaptureId(capturedId).then((value) {
-          _methodChannel
+          methodChannel
               .invokeMethod(IdCaptureFunctionNames.finishDidCaptureIdName, _idCapture.isEnabled)
               // ignore: unnecessary_lambdas
-              .then((value) => null, onError: (error) => log(error));
+              .then((value) => null, onError: (error) => developer.log(error));
         });
       } else if (eventName == IdCaptureListener._didRejectId) {
-        CapturedId? capturedId;
-        if (eventJSON["id"] != null) {
-          capturedId = CapturedId.fromJSON(jsonDecode(eventJSON["id"]));
-        }
+        CapturedId? capturedId = eventJSON["id"] != null ? _parseCapturedId(eventJSON) : null;
         var rejectionReson = RejectionReasonDeserializer.fromJSON(eventJSON['rejectionReason']);
         _notifyDidRejectId(capturedId, rejectionReson).then((value) {
-          _methodChannel
+          methodChannel
               .invokeMethod(IdCaptureFunctionNames.finishDidRejectIdName, _idCapture.isEnabled)
               // ignore: unnecessary_lambdas
-              .then((value) => null, onError: (error) => log(error));
+              .then((value) => null, onError: (error) => developer.log(error));
         });
       }
     });
@@ -159,9 +172,20 @@ class _IdCaptureListenerController {
 
   void unsubscribeListeners() {
     _idCaptureSubscription?.cancel();
-    _methodChannel
+    methodChannel
         .invokeMethod(IdCaptureFunctionNames.removeIdCaptureListenerName)
-        .then((value) => null, onError: _onError);
+        .then((value) => null, onError: onError);
+  }
+
+  CapturedId _parseCapturedId(Map<String, dynamic> eventJSON) {
+    final decodedId = jsonDecode(eventJSON["id"]);
+
+    if (eventJSON["imageInfo"] != null) {
+      final idImagesJson = eventJSON["imageInfo"] as Map<String, dynamic>;
+      decodedId["imageInfo"] = idImagesJson;
+    }
+
+    return CapturedId.fromJSON(decodedId);
   }
 
   Future<void> _notifyDidCaptureId(CapturedId capturedId) async {
@@ -176,30 +200,25 @@ class _IdCaptureListenerController {
     }
   }
 
-  void _onError(Object? error, StackTrace? stackTrace) {
-    if (error == null) return;
-    throw error;
-  }
-
   void setModeEnabledState(bool newValue) {
-    _methodChannel
+    methodChannel
         .invokeMethod(IdCaptureFunctionNames.setModeEnabledState, newValue)
-        .then((value) => null, onError: _onError);
+        .then((value) => null, onError: onError);
   }
 
   Future<void> applyNewSettings(IdCaptureSettings settings) {
-    return _methodChannel
+    return methodChannel
         .invokeMethod(IdCaptureFunctionNames.applyIdCaptureModeSettings, jsonEncode(settings.toMap()))
-        .then((value) => null, onError: _onError);
+        .then((value) => null, onError: onError);
   }
 
   Future<void> updateIdCaptureMode() {
-    return _methodChannel
+    return methodChannel
         .invokeMethod(IdCaptureFunctionNames.updateIdCaptureMode, jsonEncode(_idCapture.toMap()))
-        .then((value) => null, onError: _onError);
+        .then((value) => null, onError: onError);
   }
 
   Future<void> updateFeedback(IdCaptureFeedback feedback) {
-    return _methodChannel.invokeMethod(IdCaptureFunctionNames.updateFeedback, jsonEncode(feedback.toMap()));
+    return methodChannel.invokeMethod(IdCaptureFunctionNames.updateFeedback, jsonEncode(feedback.toMap()));
   }
 }
