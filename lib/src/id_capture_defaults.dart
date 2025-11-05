@@ -8,11 +8,9 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
-import 'package:scandit_flutter_datacapture_id/src/id_layout.dart';
 
 import 'function_names.dart';
-import '../id_anonymization_mode.dart';
-import 'duration_extensions.dart';
+import 'id_anonymization_mode.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class IdCaptureDefaults {
@@ -39,7 +37,7 @@ class IdCaptureDefaults {
     _cameraSettingsDefaults = CameraSettingsDefaults.fromJSON(json["RecommendedCameraSettings"]);
     _idCaptureOverlayDefaults = IdCaptureOverlayDefaults.fromJSON(json["IdCaptureOverlay"]);
     _captureSettingsDefaults = IdCaptureSettingsDefaults.fromJSON(json["IdCaptureSettings"]);
-    _idCaptureFeedbackDefaults = IdCaptureFeedbackDefaults.fromJSON(json);
+    _idCaptureFeedbackDefaults = IdCaptureFeedbackDefaults.fromJSON(jsonDecode(json["IdCaptureFeedback"] as String));
 
     _isInitialized = true;
   }
@@ -49,60 +47,30 @@ class IdCaptureOverlayDefaults {
   final Brush defaultCapturedBrush;
   final Brush defaultLocalizedBrush;
   final Brush defaultRejectedBrush;
-  final IdLayoutStyle idLayoutStyle;
-  final IdLayoutLineStyle idLayoutLineStyle;
 
-  IdCaptureOverlayDefaults(this.defaultCapturedBrush, this.defaultLocalizedBrush, this.defaultRejectedBrush,
-      this.idLayoutStyle, this.idLayoutLineStyle);
+  IdCaptureOverlayDefaults(this.defaultCapturedBrush, this.defaultLocalizedBrush, this.defaultRejectedBrush);
 
   factory IdCaptureOverlayDefaults.fromJSON(Map<String, dynamic> json) {
     var defaultCapturedBrush = BrushDefaults.fromJSON(json["DefaultCapturedBrush"] as Map<String, dynamic>).toBrush();
     var defaultLocalizedBrush = BrushDefaults.fromJSON(json["DefaultLocalizedBrush"] as Map<String, dynamic>).toBrush();
     var defaultRejectedBrush = BrushDefaults.fromJSON(json["DefaultRejectedBrush"] as Map<String, dynamic>).toBrush();
-    var idLayoutStyle = IdLayoutStyleDeserializer.fromJSON(json["defaultIdLayoutStyle"] as String);
-    var idLayoutLineStyle = IdLayoutLineStyleDeserializer.fromJSON(json["defaultIdLayoutLineStyle"] as String);
-    return IdCaptureOverlayDefaults(
-        defaultCapturedBrush, defaultLocalizedBrush, defaultRejectedBrush, idLayoutStyle, idLayoutLineStyle);
+    return IdCaptureOverlayDefaults(defaultCapturedBrush, defaultLocalizedBrush, defaultRejectedBrush);
   }
 }
 
 class IdCaptureSettingsDefaults {
   final IdAnonymizationMode anonymizationMode;
   final bool rejectVoidedIds;
-  final bool? decodeBackOfEuropeanDrivingLicense;
-  final bool rejectExpiredIds;
-  final Duration? rejectIdsExpiringIn;
-  final bool rejectNotRealIdCompliant;
-  final bool rejectForgedAamvaBarcodes;
-  final bool rejectInconsistentData;
-  final int? rejectHolderBelowAge;
+  final bool decodeBackOfEuropeanDrivingLicense;
 
-  IdCaptureSettingsDefaults(
-      this.anonymizationMode,
-      this.rejectVoidedIds,
-      this.decodeBackOfEuropeanDrivingLicense,
-      this.rejectExpiredIds,
-      this.rejectIdsExpiringIn,
-      this.rejectNotRealIdCompliant,
-      this.rejectForgedAamvaBarcodes,
-      this.rejectInconsistentData,
-      this.rejectHolderBelowAge);
+  IdCaptureSettingsDefaults(this.anonymizationMode, this.rejectVoidedIds, this.decodeBackOfEuropeanDrivingLicense);
 
   factory IdCaptureSettingsDefaults.fromJSON(Map<String, dynamic> json) {
     var anonymizationMode = IdAnonymizationModeDeserializer.fromJSON(json["anonymizationMode"] as String);
-
-    var rejectIdsExpiringInJson = json["rejectIdsExpiringIn"] as Map<String, dynamic>?;
-
     return IdCaptureSettingsDefaults(
       anonymizationMode,
       json["rejectVoidedIds"] as bool,
-      json["decodeBackOfEuropeDrivingLicense"] as bool?,
-      json["rejectExpiredIds"] as bool,
-      rejectIdsExpiringInJson?.toDurationFrom(DateTime.now()),
-      json["rejectNotRealIdCompliant"] as bool,
-      json["rejectForgedAamvaBarcodes"] as bool,
-      json["rejectInconsistentData"] as bool,
-      json["rejectHolderBelowAge"] as int?,
+      json["decodeBackOfEuropeDrivingLicense"] as bool? ?? false,
     );
   }
 }
@@ -110,21 +78,13 @@ class IdCaptureSettingsDefaults {
 class IdCaptureFeedbackDefaults {
   final Feedback idCaptured;
   final Feedback idRejected;
-  final Sound defaultSuccessSound;
-  final Sound defaultFailureSound;
 
-  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected, this.defaultSuccessSound, this.defaultFailureSound);
+  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected);
 
   factory IdCaptureFeedbackDefaults.fromJSON(Map<String, dynamic> json) {
-    final feedbackJson = jsonDecode(json["IdCaptureFeedback"] as String);
-    final defaultSuccessSound = Sound.fromJSON(jsonDecode(json['defaultSuccessSound']));
-    final defaultFailureSound = Sound.fromJSON(jsonDecode(json['defaultFailureSound']));
-
     return IdCaptureFeedbackDefaults(
-      feedbackFromJson(feedbackJson, 'idCaptured'),
-      feedbackFromJson(feedbackJson, 'idRejected'),
-      defaultSuccessSound,
-      defaultFailureSound,
+      feedbackFromJson(json, 'idCaptured'),
+      feedbackFromJson(json, 'idRejected'),
     );
   }
 

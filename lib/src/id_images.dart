@@ -4,9 +4,9 @@
  * Copyright (C) 2024- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/material.dart';
-// ignore: implementation_imports
-import 'package:scandit_flutter_datacapture_core/src/internal/image_extensions.dart';
+import 'dart:convert';
+
+import 'package:flutter/widgets.dart';
 import 'package:scandit_flutter_datacapture_id/src/id_side.dart';
 
 class IdImages {
@@ -53,7 +53,9 @@ class IdImages {
 
   Image? get face {
     if (_frontFace != null) return _frontFace;
-    _frontFace = _frontFaceImageEncoded.toImage();
+    if (_frontFaceImageEncoded != null) {
+      _frontFace = Image.memory(base64Decode(_frontFaceImageEncoded));
+    }
     return _frontFace;
   }
 
@@ -61,7 +63,9 @@ class IdImages {
 
   Image? get frame {
     if (_frontFrame != null) return _frontFrame;
-    _frontFrame = _frontFrameEncoded.toImage();
+    if (_frontFrameEncoded != null) {
+      _frontFrame = Image.memory(base64Decode(_frontFrameEncoded));
+    }
     return _frontFrame;
   }
 
@@ -73,11 +77,15 @@ class IdImages {
     switch (side) {
       case IdSide.front:
         if (_frontCropped != null) return _frontCropped;
-        _frontCropped = _croppedDocumentFrontFrameEncoded.toImage();
+        if (_croppedDocumentFrontFrameEncoded != null) {
+          _frontCropped = Image.memory(base64Decode(_croppedDocumentFrontFrameEncoded));
+        }
         return _frontCropped;
       case IdSide.back:
         if (_backCropped != null) return _backCropped;
-        _backCropped = _croppedDocumentBackFrameEncoded.toImage();
+        if (_croppedDocumentBackFrameEncoded != null) {
+          _backCropped = Image.memory(base64Decode(_croppedDocumentBackFrameEncoded));
+        }
         return _backCropped;
     }
   }
@@ -88,11 +96,15 @@ class IdImages {
     switch (side) {
       case IdSide.front:
         if (_frontFrame != null) return _frontFrame;
-        _frontFrame = _frontFrameEncoded.toImage();
+        if (_frontFrameEncoded != null) {
+          _frontFrame = Image.memory(base64Decode(_frontFrameEncoded));
+        }
         return _frontFrame;
       case IdSide.back:
         if (_backFrame != null) return _backFrame;
-        _backFrame = _backFrameEncoded.toImage();
+        if (_backFrameEncoded != null) {
+          _backFrame = Image.memory(base64Decode(_backFrameEncoded));
+        }
         return _backFrame;
     }
   }
