@@ -68,9 +68,7 @@ enum RegionSpecificSubtype {
   usMedicalMarijuanaCard('usMedicalMarijuanaCard'),
   usMunicipalId('usMunicipalId'),
   australiaAsicCard('australiaAsicCard'),
-  uaeVehicleRegistrationCard('uaeVehicleRegistrationCard'),
-  uaeEsaadCard('uaeEsaadCard'),
-  ukMilitaryId('ukMilitaryId');
+  uaeVehicleRegistrationCard('uaeVehicleRegistrationCard');
 
   const RegionSpecificSubtype(this._name);
 

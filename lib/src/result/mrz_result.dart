@@ -14,8 +14,6 @@ class MrzResult {
   final bool _namesAreTruncated;
   final String? _optional;
   final String? _optional1;
-  final String? _optionalDataInLine1;
-  final String? _optionalDataInLine2;
   final String _capturedMrz;
   final String? _personalIdNumber;
   final int? _renewalTimes;
@@ -28,23 +26,20 @@ class MrzResult {
   final DateResult? _passportDateOfExpiry;
 
   const MrzResult._(
-    this._documentCode,
-    this._namesAreTruncated,
-    this._optional,
-    this._optional1,
-    this._optionalDataInLine1,
-    this._optionalDataInLine2,
-    this._capturedMrz,
-    this._personalIdNumber,
-    this._renewalTimes,
-    this._fullNameSimplifiedChinese,
-    this._omittedCharacterCountInGbkName,
-    this._omittedNameCount,
-    this._issuingAuthorityCode,
-    this._passportIssuerIso,
-    this._passportNumber,
-    this._passportDateOfExpiry,
-  );
+      this._documentCode,
+      this._namesAreTruncated,
+      this._optional,
+      this._optional1,
+      this._capturedMrz,
+      this._personalIdNumber,
+      this._renewalTimes,
+      this._fullNameSimplifiedChinese,
+      this._omittedCharacterCountInGbkName,
+      this._omittedNameCount,
+      this._issuingAuthorityCode,
+      this._passportIssuerIso,
+      this._passportNumber,
+      this._passportDateOfExpiry);
 
   factory MrzResult.fromJSON(Map<String, dynamic> json) {
     DateResult? passportDateOfExpiry;
@@ -52,23 +47,20 @@ class MrzResult {
       passportDateOfExpiry = DateResult.fromJSON(json["passportDateOfExpiry"] as Map<String, dynamic>);
     }
     return MrzResult._(
-      json['documentCode'] as String,
-      json['namesAreTruncated'] as bool,
-      json['optional'] as String?,
-      json['optional1'] as String?,
-      json['optionalDataInLine1'] as String?,
-      json['optionalDataInLine2'] as String?,
-      json['capturedMrz'] as String,
-      json["personalIdNumber"] as String?,
-      json["renewalTimes"] as int?,
-      json["fullNameSimplifiedChinese"] as String?,
-      json["omittedCharacterCountInGbkName"] as int?,
-      json["omittedNameCount"] as int?,
-      json["issuingAuthorityCode"] as String?,
-      json["passportIssuerIso"] as String?,
-      json["passportNumber"] as String?,
-      passportDateOfExpiry,
-    );
+        json['documentCode'] as String,
+        json['namesAreTruncated'] as bool,
+        json['optional'] as String?,
+        json['optional1'] as String?,
+        json['capturedMrz'] as String,
+        json["personalIdNumber"] as String?,
+        json["renewalTimes"] as int?,
+        json["fullNameSimplifiedChinese"] as String?,
+        json["omittedCharacterCountInGbkName"] as int?,
+        json["omittedNameCount"] as int?,
+        json["issuingAuthorityCode"] as String?,
+        json["passportIssuerIso"] as String?,
+        json["passportNumber"] as String?,
+        passportDateOfExpiry);
   }
 
   String get documentCode {
@@ -79,26 +71,12 @@ class MrzResult {
     return _namesAreTruncated;
   }
 
-  @Deprecated(
-    'Use optionalDataInLine1 and optionalDataInLine2 instead. This property will be removed in SDK version 8.0.',
-  )
   String? get optional {
     return _optional;
   }
 
-  @Deprecated(
-    'Use optionalDataInLine1 and optionalDataInLine2 instead. This property will be removed in SDK version 8.0.',
-  )
   String? get optional1 {
     return _optional1;
-  }
-
-  String? get optionalDataInLine1 {
-    return _optionalDataInLine1;
-  }
-
-  String? get optionalDataInLine2 {
-    return _optionalDataInLine2;
   }
 
   String get capturedMrz {
