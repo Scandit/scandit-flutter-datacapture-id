@@ -18,7 +18,9 @@ export 'src/result/viz_result.dart' show VizResult;
 export 'src/scandit_flutter_datacapture_id.dart' show ScanditFlutterDataCaptureId;
 export 'src/captured_sides.dart' show CapturedSides;
 export 'src/id_anonymization_mode.dart' show IdAnonymizationMode;
+// ignore: deprecated_member_use_from_same_package
 export 'src/result/aamva_barcode_verification_result.dart' show AamvaBarcodeVerificationResult;
+// ignore: deprecated_member_use_from_same_package
 export 'src/aamva_barcode_verifier.dart' show AamvaBarcodeVerifier;
 export 'src/id_capture_feedback.dart' show IdCaptureFeedback;
 export 'src/rejection_reson.dart' show RejectionReason;
@@ -42,3 +44,4 @@ export 'src/result/vehicle_restriction.dart' show VehicleRestriction;
 export 'src/region_specific_subtypes.dart' show RegionSpecificSubtype;
 export 'src/id_side.dart' show IdSide;
 export 'src/id_images.dart' show IdImages;
+export 'src/aamva_barcode_verification_status.dart' show AamvaBarcodeVerificationStatus;

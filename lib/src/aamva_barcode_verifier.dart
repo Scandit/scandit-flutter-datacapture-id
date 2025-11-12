@@ -13,6 +13,7 @@ import 'captured_id.dart';
 import 'function_names.dart';
 import 'result/aamva_barcode_verification_result.dart';
 
+@Deprecated('Replaced by IdCaptureSettings.rejectForgedAamvaBarcodes')
 class AamvaBarcodeVerifier {
   final _AamvaBarcodeVerifierController _controller;
   // ignore: unused_field
@@ -33,6 +34,7 @@ class AamvaBarcodeVerifier {
   }
 }
 
+@Deprecated('AamvaBarcodeVerifier has been deprecated.')
 class _AamvaBarcodeVerifierController {
   final MethodChannel _methodChannel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
 
