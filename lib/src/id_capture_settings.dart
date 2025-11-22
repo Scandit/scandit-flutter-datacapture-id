@@ -5,7 +5,6 @@
  */
 
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
-import 'package:scandit_flutter_datacapture_id/src/internal/duration_extensions.dart';
 
 import 'id_capture_document.dart';
 import 'id_capture_scanner.dart';
@@ -43,20 +42,8 @@ class IdCaptureSettings implements Serializable {
 
   bool rejectVoidedIds = IdCaptureDefaults.captureSettingsDefaults.rejectVoidedIds;
 
-  bool rejectExpiredIds = IdCaptureDefaults.captureSettingsDefaults.rejectExpiredIds;
-
-  Duration? rejectIdsExpiringIn = IdCaptureDefaults.captureSettingsDefaults.rejectIdsExpiringIn;
-
-  bool rejectNotRealIdCompliant = IdCaptureDefaults.captureSettingsDefaults.rejectNotRealIdCompliant;
-
-  bool rejectForgedAamvaBarcodes = IdCaptureDefaults.captureSettingsDefaults.rejectForgedAamvaBarcodes;
-
-  bool rejectInconsistentData = IdCaptureDefaults.captureSettingsDefaults.rejectInconsistentData;
-
-  int? rejectHolderBelowAge = IdCaptureDefaults.captureSettingsDefaults.rejectHolderBelowAge;
-
   bool decodeBackOfEuropeanDrivingLicense =
-      IdCaptureDefaults.captureSettingsDefaults.decodeBackOfEuropeanDrivingLicense ?? false;
+      IdCaptureDefaults.captureSettingsDefaults.decodeBackOfEuropeanDrivingLicense;
 
   @override
   Map<String, dynamic> toMap() {
@@ -68,12 +55,6 @@ class IdCaptureSettings implements Serializable {
       'scannerType': scannerType.toMap(),
       'acceptedDocuments': acceptedDocuments.map((doc) => doc.toMap()).toList(),
       'rejectedDocuments': rejectedDocuments.map((doc) => doc.toMap()).toList(),
-      'rejectExpiredIds': rejectExpiredIds,
-      'rejectIdsExpiringIn': rejectIdsExpiringIn?.toMap(DateTime.now()),
-      'rejectNotRealIdCompliant': rejectNotRealIdCompliant,
-      'rejectForgedAamvaBarcodes': rejectForgedAamvaBarcodes,
-      'rejectInconsistentData': rejectInconsistentData,
-      'rejectHolderBelowAge': rejectHolderBelowAge,
     };
   }
 }
