@@ -6,15 +6,19 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as developer;
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+// ignore: implementation_imports
+import 'package:scandit_flutter_datacapture_core/src/internal/base_controller.dart';
+
 import 'package:scandit_flutter_datacapture_id/src/rejection_reson.dart';
 
 import '../scandit_flutter_datacapture_id.dart';
-import 'function_names.dart';
-import 'id_capture_defaults.dart';
+import 'internal/function_names.dart';
+import 'internal/id_capture_defaults.dart';
 
 abstract class IdCaptureListener {
   static const String _didCaptureId = "IdCaptureListener.didCaptureId";
@@ -36,21 +40,32 @@ class IdCapture extends DataCaptureMode {
 
   IdCaptureFeedback _feedback = IdCaptureFeedback.defaultFeedback;
 
-  IdCapture._(DataCaptureContext? context, this._settings) {
-    _controller = _IdCaptureListenerController.forIdCapture(this);
+  final _modeId = Random().nextInt(0x7FFFFFFF);
 
-    context?.addMode(this);
+  IdCapture._(DataCaptureContext? context, this._settings) {
+    _controller = _IdCaptureListenerController(this);
+
+    context?.setMode(this);
+    _feedback.addListener(_onFeedbackChanged);
   }
 
-  IdCapture.forContext(DataCaptureContext context, IdCaptureSettings settings) : this._(context, settings);
+  IdCapture(IdCaptureSettings settings) : this._(null, settings);
 
-  static CameraSettings get recommendedCameraSettings => _recommendedCameraSettings();
+  void _onFeedbackChanged() {
+    _controller.updateFeedback(_feedback);
+  }
 
-  static CameraSettings _recommendedCameraSettings() {
+  static CameraSettings createRecommendedCameraSettings() {
     var defaults = IdCaptureDefaults.cameraSettingsDefaults;
-    return CameraSettings(defaults.preferredResolution, defaults.zoomFactor, defaults.focusRange,
-        defaults.focusGestureStrategy, defaults.zoomGestureZoomFactor,
-        properties: defaults.properties, shouldPreferSmoothAutoFocus: defaults.shouldPreferSmoothAutoFocus);
+    return CameraSettings(
+      defaults.preferredResolution,
+      defaults.zoomFactor,
+      defaults.focusRange,
+      defaults.focusGestureStrategy,
+      defaults.zoomGestureZoomFactor,
+      properties: defaults.properties,
+      shouldPreferSmoothAutoFocus: defaults.shouldPreferSmoothAutoFocus,
+    );
   }
 
   @override
@@ -69,8 +84,10 @@ class IdCapture extends DataCaptureMode {
   IdCaptureFeedback get feedback => _feedback;
 
   set feedback(IdCaptureFeedback newValue) {
+    _feedback.removeListener(_onFeedbackChanged);
     _feedback = newValue;
     _controller.updateFeedback(newValue);
+    _feedback.addListener(_onFeedbackChanged);
   }
 
   void addListener(IdCaptureListener listener) {
@@ -90,6 +107,15 @@ class IdCapture extends DataCaptureMode {
     }
   }
 
+  String? _externalTransactionId;
+
+  String? get externalTransactionId => _externalTransactionId;
+
+  set externalTransactionId(String? value) {
+    _externalTransactionId = value;
+    _controller.updateIdCaptureMode();
+  }
+
   Future<void> reset() {
     return _controller.reset();
   }
@@ -105,26 +131,31 @@ class IdCapture extends DataCaptureMode {
       'type': 'idCapture',
       "settings": _settings.toMap(),
       'feedback': _feedback.toMap(),
+      'externalTransactionId': _externalTransactionId,
+      'modeId': _modeId,
+      'enabled': _enabled,
+      'hasListeners': _listeners.isNotEmpty,
     };
   }
 }
 
-class _IdCaptureListenerController {
+class _IdCaptureListenerController extends BaseController {
   final EventChannel _eventChannel = const EventChannel(IdCaptureFunctionNames.eventsChannelName);
-  final MethodChannel _methodChannel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
   final IdCapture _idCapture;
   StreamSubscription<dynamic>? _idCaptureSubscription;
 
-  _IdCaptureListenerController.forIdCapture(this._idCapture);
+  _IdCaptureListenerController(this._idCapture) : super(IdCaptureFunctionNames.methodsChannelName);
 
   void subscribeListeners() {
-    _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.addIdCaptureListenerName)
-        .then((value) => _setupIdCaptureSubscription(), onError: _onError);
+    methodChannel.invokeMethod(IdCaptureFunctionNames.addIdCaptureListenerName, {"modeId": _idCapture._modeId}).then(
+        (value) => _setupIdCaptureSubscription(),
+        onError: onError);
   }
 
   Future<void> reset() {
-    return _methodChannel.invokeMethod<void>(IdCaptureFunctionNames.resetName).onError(_onError);
+    return methodChannel.invokeMethod<void>(IdCaptureFunctionNames.resetName, {
+      "modeId": _idCapture._modeId,
+    }).onError(onError);
   }
 
   void _setupIdCaptureSubscription() {
@@ -132,33 +163,28 @@ class _IdCaptureListenerController {
       if (_idCapture._listeners.isEmpty) return;
 
       var eventJSON = jsonDecode(event);
+
+      if (eventJSON["modeId"] != _idCapture._modeId) {
+        return;
+      }
+
       var eventName = eventJSON["event"] as String;
       if (eventName == IdCaptureListener._didCaptureId) {
-        final decodedId = jsonDecode(eventJSON["id"]);
-
-        if (eventJSON["imageInfo"] != null) {
-          final idImagesJson = eventJSON["imageInfo"] as Map<String, dynamic>;
-          decodedId["imageInfo"] = idImagesJson;
-        }
-
-        var capturedId = CapturedId.fromJSON(decodedId);
+        var capturedId = _parseCapturedId(eventJSON);
         _notifyDidCaptureId(capturedId).then((value) {
-          _methodChannel
-              .invokeMethod(IdCaptureFunctionNames.finishDidCaptureIdName, _idCapture.isEnabled)
-              // ignore: unnecessary_lambdas
-              .then((value) => null, onError: (error) => log(error));
+          methodChannel.invokeMethod(IdCaptureFunctionNames.finishDidCaptureIdName, {
+            "modeId": _idCapture._modeId,
+            "enabled": _idCapture.isEnabled,
+          }).then((value) => null, onError: (error) => developer.log(error));
         });
       } else if (eventName == IdCaptureListener._didRejectId) {
-        CapturedId? capturedId;
-        if (eventJSON["id"] != null) {
-          capturedId = CapturedId.fromJSON(jsonDecode(eventJSON["id"]));
-        }
+        CapturedId? capturedId = eventJSON["id"] != null ? _parseCapturedId(eventJSON) : null;
         var rejectionReson = RejectionReasonDeserializer.fromJSON(eventJSON['rejectionReason']);
         _notifyDidRejectId(capturedId, rejectionReson).then((value) {
-          _methodChannel
-              .invokeMethod(IdCaptureFunctionNames.finishDidRejectIdName, _idCapture.isEnabled)
-              // ignore: unnecessary_lambdas
-              .then((value) => null, onError: (error) => log(error));
+          methodChannel.invokeMethod(IdCaptureFunctionNames.finishDidRejectIdName, {
+            "modeId": _idCapture._modeId,
+            "enabled": _idCapture.isEnabled,
+          }).then((value) => null, onError: (error) => developer.log(error));
         });
       }
     });
@@ -166,9 +192,28 @@ class _IdCaptureListenerController {
 
   void unsubscribeListeners() {
     _idCaptureSubscription?.cancel();
-    _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.removeIdCaptureListenerName)
-        .then((value) => null, onError: _onError);
+    methodChannel.invokeMethod(IdCaptureFunctionNames.removeIdCaptureListenerName, {
+      "modeId": _idCapture._modeId,
+    }).then((value) => null, onError: onError);
+  }
+
+  CapturedId _parseCapturedId(Map<String, dynamic> eventJSON) {
+    final decodedId = jsonDecode(eventJSON["id"]);
+
+    if (eventJSON["imageInfo"] != null) {
+      final idImagesJson = eventJSON["imageInfo"] as Map<String, dynamic>;
+      decodedId["imageInfo"] = idImagesJson;
+    }
+
+    if (eventJSON["frontReviewImage"] != null) {
+      final verificationResultJson = decodedId["verificationResult"] as Map<String, dynamic>;
+      if (verificationResultJson["dataConsistencyResult"] != null) {
+        final dataConsistencyResultJson = verificationResultJson["dataConsistencyResult"] as Map<String, dynamic>;
+        dataConsistencyResultJson["frontReviewImage"] = eventJSON["frontReviewImage"];
+      }
+    }
+
+    return CapturedId.fromJSON(decodedId);
   }
 
   Future<void> _notifyDidCaptureId(CapturedId capturedId) async {
@@ -183,30 +228,31 @@ class _IdCaptureListenerController {
     }
   }
 
-  void _onError(Object? error, StackTrace? stackTrace) {
-    if (error == null) return;
-    throw error;
-  }
-
   void setModeEnabledState(bool newValue) {
-    _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.setModeEnabledState, newValue)
-        .then((value) => null, onError: _onError);
+    methodChannel.invokeMethod(IdCaptureFunctionNames.setModeEnabledState, {
+      "modeId": _idCapture._modeId,
+      "enabled": newValue,
+    }).then((value) => null, onError: onError);
   }
 
   Future<void> applyNewSettings(IdCaptureSettings settings) {
-    return _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.applyIdCaptureModeSettings, jsonEncode(settings.toMap()))
-        .then((value) => null, onError: _onError);
+    return methodChannel.invokeMethod(IdCaptureFunctionNames.applyIdCaptureModeSettings, {
+      "modeId": _idCapture._modeId,
+      "settingsJson": jsonEncode(settings.toMap())
+    }).then((value) => null, onError: onError);
   }
 
   Future<void> updateIdCaptureMode() {
-    return _methodChannel
-        .invokeMethod(IdCaptureFunctionNames.updateIdCaptureMode, jsonEncode(_idCapture.toMap()))
-        .then((value) => null, onError: _onError);
+    return methodChannel.invokeMethod(IdCaptureFunctionNames.updateIdCaptureMode, {
+      "modeId": _idCapture._modeId,
+      "modeJson": jsonEncode(_idCapture.toMap())
+    }).then((value) => null, onError: onError);
   }
 
   Future<void> updateFeedback(IdCaptureFeedback feedback) {
-    return _methodChannel.invokeMethod(IdCaptureFunctionNames.updateFeedback, jsonEncode(feedback.toMap()));
+    return methodChannel.invokeMethod(IdCaptureFunctionNames.updateFeedback, {
+      "modeId": _idCapture._modeId,
+      "feedbackJson": jsonEncode(feedback.toMap())
+    }).then((value) => null, onError: onError);
   }
 }

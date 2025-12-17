@@ -6,7 +6,13 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+import 'package:scandit_flutter_datacapture_id/src/data/sex.dart';
+import 'package:scandit_flutter_datacapture_id/src/data/us_real_id_status.dart';
+import 'package:scandit_flutter_datacapture_id/src/id_field_type.dart';
 import 'package:scandit_flutter_datacapture_id/src/id_images.dart';
+import 'package:scandit_flutter_datacapture_id/src/result/mobile_document_ocr_result.dart';
+import 'package:scandit_flutter_datacapture_id/src/result/mobile_document_result.dart';
+import 'package:scandit_flutter_datacapture_id/src/result/verification_result.dart';
 
 import 'id_capture_document.dart';
 import 'id_capture_region.dart';
@@ -21,84 +27,192 @@ class CapturedId extends Serializable {
   final MrzResult? _mrzResult;
   final VizResult? _vizResult;
   final Map<String, dynamic> _json;
-  final _CommonCapturedIdFields? _commonCapturedIdFields;
   final BarcodeResult? _barcodeResult;
   final IdImages _images;
+  final VerificationResult _verificationResult;
+  final MobileDocumentResult? _mobileDocument;
+  final MobileDocumentOcrResult? _mobileDocumentOcr;
 
   final bool? _isExpired;
+  final bool _isCitizenPassport;
   final int? _age;
+  final Sex _sexType;
+  final UsRealIdStatus _usRealIdStatus;
 
-  CapturedId._(this._mrzResult, this._vizResult, this._barcodeResult, this._commonCapturedIdFields, this._age,
-      this._isExpired, this._images, this._json);
+  // Common captured ID fields
+  final String? _firstName;
+  final String? _lastName;
+  final String? _fullName;
+  final String? _sex;
+  final DateResult? _dateOfBirth;
+  final String? _nationality;
+  final String? _nationalityISO;
+  final String? _address;
+  final String? _documentNumber;
+  final String? _documentAdditionalNumber;
+  final DateResult? _dateOfExpiry;
+  final DateResult? _dateOfIssue;
+  final String? _issuingCountryIso;
+  final IdCaptureDocument? _document;
+  final IdCaptureRegion _issuingCountry;
+
+  CapturedId._(
+    this._mrzResult,
+    this._vizResult,
+    this._barcodeResult,
+    this._age,
+    this._isExpired,
+    this._isCitizenPassport,
+    this._images,
+    this._verificationResult,
+    this._json,
+    this._firstName,
+    this._lastName,
+    this._fullName,
+    this._sex,
+    this._dateOfBirth,
+    this._nationality,
+    this._nationalityISO,
+    this._address,
+    this._documentNumber,
+    this._documentAdditionalNumber,
+    this._dateOfExpiry,
+    this._dateOfIssue,
+    this._issuingCountryIso,
+    this._document,
+    this._issuingCountry,
+    this._sexType,
+    this._usRealIdStatus,
+    this._mobileDocument,
+    this._mobileDocumentOcr,
+  );
 
   factory CapturedId.fromJSON(Map<String, dynamic> json) {
-    _CommonCapturedIdFields? commonCapturedIdFields;
-
     MrzResult? mrzResult;
     if (json["mrzResult"] != null) {
       mrzResult = MrzResult.fromJSON(json["mrzResult"] as Map<String, dynamic>);
-      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["mrzResult"], commonCapturedIdFields);
     }
 
     VizResult? vizResult;
     if (json["vizResult"] != null) {
       vizResult = VizResult.fromJSON(json["vizResult"] as Map<String, dynamic>);
-      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["vizResult"], commonCapturedIdFields);
     }
 
     BarcodeResult? barcodeResult;
     if (json["barcodeResult"] != null) {
       barcodeResult = BarcodeResult.fromJSON(json["barcodeResult"] as Map<String, dynamic>);
-      commonCapturedIdFields = _CommonCapturedIdFields.fromJSON(json["barcodeResult"], commonCapturedIdFields);
     }
 
     var images = (json["imageInfo"] != null)
         ? IdImages.fromJSON(json["imageInfo"] as Map<String, dynamic>)
         : IdImages.fromJSON({});
 
-    return CapturedId._(mrzResult, vizResult, barcodeResult, commonCapturedIdFields, json["age"] as int?,
-        json["isExpired"] as bool?, images, json);
+    VerificationResult? verificationResult;
+
+    if (json["verificationResult"] != null) {
+      verificationResult = VerificationResult.fromJSON(json["verificationResult"] as Map<String, dynamic>);
+    }
+
+    // Parse common captured ID fields
+    final firstName = json['firstName']?.toString();
+    final lastName = json['lastName']?.toString();
+    final fullName = json['fullName']?.toString();
+    final sex = json['sex']?.toString();
+    final dateOfBirth = json['dateOfBirth'] != null ? DateResult.fromJSON(json['dateOfBirth']) : null;
+    final nationality = json['nationality']?.toString();
+    final nationalityISO = json['nationalityISO']?.toString();
+    final address = json['address']?.toString();
+    final documentNumber = json['documentNumber']?.toString();
+    final documentAdditionalNumber = json['documentAdditionalNumber']?.toString();
+    final dateOfExpiry = json['dateOfExpiry'] != null ? DateResult.fromJSON(json['dateOfExpiry']) : null;
+    final dateOfIssue = json['dateOfIssue'] != null ? DateResult.fromJSON(json['dateOfIssue']) : null;
+    final issuingCountryIso = json['issuingCountryIso']?.toString();
+
+    IdCaptureRegion issuingCountry = IdCaptureRegion.any;
+
+    if (json['issuingCountry'] != null) {
+      issuingCountry = IdCaptureRegionDeserializer.fromJSON(json['issuingCountry']);
+    }
+
+    IdCaptureDocument? document;
+
+    if (json['documentType'] != null) {
+      document = _getDocument(issuingCountry, json['documentType'], json['documentSubtype']);
+    }
+
+    Sex sexType = Sex.unspecified;
+    if (sex != null) {
+      sexType = SexDeserializer.fromJSON(sex);
+    }
+
+    UsRealIdStatus usRealIdStatus = UsRealIdStatus.notAvailable;
+    if (json['usRealIdStatus'] != null) {
+      usRealIdStatus = UsRealIdStatusDeserializer.fromJSON(json['usRealIdStatus']);
+    }
+
+    MobileDocumentResult? mobileDocument;
+    if (json["mobileDocumentResult"] != null) {
+      mobileDocument = MobileDocumentResult.fromJSON(json["mobileDocumentResult"] as Map<String, dynamic>);
+    }
+
+    MobileDocumentOcrResult? mobileDocumentOcr;
+    if (json["mobileDocumentOcrResult"] != null) {
+      mobileDocumentOcr = MobileDocumentOcrResult.fromJSON(json["mobileDocumentOcrResult"] as Map<String, dynamic>);
+    }
+
+    return CapturedId._(
+      mrzResult,
+      vizResult,
+      barcodeResult,
+      json["age"] as int?,
+      json["isExpired"] as bool?,
+      json["isCitizenPassport"] as bool,
+      images,
+      verificationResult ?? VerificationResult.fromJSON(const {}),
+      json,
+      firstName,
+      lastName,
+      fullName,
+      sex,
+      dateOfBirth,
+      nationality,
+      nationalityISO,
+      address,
+      documentNumber,
+      documentAdditionalNumber,
+      dateOfExpiry,
+      dateOfIssue,
+      issuingCountryIso,
+      document,
+      issuingCountry,
+      sexType,
+      usRealIdStatus,
+      mobileDocument,
+      mobileDocumentOcr,
+    );
   }
 
-  String? get firstName {
-    return _commonCapturedIdFields?.firstName;
-  }
+  String? get firstName => _firstName;
 
-  String? get lastName {
-    return _commonCapturedIdFields?.lastName;
-  }
+  String? get lastName => _lastName;
 
-  String get fullName {
-    return _commonCapturedIdFields?.fullName ?? "";
-  }
+  String? get fullName => _fullName;
 
-  String? get sex {
-    return _commonCapturedIdFields?.sex;
-  }
+  String? get sex => _sex;
 
-  DateResult? get dateOfBirth {
-    return _commonCapturedIdFields?.dateOfBirth;
-  }
+  DateResult? get dateOfBirth => _dateOfBirth;
 
-  String? get nationality {
-    return _commonCapturedIdFields?.nationality;
-  }
+  String? get nationality => _nationality;
 
-  String? get address {
-    return _commonCapturedIdFields?.address;
-  }
+  String? get nationalityISO => _nationalityISO;
 
-  IdCaptureDocument? get document {
-    return _commonCapturedIdFields?.document;
-  }
+  String? get address => _address;
 
-  String? get issuingCountryIso {
-    return _commonCapturedIdFields?.issuingCountryIso;
-  }
+  IdCaptureDocument? get document => _document;
 
-  IdCaptureRegion get issuingCountry {
-    return _commonCapturedIdFields?.issuingCountry ?? IdCaptureRegion.any;
-  }
+  String? get issuingCountryIso => _issuingCountryIso;
+
+  IdCaptureRegion get issuingCountry => _issuingCountry;
 
   bool isIdCard() => document?.isIdCard == true;
 
@@ -108,6 +222,8 @@ class CapturedId extends Serializable {
 
   bool isPassport() => document?.isPassport == true;
 
+  bool get isCitizenPassport => _isCitizenPassport == true;
+
   bool isRegionSpecific(RegionSpecificSubtype subtype) =>
       document?.isRegionSpecific == true && (document as RegionSpecific).subtype == subtype;
 
@@ -115,239 +231,78 @@ class CapturedId extends Serializable {
 
   bool isVisaIcao() => document?.isVisaIcao == true;
 
-  String? get documentNumber {
-    return _commonCapturedIdFields?.documentNumber;
-  }
+  String? get documentNumber => _documentNumber;
 
-  String? get documentAdditionalNumber {
-    return _commonCapturedIdFields?._documentAdditionalNumber;
-  }
+  String? get documentAdditionalNumber => _documentAdditionalNumber;
 
-  DateResult? get dateOfExpiry {
-    return _commonCapturedIdFields?.dateOfExpiry;
-  }
+  DateResult? get dateOfExpiry => _dateOfExpiry;
 
-  DateResult? get dateOfIssue {
-    return _commonCapturedIdFields?.dateOfIssue;
-  }
+  DateResult? get dateOfIssue => _dateOfIssue;
 
-  MrzResult? get mrz {
-    return _mrzResult;
-  }
+  MrzResult? get mrz => _mrzResult;
 
-  VizResult? get viz {
-    return _vizResult;
-  }
+  VizResult? get viz => _vizResult;
 
-  BarcodeResult? get barcode {
-    return _barcodeResult;
-  }
+  BarcodeResult? get barcode => _barcodeResult;
 
   IdImages get images => _images;
 
-  int? get age {
-    return _age;
+  int? get age => _age;
+
+  bool? get isExpired => _isExpired;
+
+  VerificationResult get verificationResult => _verificationResult;
+
+  Sex get sexType => _sexType;
+
+  UsRealIdStatus get usRealIdStatus => _usRealIdStatus;
+
+  MobileDocumentResult? get mobileDocument => _mobileDocument;
+
+  MobileDocumentOcrResult? get mobileDocumentOcr => _mobileDocumentOcr;
+
+  bool isAnonymized(IdFieldType field) {
+    final anonymizedFieldsList = _json['anonymizedFields'] as List<dynamic>?;
+    if (anonymizedFieldsList == null) return false;
+    return anonymizedFieldsList.contains(field.toString());
   }
 
-  bool? get isExpired {
-    return _isExpired;
+  List<IdFieldType> get anonymizedFields {
+    final anonymizedFieldsList = _json['anonymizedFields'] as List<dynamic>?;
+    if (anonymizedFieldsList == null) return [];
+    return anonymizedFieldsList.map((fieldString) => IdFieldType.fromJSON(fieldString as String)).toList();
   }
 
   @override
-  Map<String, dynamic> toMap() {
-    return _json;
-  }
+  Map<String, dynamic> toMap() => _json;
 }
 
-class _CommonCapturedIdFields {
-  String? _firstName;
-  String? _lastName;
-  String _fullName;
-  String? _sex;
-  DateResult? _dateOfBirth;
-  String? _nationality;
-  String? _address;
-  IdCaptureDocument? _document;
-  String? _issuingCountryIso;
-  IdCaptureRegion _issuingCountry;
-  String? _documentNumber;
-  String? _documentAdditionalNumber;
-  DateResult? _dateOfExpiry;
-  DateResult? _dateOfIssue;
+IdCaptureDocument _getDocument(IdCaptureRegion issuingCountry, String documentTypeJson, String? documentSubtype) {
+  var documentType = IdCaptureDocumentTypeDeserializer.fromJSON(documentTypeJson);
 
-  _CommonCapturedIdFields._(
-      this._firstName,
-      this._lastName,
-      this._fullName,
-      this._sex,
-      this._dateOfBirth,
-      this._nationality,
-      this._address,
-      this._document,
-      this._issuingCountryIso,
-      this._issuingCountry,
-      this._documentNumber,
-      this._documentAdditionalNumber,
-      this._dateOfExpiry,
-      this._dateOfIssue);
+  RegionSpecificSubtype? subtype;
 
-  factory _CommonCapturedIdFields.fromJSON(Map<String, dynamic> json, _CommonCapturedIdFields? existingInstance) {
-    DateResult? dateOfExpiry;
-    if (json.containsKey("dateOfExpiry") && json["dateOfExpiry"] != null) {
-      dateOfExpiry = DateResult.fromJSON(json["dateOfExpiry"] as Map<String, dynamic>);
-    }
+  if (documentSubtype != null) {
+    subtype = RegionSpecificSubtypeDeserializer.fromJSON(documentSubtype);
+  }
 
-    DateResult? dateOfIssue;
-    if (json.containsKey("dateOfIssue") && json["dateOfIssue"] != null) {
-      dateOfIssue = DateResult.fromJSON(json["dateOfIssue"] as Map<String, dynamic>);
-    }
-
-    DateResult? dateOfBirth;
-    if (json.containsKey("dateOfBirth") && json["dateOfBirth"] != null) {
-      dateOfBirth = DateResult.fromJSON(json["dateOfBirth"] as Map<String, dynamic>);
-    }
-
-    var firstName = json["firstName"] as String?;
-    var lastName = json["lastName"] as String?;
-    var fullName = json["fullName"] as String;
-    var sex = json["sex"] as String?;
-    var nationality = json["nationality"] as String?;
-    var address = json["address"] as String?;
-
-    var issuingCountryIso = json["issuingCountryIso"] as String?;
-
-    var documentNumber = json["documentNumber"] as String?;
-
-    var documentAdditionalNumber = json["documentAdditionalNumber"] as String?;
-
-    var issuingCountry = IdCaptureRegionDeserializer.fromJSON(json['issuingCountry']);
-
-    IdCaptureDocument? document;
-
-    if (json['documentType'] != null) {
-      document = _CommonCapturedIdFields._getDocument(issuingCountry, json['documentType'], json['documentSubtype']);
-    }
-
-    if (existingInstance != null) {
-      existingInstance._firstName ??= firstName;
-      existingInstance._lastName ??= lastName;
-      if (existingInstance._fullName.isEmpty) {
-        existingInstance._fullName = fullName;
+  switch (documentType) {
+    case IdCaptureDocumentType.driverLicense:
+      return DriverLicense(issuingCountry);
+    case IdCaptureDocumentType.healthInsuranceCard:
+      return HealthInsuranceCard(issuingCountry);
+    case IdCaptureDocumentType.idCard:
+      return IdCard(issuingCountry);
+    case IdCaptureDocumentType.passport:
+      return Passport(issuingCountry);
+    case IdCaptureDocumentType.regionSpecific:
+      if (subtype == null) {
+        throw ArgumentError("Document subtype is required for region specific documents.", "documentSubtype");
       }
-      existingInstance._sex ??= sex;
-      existingInstance._dateOfBirth ??= dateOfBirth;
-      existingInstance._nationality ??= nationality;
-      existingInstance._address ??= address;
-      existingInstance._issuingCountryIso ??= issuingCountryIso;
-      existingInstance._documentNumber ??= documentNumber;
-      existingInstance._documentAdditionalNumber ??= documentAdditionalNumber;
-      existingInstance._dateOfExpiry ??= dateOfExpiry;
-      existingInstance._dateOfIssue ??= dateOfIssue;
-      return existingInstance;
-    }
-
-    return _CommonCapturedIdFields._(
-      firstName,
-      lastName,
-      fullName,
-      sex,
-      dateOfBirth,
-      nationality,
-      address,
-      document,
-      issuingCountryIso,
-      issuingCountry,
-      documentNumber,
-      documentAdditionalNumber,
-      dateOfExpiry,
-      dateOfIssue,
-    );
-  }
-
-  String? get firstName {
-    return _firstName;
-  }
-
-  String? get lastName {
-    return _lastName;
-  }
-
-  String get fullName {
-    return _fullName;
-  }
-
-  String? get sex {
-    return _sex;
-  }
-
-  DateResult? get dateOfBirth {
-    return _dateOfBirth;
-  }
-
-  String? get nationality {
-    return _nationality;
-  }
-
-  String? get address {
-    return _address;
-  }
-
-  IdCaptureDocument? get document {
-    return _document;
-  }
-
-  String? get issuingCountryIso {
-    return _issuingCountryIso;
-  }
-
-  IdCaptureRegion get issuingCountry {
-    return _issuingCountry;
-  }
-
-  String? get documentNumber {
-    return _documentNumber;
-  }
-
-  String? get documentAdditionalNumber {
-    return _documentAdditionalNumber;
-  }
-
-  DateResult? get dateOfExpiry {
-    return _dateOfExpiry;
-  }
-
-  DateResult? get dateOfIssue {
-    return _dateOfIssue;
-  }
-
-  static IdCaptureDocument _getDocument(
-      IdCaptureRegion issuingCountry, String documentTypeJson, String? documentSubtype) {
-    var documentType = IdCaptureDocumentTypeDeserializer.fromJSON(documentTypeJson);
-
-    RegionSpecificSubtype? subtype;
-
-    if (documentSubtype != null) {
-      subtype = RegionSpecificSubtypeDeserializer.fromJSON(documentSubtype);
-    }
-
-    switch (documentType) {
-      case IdCaptureDocumentType.driverLicense:
-        return DriverLicense(issuingCountry);
-      case IdCaptureDocumentType.healthInsuranceCard:
-        return HealthInsuranceCard(issuingCountry);
-      case IdCaptureDocumentType.idCard:
-        return IdCard(issuingCountry);
-      case IdCaptureDocumentType.passport:
-        return Passport(issuingCountry);
-      case IdCaptureDocumentType.regionSpecific:
-        if (subtype == null) {
-          throw ArgumentError("Document subtype is required for region specific documents.", "documentSubtype");
-        }
-        return RegionSpecific(subtype);
-      case IdCaptureDocumentType.residencePermit:
-        return ResidencePermit(issuingCountry);
-      case IdCaptureDocumentType.visaIcao:
-        return VisaIcao(issuingCountry);
-    }
+      return RegionSpecific(subtype);
+    case IdCaptureDocumentType.residencePermit:
+      return ResidencePermit(issuingCountry);
+    case IdCaptureDocumentType.visaIcao:
+      return VisaIcao(issuingCountry);
   }
 }
