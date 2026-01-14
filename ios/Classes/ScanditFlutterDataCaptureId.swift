@@ -6,9 +6,9 @@
 
 import Flutter
 import Foundation
+import scandit_flutter_datacapture_core
 import ScanditFrameworksCore
 import ScanditFrameworksId
-import scandit_flutter_datacapture_core
 
 @objc
 public class ScanditFlutterDataCaptureId: NSObject, FlutterPlugin {
@@ -23,14 +23,10 @@ public class ScanditFlutterDataCaptureId: NSObject, FlutterPlugin {
     @objc
     public static func register(with registrar: FlutterPluginRegistrar) {
         let prefix = "com.scandit.datacapture.id.capture"
-        let methodChannel = FlutterMethodChannel(
-            name: "\(prefix)/method_channel",
-            binaryMessenger: registrar.messenger()
-        )
-        let eventChannel = FlutterEventChannel(
-            name: "\(prefix)/event_channel",
-            binaryMessenger: registrar.messenger()
-        )
+        let methodChannel = FlutterMethodChannel(name: "\(prefix)/method_channel",
+                                                 binaryMessenger: registrar.messenger())
+        let eventChannel = FlutterEventChannel(name: "\(prefix)/event_channel",
+                                               binaryMessenger: registrar.messenger())
         let emitter = FlutterEventEmitter(eventChannel: eventChannel)
         let idModule = IdCaptureModule(emitter: emitter)
         let methodCallHandler = IdCaptureMethodHandler(idModule: idModule)

@@ -180,7 +180,7 @@ class _IdCaptureOverlayController extends BaseController {
   Future<void> update() {
     return methodChannel.invokeMethod(
       IdCaptureFunctionNames.updateIdCaptureOverlay,
-      {'overlayJson': jsonEncode(_overlay.toMap())},
+      jsonEncode(_overlay.toMap()),
     );
   }
 }

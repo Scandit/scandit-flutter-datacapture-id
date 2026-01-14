@@ -5,17 +5,17 @@
  */
 
 import Flutter
-import ScanditFrameworksCore
-import ScanditFrameworksId
 import scandit_flutter_datacapture_core
+import ScanditFrameworksId
+import ScanditFrameworksCore
 
-class IdCaptureMethodHandler {
+ class IdCaptureMethodHandler {
 
-    private let idModule: IdCaptureModule
+     private let idModule: IdCaptureModule
 
-    init(idModule: IdCaptureModule) {
-        self.idModule = idModule
-    }
+     init(idModule: IdCaptureModule) {
+         self.idModule = idModule
+     }
 
     @objc
     func handleMethodCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -29,4 +29,4 @@ class IdCaptureMethodHandler {
         }
     }
 
-}
+ }

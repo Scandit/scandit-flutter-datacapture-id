@@ -24,9 +24,9 @@ class MobileDocumentScanner implements Serializable {
   @override
   Map<String, dynamic> toMap() {
     return {
-      'iso180135': iso180135,
+      'iso18013_5': iso180135,
       'ocr': ocr,
-      'elementsToRetain': elementsToRetain.map((e) => e.toString()).toList(),
+      'elements_to_retain': elementsToRetain.map((e) => e.toString()).toList(),
     };
   }
 }

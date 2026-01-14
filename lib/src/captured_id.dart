@@ -46,7 +46,6 @@ class CapturedId extends Serializable {
   final String? _sex;
   final DateResult? _dateOfBirth;
   final String? _nationality;
-  final String? _nationalityISO;
   final String? _address;
   final String? _documentNumber;
   final String? _documentAdditionalNumber;
@@ -72,7 +71,6 @@ class CapturedId extends Serializable {
     this._sex,
     this._dateOfBirth,
     this._nationality,
-    this._nationalityISO,
     this._address,
     this._documentNumber,
     this._documentAdditionalNumber,
@@ -120,7 +118,6 @@ class CapturedId extends Serializable {
     final sex = json['sex']?.toString();
     final dateOfBirth = json['dateOfBirth'] != null ? DateResult.fromJSON(json['dateOfBirth']) : null;
     final nationality = json['nationality']?.toString();
-    final nationalityISO = json['nationalityISO']?.toString();
     final address = json['address']?.toString();
     final documentNumber = json['documentNumber']?.toString();
     final documentAdditionalNumber = json['documentAdditionalNumber']?.toString();
@@ -176,7 +173,6 @@ class CapturedId extends Serializable {
       sex,
       dateOfBirth,
       nationality,
-      nationalityISO,
       address,
       documentNumber,
       documentAdditionalNumber,
@@ -203,8 +199,6 @@ class CapturedId extends Serializable {
   DateResult? get dateOfBirth => _dateOfBirth;
 
   String? get nationality => _nationality;
-
-  String? get nationalityISO => _nationalityISO;
 
   String? get address => _address;
 

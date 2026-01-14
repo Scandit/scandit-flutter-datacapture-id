@@ -76,7 +76,7 @@ class IdCaptureSettings implements Serializable {
       'anonymizationMode': anonymizationMode.toString(),
       'rejectVoidedIds': rejectVoidedIds,
       'decodeBackOfEuropeDrivingLicense': decodeBackOfEuropeanDrivingLicense,
-      'scanner': scanner.toMap(),
+      'scannerType': scanner.toMap(),
       'acceptedDocuments': acceptedDocuments.map((doc) => doc.toMap()).toList(),
       'rejectedDocuments': rejectedDocuments.map((doc) => doc.toMap()).toList(),
       'rejectExpiredIds': rejectExpiredIds,
