@@ -5,25 +5,39 @@
  */
 
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
-import 'package:scandit_flutter_datacapture_id/src/mobile_document_scanner.dart';
-import 'package:scandit_flutter_datacapture_id/src/physical_document_scanner.dart';
 
-class IdCaptureScanner implements Serializable {
-  final PhysicalDocumentScanner? _physicalDocumentScanner;
-  final MobileDocumentScanner? _mobileDocumentScanner;
+abstract class IdCaptureScanner implements Serializable {
+  final bool _isFull;
+  final bool _barcode;
+  final bool _machineReadableZone;
+  final bool _visualInspectionZone;
 
-  IdCaptureScanner({PhysicalDocumentScanner? physicalDocumentScanner, MobileDocumentScanner? mobileDocumentScanner})
-      : _physicalDocumentScanner = physicalDocumentScanner,
-        _mobileDocumentScanner = mobileDocumentScanner;
-
-  PhysicalDocumentScanner? get physicalDocument => _physicalDocumentScanner;
-  MobileDocumentScanner? get mobileDocument => _mobileDocumentScanner;
+  IdCaptureScanner._(this._isFull, this._barcode, this._machineReadableZone, this._visualInspectionZone);
 
   @override
   Map<String, dynamic> toMap() {
     return {
-      'physicalDocument': _physicalDocumentScanner?.toMap(),
-      'mobileDocument': _mobileDocumentScanner?.toMap(),
+      'options': {
+        'barcode': _barcode,
+        'machineReadableZone': _machineReadableZone,
+        'visualInspectionZone': _visualInspectionZone
+      },
+      'isFull': _isFull,
     };
   }
+}
+
+class SingleSideScanner extends IdCaptureScanner {
+  SingleSideScanner(bool barcode, bool machineReadableZone, bool visualInspectionZone)
+      : super._(false, barcode, machineReadableZone, visualInspectionZone);
+
+  bool get barcode => _barcode;
+
+  bool get machineReadableZone => _machineReadableZone;
+
+  bool get visualInspectionZone => _visualInspectionZone;
+}
+
+class FullDocumentScanner extends IdCaptureScanner {
+  FullDocumentScanner() : super._(true, true, true, true);
 }
