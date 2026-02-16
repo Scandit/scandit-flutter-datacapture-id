@@ -6,7 +6,7 @@
 
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
 
-import 'id_capture_defaults.dart';
+import 'internal/id_capture_defaults.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class ScanditFlutterDataCaptureId {

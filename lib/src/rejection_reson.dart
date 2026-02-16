@@ -15,7 +15,9 @@ enum RejectionReason {
   notRealIdCompliant('notRealIdCompliant'),
   holderUnderage('holderUnderage'),
   forgedAamvaBarcode('forgedAamvaBarcode'),
-  inconsistentData('inconsistentData');
+  inconsistentData('inconsistentData'),
+  bluetoothCommunicationError('bluetoothCommunicationError'),
+  bluetoothUnavailable('bluetoothUnavailable');
 
   const RejectionReason(this._name);
 

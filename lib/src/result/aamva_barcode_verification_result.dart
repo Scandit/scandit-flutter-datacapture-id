@@ -10,17 +10,14 @@ import 'package:scandit_flutter_datacapture_id/src/aamva_barcode_verification_st
 @immutable
 class AamvaBarcodeVerificationResult {
   final bool _allChecksPassed;
-  // ignore: unused_field
-  final String _resultJson;
 
   final AamvaBarcodeVerificationStatus _status;
 
-  const AamvaBarcodeVerificationResult._(this._allChecksPassed, this._resultJson, this._status);
+  const AamvaBarcodeVerificationResult._(this._allChecksPassed, this._status);
 
   factory AamvaBarcodeVerificationResult.fromJSON(Map<String, dynamic> json) {
     return AamvaBarcodeVerificationResult._(
       json['allChecksPassed'] as bool,
-      json['serverResponseJson'] as String,
       AamvaBarcodeVerificationStatusSerializer.fromJson(json['verificationStatus'] as String),
     );
   }

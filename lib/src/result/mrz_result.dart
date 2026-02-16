@@ -12,9 +12,9 @@ import 'package:flutter/foundation.dart';
 class MrzResult {
   final String _documentCode;
   final bool _namesAreTruncated;
-  final String? _optional;
-  final String? _optional1;
-  final String _capturedMrz;
+  final String? _optionalDataInLine1;
+  final String? _optionalDataInLine2;
+  final String? _capturedMrz;
   final String? _personalIdNumber;
   final int? _renewalTimes;
   final String? _fullNameSimplifiedChinese;
@@ -24,43 +24,109 @@ class MrzResult {
   final String? _passportIssuerIso;
   final String? _passportNumber;
   final DateResult? _passportDateOfExpiry;
+  final String? _firstName;
+  final String? _lastName;
+  final String? _fullName;
+  final String? _sex;
+  final DateResult? _dateOfBirth;
+  final String? _nationality;
+  final String? _address;
+  final String? _documentNumber;
+  final DateResult? _dateOfExpiry;
+  final DateResult? _dateOfIssue;
 
-  const MrzResult._(
-      this._documentCode,
-      this._namesAreTruncated,
-      this._optional,
-      this._optional1,
-      this._capturedMrz,
-      this._personalIdNumber,
-      this._renewalTimes,
-      this._fullNameSimplifiedChinese,
-      this._omittedCharacterCountInGbkName,
-      this._omittedNameCount,
-      this._issuingAuthorityCode,
-      this._passportIssuerIso,
-      this._passportNumber,
-      this._passportDateOfExpiry);
+  const MrzResult._({
+    required String documentCode,
+    required bool namesAreTruncated,
+    required String? optionalDataInLine1,
+    required String? optionalDataInLine2,
+    required String? capturedMrz,
+    required String? personalIdNumber,
+    required int? renewalTimes,
+    required String? fullNameSimplifiedChinese,
+    required int? omittedCharacterCountInGbkName,
+    required int? omittedNameCount,
+    required String? issuingAuthorityCode,
+    required String? passportIssuerIso,
+    required String? passportNumber,
+    required DateResult? passportDateOfExpiry,
+    required String? firstName,
+    required String? lastName,
+    required String? fullName,
+    required String? sex,
+    required DateResult? dateOfBirth,
+    required String? nationality,
+    required String? address,
+    required String? documentNumber,
+    required DateResult? dateOfExpiry,
+    required DateResult? dateOfIssue,
+  })  : _documentCode = documentCode,
+        _namesAreTruncated = namesAreTruncated,
+        _optionalDataInLine1 = optionalDataInLine1,
+        _optionalDataInLine2 = optionalDataInLine2,
+        _capturedMrz = capturedMrz,
+        _personalIdNumber = personalIdNumber,
+        _renewalTimes = renewalTimes,
+        _fullNameSimplifiedChinese = fullNameSimplifiedChinese,
+        _omittedCharacterCountInGbkName = omittedCharacterCountInGbkName,
+        _omittedNameCount = omittedNameCount,
+        _issuingAuthorityCode = issuingAuthorityCode,
+        _passportIssuerIso = passportIssuerIso,
+        _passportNumber = passportNumber,
+        _passportDateOfExpiry = passportDateOfExpiry,
+        _firstName = firstName,
+        _lastName = lastName,
+        _fullName = fullName,
+        _sex = sex,
+        _dateOfBirth = dateOfBirth,
+        _nationality = nationality,
+        _address = address,
+        _documentNumber = documentNumber,
+        _dateOfExpiry = dateOfExpiry,
+        _dateOfIssue = dateOfIssue;
 
   factory MrzResult.fromJSON(Map<String, dynamic> json) {
     DateResult? passportDateOfExpiry;
     if (json.containsKey("passportDateOfExpiry") && json["passportDateOfExpiry"] != null) {
       passportDateOfExpiry = DateResult.fromJSON(json["passportDateOfExpiry"] as Map<String, dynamic>);
     }
+
+    final firstName = json['firstName']?.toString();
+    final lastName = json['lastName']?.toString();
+    final fullName = json['fullName']?.toString();
+    final sex = json['sex']?.toString();
+    final dateOfBirth = json['dateOfBirth'] != null ? DateResult.fromJSON(json['dateOfBirth']) : null;
+    final nationality = json['nationality']?.toString();
+    final address = json['address']?.toString();
+    final documentNumber = json['documentNumber']?.toString();
+    final dateOfExpiry = json['dateOfExpiry'] != null ? DateResult.fromJSON(json['dateOfExpiry']) : null;
+    final dateOfIssue = json['dateOfIssue'] != null ? DateResult.fromJSON(json['dateOfIssue']) : null;
     return MrzResult._(
-        json['documentCode'] as String,
-        json['namesAreTruncated'] as bool,
-        json['optional'] as String?,
-        json['optional1'] as String?,
-        json['capturedMrz'] as String,
-        json["personalIdNumber"] as String?,
-        json["renewalTimes"] as int?,
-        json["fullNameSimplifiedChinese"] as String?,
-        json["omittedCharacterCountInGbkName"] as int?,
-        json["omittedNameCount"] as int?,
-        json["issuingAuthorityCode"] as String?,
-        json["passportIssuerIso"] as String?,
-        json["passportNumber"] as String?,
-        passportDateOfExpiry);
+      documentCode: json['documentCode'] as String,
+      namesAreTruncated: json['namesAreTruncated'] as bool,
+      optionalDataInLine1: json['optionalDataInLine1'] as String?,
+      optionalDataInLine2: json['optionalDataInLine2'] as String?,
+      capturedMrz: json['capturedMrz'] as String?,
+      personalIdNumber: json["personalIdNumber"] as String?,
+      renewalTimes: json["renewalTimes"] as int?,
+      fullNameSimplifiedChinese: json["fullNameSimplifiedChinese"] as String?,
+      omittedCharacterCountInGbkName: json["omittedCharacterCountInGbkName"] as int?,
+      omittedNameCount: json["omittedNameCount"] as int?,
+      issuingAuthorityCode: json["issuingAuthorityCode"] as String?,
+      passportIssuerIso: json["passportIssuerIso"] as String?,
+      passportNumber: json["passportNumber"] as String?,
+      passportDateOfExpiry: passportDateOfExpiry,
+      firstName: firstName,
+      lastName: lastName,
+      fullName: fullName,
+      sex: sex,
+      dateOfBirth: dateOfBirth,
+      nationality: nationality,
+      address: address,
+      documentNumber: documentNumber,
+      dateOfExpiry: dateOfExpiry,
+      dateOfIssue: dateOfIssue,
+    );
   }
 
   String get documentCode {
@@ -71,15 +137,15 @@ class MrzResult {
     return _namesAreTruncated;
   }
 
-  String? get optional {
-    return _optional;
+  String? get optionalDataInLine1 {
+    return _optionalDataInLine1;
   }
 
-  String? get optional1 {
-    return _optional1;
+  String? get optionalDataInLine2 {
+    return _optionalDataInLine2;
   }
 
-  String get capturedMrz {
+  String? get capturedMrz {
     return _capturedMrz;
   }
 
@@ -118,4 +184,15 @@ class MrzResult {
   DateResult? get passportDateOfExpiry {
     return _passportDateOfExpiry;
   }
+
+  String? get firstName => _firstName;
+  String? get lastName => _lastName;
+  String? get fullName => _fullName;
+  String? get sex => _sex;
+  DateResult? get dateOfBirth => _dateOfBirth;
+  String? get nationality => _nationality;
+  String? get address => _address;
+  String? get documentNumber => _documentNumber;
+  DateResult? get dateOfExpiry => _dateOfExpiry;
+  DateResult? get dateOfIssue => _dateOfIssue;
 }
