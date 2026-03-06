@@ -4,30 +4,24 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
-import 'dart:convert';
-
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
-import 'package:scandit_flutter_datacapture_id/src/id_field_type.dart';
 import 'package:scandit_flutter_datacapture_id/src/internal/duration_extensions.dart';
 
 import 'id_capture_document.dart';
 import 'id_capture_scanner.dart';
 import 'id_image_type.dart';
 import 'id_anonymization_mode.dart';
-import 'internal/id_capture_defaults.dart';
+import 'id_capture_defaults.dart';
 
 class IdCaptureSettings implements Serializable {
   final Map<String, dynamic> _properties = {};
   final Map<IdImageType, dynamic> _imageToResult = {};
-  final Map<String, Set<String>> _anonymizationMap = {};
-
-  IdCaptureSettings();
 
   List<IdCaptureDocument> acceptedDocuments = [];
 
   List<IdCaptureDocument> rejectedDocuments = [];
 
-  IdCaptureScanner scanner = IdCaptureScanner();
+  IdCaptureScanner scannerType = SingleSideScanner(false, false, false);
 
   void setProperty<T>(String name, T value) {
     _properties[name] = value;
@@ -47,8 +41,6 @@ class IdCaptureSettings implements Serializable {
 
   IdAnonymizationMode anonymizationMode = IdCaptureDefaults.captureSettingsDefaults.anonymizationMode;
 
-  bool anonymizeDefaultFields = IdCaptureDefaults.captureSettingsDefaults.anonymizeDefaultFields;
-
   bool rejectVoidedIds = IdCaptureDefaults.captureSettingsDefaults.rejectVoidedIds;
 
   bool rejectExpiredIds = IdCaptureDefaults.captureSettingsDefaults.rejectExpiredIds;
@@ -66,20 +58,14 @@ class IdCaptureSettings implements Serializable {
   bool decodeBackOfEuropeanDrivingLicense =
       IdCaptureDefaults.captureSettingsDefaults.decodeBackOfEuropeanDrivingLicense ?? false;
 
-  void addAnonymizedField(IdCaptureDocument document, IdFieldType fieldType) {
-    final key = jsonEncode(document.toMap());
-    _anonymizationMap[key] = (_anonymizationMap[key] ?? {})..add(fieldType.toString());
-  }
-
   @override
   Map<String, dynamic> toMap() {
     return {
       'imageToResult': _imageToResult.map((key, value) => MapEntry(key.toString(), value)),
-      'anonymizationMode': anonymizationMode.toString(),
-      'anonymizeDefaultFields': anonymizeDefaultFields,
+      'anonymizationMode': anonymizationMode.name,
       'rejectVoidedIds': rejectVoidedIds,
       'decodeBackOfEuropeDrivingLicense': decodeBackOfEuropeanDrivingLicense,
-      'scanner': scanner.toMap(),
+      'scannerType': scannerType.toMap(),
       'acceptedDocuments': acceptedDocuments.map((doc) => doc.toMap()).toList(),
       'rejectedDocuments': rejectedDocuments.map((doc) => doc.toMap()).toList(),
       'rejectExpiredIds': rejectExpiredIds,
@@ -88,7 +74,6 @@ class IdCaptureSettings implements Serializable {
       'rejectForgedAamvaBarcodes': rejectForgedAamvaBarcodes,
       'rejectInconsistentData': rejectInconsistentData,
       'rejectHolderBelowAge': rejectHolderBelowAge,
-      'anonymizationMap': _anonymizationMap.map((key, value) => MapEntry(key, value.toList())),
     };
   }
 }
