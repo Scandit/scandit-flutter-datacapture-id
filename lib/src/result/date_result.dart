@@ -30,6 +30,11 @@ class DateResult extends Serializable {
     return _year;
   }
 
+  @Deprecated("Use [localDate] or [utcDate] instead.")
+  DateTime get date {
+    return DateTime.utc(year, month, day);
+  }
+
   DateTime get localDate {
     return utcDate.toLocal();
   }

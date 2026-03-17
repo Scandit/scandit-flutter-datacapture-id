@@ -79,7 +79,9 @@ public class ScanditFlutterDataCaptureIdProxyPlugin extends BaseFlutterPlugin im
         IdCaptureModule idCaptureModule = resolveModule(IdCaptureModule.class);
         if (idCaptureModule != null) return;
 
-        idCaptureModule = IdCaptureModule.create(idEmitter);
+        idCaptureModule = IdCaptureModule.create(
+                FrameworksIdCaptureListener.create(idEmitter)
+        );
         idCaptureModule.onCreate(binding.getApplicationContext());
 
         registerModule(idCaptureModule);
