@@ -11,8 +11,8 @@ import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_cor
 import 'package:scandit_flutter_datacapture_core/src/internal/base_controller.dart';
 import 'package:scandit_flutter_datacapture_id/src/id_capture.dart';
 
-import 'function_names.dart';
-import 'id_capture_defaults.dart';
+import 'internal/function_names.dart';
+import 'internal/id_capture_defaults.dart';
 import 'id_layout.dart';
 
 class IdCaptureOverlay extends DataCaptureOverlay {
@@ -41,19 +41,15 @@ class IdCaptureOverlay extends DataCaptureOverlay {
     _controller ??= _IdCaptureOverlayController(this);
   }
 
-  IdCaptureOverlay._(this._mode, this._view) : super('idCapture') {
-    view?.addOverlay(this);
+  IdCaptureOverlay._(this._mode) : super('idCapture');
+
+  IdCaptureOverlay(IdCapture mode) : this._(mode);
+
+  IdLayoutStyle _idLayoutStyle = defaultIdLayoutStyle;
+
+  static IdLayoutStyle get defaultIdLayoutStyle {
+    return IdCaptureDefaults.idCaptureOverlayDefaults.idLayoutStyle;
   }
-
-  IdCaptureOverlay(IdCapture mode) : this._(mode, null);
-
-  @Deprecated('Use IdCaptureOverlay() instead')
-  IdCaptureOverlay.withIdCaptureForView(IdCapture idCapture, DataCaptureView? view) : this._(idCapture, view);
-
-  @Deprecated('Use IdCaptureOverlay() instead')
-  IdCaptureOverlay.withIdCapture(IdCapture idCapture) : this.withIdCaptureForView(idCapture, null);
-
-  IdLayoutStyle _idLayoutStyle = IdLayoutStyle.rounded;
 
   IdLayoutStyle get idLayoutStyle {
     return _idLayoutStyle;
@@ -64,7 +60,11 @@ class IdCaptureOverlay extends DataCaptureOverlay {
     _controller?.update();
   }
 
-  IdLayoutLineStyle _idLayoutLineStyle = IdLayoutLineStyle.light;
+  IdLayoutLineStyle _idLayoutLineStyle = defaultIdLayoutLineStyle;
+
+  static IdLayoutLineStyle get defaultIdLayoutLineStyle {
+    return IdCaptureDefaults.idCaptureOverlayDefaults.idLayoutLineStyle;
+  }
 
   IdLayoutLineStyle get idLayoutLineStyle {
     return _idLayoutLineStyle;
@@ -180,7 +180,7 @@ class _IdCaptureOverlayController extends BaseController {
   Future<void> update() {
     return methodChannel.invokeMethod(
       IdCaptureFunctionNames.updateIdCaptureOverlay,
-      jsonEncode(_overlay.toMap()),
+      {'overlayJson': jsonEncode(_overlay.toMap())},
     );
   }
 }
