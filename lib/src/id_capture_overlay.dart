@@ -10,6 +10,7 @@ import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_cor
 // ignore: implementation_imports
 import 'package:scandit_flutter_datacapture_core/src/internal/base_controller.dart';
 import 'package:scandit_flutter_datacapture_id/src/id_capture.dart';
+import 'package:scandit_flutter_datacapture_id/src/internal/generated/id_method_handler.dart';
 
 import 'internal/function_names.dart';
 import 'internal/id_capture_defaults.dart';
@@ -174,13 +175,13 @@ class IdCaptureOverlay extends DataCaptureOverlay {
 
 class _IdCaptureOverlayController extends BaseController {
   final IdCaptureOverlay _overlay;
+  late final IdMethodHandler idMethodHandler;
 
-  _IdCaptureOverlayController(this._overlay) : super(IdCaptureFunctionNames.methodsChannelName);
+  _IdCaptureOverlayController(this._overlay) : super(IdCaptureFunctionNames.methodsChannelName) {
+    idMethodHandler = IdMethodHandler(methodChannel);
+  }
 
   Future<void> update() {
-    return methodChannel.invokeMethod(
-      IdCaptureFunctionNames.updateIdCaptureOverlay,
-      {'overlayJson': jsonEncode(_overlay.toMap())},
-    );
+    return idMethodHandler.updateIdCaptureOverlay(overlayJson: jsonEncode(_overlay.toMap())).onError(onError);
   }
 }

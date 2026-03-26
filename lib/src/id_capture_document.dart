@@ -38,7 +38,9 @@ abstract class IdCaptureDocument implements Serializable {
 
   IdCaptureDocument._(this._region, this._documentType);
 
-  IdCaptureRegion get region => _region;
+  IdCaptureDocumentType get documentType;
+
+  IdCaptureRegion get region;
 
   bool get isIdCard => _documentType == IdCaptureDocumentType.idCard;
 
@@ -65,18 +67,42 @@ abstract class IdCaptureDocument implements Serializable {
 
 class IdCard extends IdCaptureDocument {
   IdCard(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.idCard);
+
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
+  @override
+  IdCaptureRegion get region => super._region;
 }
 
 class DriverLicense extends IdCaptureDocument {
   DriverLicense(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.driverLicense);
+
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
+  @override
+  IdCaptureRegion get region => super._region;
 }
 
 class Passport extends IdCaptureDocument {
   Passport(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.passport);
+
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
+  @override
+  IdCaptureRegion get region => super._region;
 }
 
 class VisaIcao extends IdCaptureDocument {
   VisaIcao(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.visaIcao);
+
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
+  @override
+  IdCaptureRegion get region => super._region;
 }
 
 class RegionSpecific extends IdCaptureDocument {
@@ -84,7 +110,13 @@ class RegionSpecific extends IdCaptureDocument {
 
   RegionSpecific(this._subtype) : super._(IdCaptureRegion.any, IdCaptureDocumentType.regionSpecific);
 
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
   RegionSpecificSubtype get subtype => _subtype;
+
+  @override
+  IdCaptureRegion get region => super._region;
 
   @override
   Map<String, dynamic> toMap() {
@@ -96,8 +128,20 @@ class RegionSpecific extends IdCaptureDocument {
 
 class ResidencePermit extends IdCaptureDocument {
   ResidencePermit(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.residencePermit);
+
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
+  @override
+  IdCaptureRegion get region => super._region;
 }
 
 class HealthInsuranceCard extends IdCaptureDocument {
   HealthInsuranceCard(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.healthInsuranceCard);
+
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
+  @override
+  IdCaptureRegion get region => super._region;
 }
