@@ -11,12 +11,11 @@ import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_cor
 
 import 'function_names.dart';
 import 'id_anonymization_mode.dart';
-import 'internal/duration_extensions.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class IdCaptureDefaults {
   static bool _isInitialized = false;
-  static MethodChannel channel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+  static MethodChannel channel = MethodChannel(IdCaptureFunctionNames.methodsChannelName);
   static late IdCaptureOverlayDefaults _idCaptureOverlayDefaults;
   static late CameraSettingsDefaults _cameraSettingsDefaults;
   static late IdCaptureSettingsDefaults _captureSettingsDefaults;
@@ -62,40 +61,14 @@ class IdCaptureOverlayDefaults {
 class IdCaptureSettingsDefaults {
   final IdAnonymizationMode anonymizationMode;
   final bool rejectVoidedIds;
-  final bool? decodeBackOfEuropeanDrivingLicense;
-  final bool rejectExpiredIds;
-  final Duration? rejectIdsExpiringIn;
-  final bool rejectNotRealIdCompliant;
-  final bool rejectForgedAamvaBarcodes;
-  final bool rejectInconsistentData;
-  final int? rejectHolderBelowAge;
 
-  IdCaptureSettingsDefaults(
-      this.anonymizationMode,
-      this.rejectVoidedIds,
-      this.decodeBackOfEuropeanDrivingLicense,
-      this.rejectExpiredIds,
-      this.rejectIdsExpiringIn,
-      this.rejectNotRealIdCompliant,
-      this.rejectForgedAamvaBarcodes,
-      this.rejectInconsistentData,
-      this.rejectHolderBelowAge);
+  IdCaptureSettingsDefaults(this.anonymizationMode, this.rejectVoidedIds);
 
   factory IdCaptureSettingsDefaults.fromJSON(Map<String, dynamic> json) {
     var anonymizationMode = IdAnonymizationModeDeserializer.fromJSON(json["anonymizationMode"] as String);
-
-    var rejectIdsExpiringInJson = json["rejectIdsExpiringIn"] as Map<String, dynamic>?;
-
     return IdCaptureSettingsDefaults(
       anonymizationMode,
       json["rejectVoidedIds"] as bool,
-      json["decodeBackOfEuropeDrivingLicense"] as bool?,
-      json["rejectExpiredIds"] as bool,
-      rejectIdsExpiringInJson?.toDurationFrom(DateTime.now()),
-      json["rejectNotRealIdCompliant"] as bool,
-      json["rejectForgedAamvaBarcodes"] as bool,
-      json["rejectInconsistentData"] as bool,
-      json["rejectHolderBelowAge"] as int?,
     );
   }
 }
@@ -103,13 +76,15 @@ class IdCaptureSettingsDefaults {
 class IdCaptureFeedbackDefaults {
   final Feedback idCaptured;
   final Feedback idRejected;
+  final Feedback idCaptureTimeout;
 
-  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected);
+  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected, this.idCaptureTimeout);
 
   factory IdCaptureFeedbackDefaults.fromJSON(Map<String, dynamic> json) {
     return IdCaptureFeedbackDefaults(
       feedbackFromJson(json, 'idCaptured'),
       feedbackFromJson(json, 'idRejected'),
+      feedbackFromJson(json, 'idCaptureTimeout'),
     );
   }
 

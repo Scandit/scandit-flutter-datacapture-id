@@ -4,6 +4,30 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+enum IdLayout {
+  td1('td1'),
+  td2('td2'),
+  td3('td3'),
+  mrvA('mrvA'),
+  viz('viz'),
+  pdf417('pdf417'),
+  auto('auto'),
+  none('none');
+
+  const IdLayout(this._name);
+
+  @override
+  String toString() => _name;
+
+  final String _name;
+}
+
+extension IdLayoutDeserializer on IdLayout {
+  static IdLayout fromJSON(String jsonValue) {
+    return IdLayout.values.firstWhere((element) => element.toString() == jsonValue);
+  }
+}
+
 enum IdLayoutStyle {
   rounded('rounded'),
   square('square');

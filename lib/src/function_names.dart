@@ -10,6 +10,10 @@ abstract class IdCaptureFunctionNames {
 
   static const String createAamvaBarcodeVerifier = 'createAamvaBarcodeVerifier';
   static const String verifyCapturedIdBarcode = 'verifyCapturedIdBarcode';
+  static const String aamvaVizBarcodeComparisonVerifier = 'verify';
+  static const String vizMrzComparisonVerifier = 'vizMrzComparisonVerifier';
+  static const String addIdCaptureAsyncListener = 'addIdCaptureAsyncListener';
+  static const String removeIdCaptureAsyncListener = 'removeIdCaptureAsyncListener';
   static const String getLastFrameDataName = 'getLastFrameData';
   static const String removeIdCaptureListenerName = 'removeIdCaptureListener';
   static const String addIdCaptureListenerName = 'addIdCaptureListener';
