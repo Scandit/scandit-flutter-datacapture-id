@@ -14,6 +14,7 @@ enum RegionSpecificSubtype {
   apecBusinessTravelCard('apecBusinessTravelCard'),
   pakistanAfghanCitizenCard('pakistanAfghanCitizenCard'),
   singaporeFinCard('singaporeFinCard'),
+  usGreenCard('usGreenCard'),
   malaysiaIkad('malaysiaIkad'),
   malaysiaMykad('malaysiaMykad'),
   malaysiaMypr('malaysiaMypr'),
