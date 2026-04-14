@@ -5,9 +5,19 @@
  */
 
 enum RejectionReason {
-  documentTypeNotEnabled('documentTypeNotEnabled'),
-  incorrectBarcodeFormat('incorrectBarcodeFormat'),
-  documentVoided('documentVoided');
+  notAcceptedDocumentType('notAcceptedDocumentType'),
+  invalidFormat('invalidFormat'),
+  documentVoided('documentVoided'),
+  timeout('timeout'),
+  singleImageNotRecognized('singleImageNotRecognized'),
+  documentExpired('documentExpired'),
+  documentExpiresSoon('documentExpiresSoon'),
+  notRealIdCompliant('notRealIdCompliant'),
+  holderUnderage('holderUnderage'),
+  forgedAamvaBarcode('forgedAamvaBarcode'),
+  inconsistentData('inconsistentData'),
+  bluetoothCommunicationError('bluetoothCommunicationError'),
+  bluetoothUnavailable('bluetoothUnavailable');
 
   const RejectionReason(this._name);
 
