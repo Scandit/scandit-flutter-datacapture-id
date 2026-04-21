@@ -8,11 +8,10 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
-import 'package:scandit_flutter_datacapture_id/src/id_layout.dart';
 
 import 'function_names.dart';
-import '../id_anonymization_mode.dart';
-import 'duration_extensions.dart';
+import 'id_anonymization_mode.dart';
+import 'internal/duration_extensions.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class IdCaptureDefaults {
@@ -39,7 +38,7 @@ class IdCaptureDefaults {
     _cameraSettingsDefaults = CameraSettingsDefaults.fromJSON(json["RecommendedCameraSettings"]);
     _idCaptureOverlayDefaults = IdCaptureOverlayDefaults.fromJSON(json["IdCaptureOverlay"]);
     _captureSettingsDefaults = IdCaptureSettingsDefaults.fromJSON(json["IdCaptureSettings"]);
-    _idCaptureFeedbackDefaults = IdCaptureFeedbackDefaults.fromJSON(json);
+    _idCaptureFeedbackDefaults = IdCaptureFeedbackDefaults.fromJSON(jsonDecode(json["IdCaptureFeedback"] as String));
 
     _isInitialized = true;
   }
@@ -49,20 +48,14 @@ class IdCaptureOverlayDefaults {
   final Brush defaultCapturedBrush;
   final Brush defaultLocalizedBrush;
   final Brush defaultRejectedBrush;
-  final IdLayoutStyle idLayoutStyle;
-  final IdLayoutLineStyle idLayoutLineStyle;
 
-  IdCaptureOverlayDefaults(this.defaultCapturedBrush, this.defaultLocalizedBrush, this.defaultRejectedBrush,
-      this.idLayoutStyle, this.idLayoutLineStyle);
+  IdCaptureOverlayDefaults(this.defaultCapturedBrush, this.defaultLocalizedBrush, this.defaultRejectedBrush);
 
   factory IdCaptureOverlayDefaults.fromJSON(Map<String, dynamic> json) {
     var defaultCapturedBrush = BrushDefaults.fromJSON(json["DefaultCapturedBrush"] as Map<String, dynamic>).toBrush();
     var defaultLocalizedBrush = BrushDefaults.fromJSON(json["DefaultLocalizedBrush"] as Map<String, dynamic>).toBrush();
     var defaultRejectedBrush = BrushDefaults.fromJSON(json["DefaultRejectedBrush"] as Map<String, dynamic>).toBrush();
-    var idLayoutStyle = IdLayoutStyleDeserializer.fromJSON(json["defaultIdLayoutStyle"] as String);
-    var idLayoutLineStyle = IdLayoutLineStyleDeserializer.fromJSON(json["defaultIdLayoutLineStyle"] as String);
-    return IdCaptureOverlayDefaults(
-        defaultCapturedBrush, defaultLocalizedBrush, defaultRejectedBrush, idLayoutStyle, idLayoutLineStyle);
+    return IdCaptureOverlayDefaults(defaultCapturedBrush, defaultLocalizedBrush, defaultRejectedBrush);
   }
 }
 
@@ -110,21 +103,13 @@ class IdCaptureSettingsDefaults {
 class IdCaptureFeedbackDefaults {
   final Feedback idCaptured;
   final Feedback idRejected;
-  final Sound defaultSuccessSound;
-  final Sound defaultFailureSound;
 
-  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected, this.defaultSuccessSound, this.defaultFailureSound);
+  IdCaptureFeedbackDefaults(this.idCaptured, this.idRejected);
 
   factory IdCaptureFeedbackDefaults.fromJSON(Map<String, dynamic> json) {
-    final feedbackJson = jsonDecode(json["IdCaptureFeedback"] as String);
-    final defaultSuccessSound = Sound.fromJSON(jsonDecode(json['defaultSuccessSound']));
-    final defaultFailureSound = Sound.fromJSON(jsonDecode(json['defaultFailureSound']));
-
     return IdCaptureFeedbackDefaults(
-      feedbackFromJson(feedbackJson, 'idCaptured'),
-      feedbackFromJson(feedbackJson, 'idRejected'),
-      defaultSuccessSound,
-      defaultFailureSound,
+      feedbackFromJson(json, 'idCaptured'),
+      feedbackFromJson(json, 'idRejected'),
     );
   }
 
