@@ -47,8 +47,6 @@ class IdCaptureSettings implements Serializable {
 
   IdAnonymizationMode anonymizationMode = IdCaptureDefaults.captureSettingsDefaults.anonymizationMode;
 
-  bool anonymizeDefaultFields = IdCaptureDefaults.captureSettingsDefaults.anonymizeDefaultFields;
-
   bool rejectVoidedIds = IdCaptureDefaults.captureSettingsDefaults.rejectVoidedIds;
 
   bool rejectExpiredIds = IdCaptureDefaults.captureSettingsDefaults.rejectExpiredIds;
@@ -76,9 +74,8 @@ class IdCaptureSettings implements Serializable {
     return {
       'imageToResult': _imageToResult.map((key, value) => MapEntry(key.toString(), value)),
       'anonymizationMode': anonymizationMode.toString(),
-      'anonymizeDefaultFields': anonymizeDefaultFields,
       'rejectVoidedIds': rejectVoidedIds,
-      'decodeBackOfEuropeanDrivingLicense': decodeBackOfEuropeanDrivingLicense,
+      'decodeBackOfEuropeDrivingLicense': decodeBackOfEuropeanDrivingLicense,
       'scanner': scanner.toMap(),
       'acceptedDocuments': acceptedDocuments.map((doc) => doc.toMap()).toList(),
       'rejectedDocuments': rejectedDocuments.map((doc) => doc.toMap()).toList(),
