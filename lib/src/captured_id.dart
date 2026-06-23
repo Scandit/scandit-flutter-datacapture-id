@@ -261,6 +261,8 @@ class CapturedId extends Serializable {
 
   MobileDocumentOcrResult? get mobileDocumentOcr => _mobileDocumentOcr;
 
+  String get rejectionDiagnosticJSON => _json['rejectionDiagnosticJSON'] as String? ?? '';
+
   bool isAnonymized(IdFieldType field) {
     final anonymizedFieldsList = _json['anonymizedFields'] as List<dynamic>?;
     if (anonymizedFieldsList == null) return false;

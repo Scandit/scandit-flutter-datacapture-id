@@ -8,7 +8,6 @@ abstract class IdCaptureFunctionNames {
   static const String methodsChannelName = 'com.scandit.datacapture.id.capture/method_channel';
   static const String eventsChannelName = 'com.scandit.datacapture.id.capture/event_channel';
 
-  static const String getLastFrameDataName = 'getLastFrameData';
   static const String removeIdCaptureListenerName = 'removeIdCaptureListener';
   static const String addIdCaptureListenerName = 'addIdCaptureListener';
   static const String resetName = 'reset';
