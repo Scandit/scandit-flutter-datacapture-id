@@ -66,9 +66,25 @@ class IdCaptureSettings implements Serializable {
   bool decodeBackOfEuropeanDrivingLicense =
       IdCaptureDefaults.captureSettingsDefaults.decodeBackOfEuropeanDrivingLicense ?? false;
 
+  int rejectionTimeoutSeconds = IdCaptureDefaults.captureSettingsDefaults.rejectionTimeoutSeconds;
+
   void addAnonymizedField(IdCaptureDocument document, IdFieldType fieldType) {
     final key = jsonEncode(document.toMap());
     _anonymizationMap[key] = (_anonymizationMap[key] ?? {})..add(fieldType.toString());
+  }
+
+  void removeAnonymizedField(IdCaptureDocument document, IdFieldType fieldType) {
+    final key = jsonEncode(document.toMap());
+    final fields = _anonymizationMap[key];
+    if (fields == null) return;
+    fields.remove(fieldType.toString());
+    if (fields.isEmpty) {
+      _anonymizationMap.remove(key);
+    }
+  }
+
+  void clearAnonymizedFields() {
+    _anonymizationMap.clear();
   }
 
   @override
@@ -88,6 +104,7 @@ class IdCaptureSettings implements Serializable {
       'rejectForgedAamvaBarcodes': rejectForgedAamvaBarcodes,
       'rejectInconsistentData': rejectInconsistentData,
       'rejectHolderBelowAge': rejectHolderBelowAge,
+      'rejectionTimeoutSeconds': rejectionTimeoutSeconds,
       'anonymizationMap': _anonymizationMap.map((key, value) => MapEntry(key, value.toList())),
     };
   }
