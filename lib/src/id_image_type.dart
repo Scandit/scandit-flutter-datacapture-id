@@ -6,8 +6,8 @@
 
 enum IdImageType {
   face('face'),
-  idFront('idFront'),
-  idBack('idBack');
+  croppedDocument('croppedDocument'),
+  frame('frame');
 
   const IdImageType(this._name);
 
