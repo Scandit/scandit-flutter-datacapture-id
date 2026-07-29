@@ -9,7 +9,6 @@ import 'package:scandit_flutter_datacapture_id/src/driving_license_details.dart'
 
 import '../captured_sides.dart';
 import 'date_result.dart';
-import 'visa_details.dart';
 
 @immutable
 class VizResult {
@@ -47,7 +46,6 @@ class VizResult {
   final DateResult? _dateOfIssue;
   final String? _vehicleOwner;
   final DrivingLicenseDetails? _drivingLicenseDetails;
-  final VisaDetails? _visaDetails;
 
   const VizResult._({
     required String? additionalNameInformation,
@@ -84,7 +82,6 @@ class VizResult {
     required DateResult? dateOfIssue,
     required String? vehicleOwner,
     required DrivingLicenseDetails? drivingLicenseDetails,
-    required VisaDetails? visaDetails,
   })  : _additionalNameInformation = additionalNameInformation,
         _additionalAddressInformation = additionalAddressInformation,
         _placeOfBirth = placeOfBirth,
@@ -118,8 +115,7 @@ class VizResult {
         _dateOfExpiry = dateOfExpiry,
         _dateOfIssue = dateOfIssue,
         _vehicleOwner = vehicleOwner,
-        _drivingLicenseDetails = drivingLicenseDetails,
-        _visaDetails = visaDetails;
+        _drivingLicenseDetails = drivingLicenseDetails;
 
   factory VizResult.fromJSON(Map<String, dynamic> json) {
     final additionalNameInformation = json['additionalNameInformation'] as String?;
@@ -161,11 +157,6 @@ class VizResult {
       drivingLicenseDetails = DrivingLicenseDetails.fromJSON(json['drivingLicenseDetails']);
     }
 
-    VisaDetails? visaDetails;
-    if (json['visaDetails'] != null) {
-      visaDetails = VisaDetails.fromJSON(json['visaDetails'] as Map<String, dynamic>);
-    }
-
     return VizResult._(
       additionalNameInformation: additionalNameInformation,
       additionalAddressInformation: additionalAddressInformation,
@@ -201,7 +192,6 @@ class VizResult {
       dateOfIssue: dateOfIssue,
       vehicleOwner: vehicleOwner,
       drivingLicenseDetails: drivingLicenseDetails,
-      visaDetails: visaDetails,
     );
   }
 
@@ -272,6 +262,4 @@ class VizResult {
   String? get vehicleOwner => _vehicleOwner;
 
   DrivingLicenseDetails? get drivingLicenseDetails => _drivingLicenseDetails;
-
-  VisaDetails? get visaDetails => _visaDetails;
 }

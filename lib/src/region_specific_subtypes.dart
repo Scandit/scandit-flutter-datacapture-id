@@ -69,9 +69,7 @@ enum RegionSpecificSubtype {
   australiaAsicCard('australiaAsicCard'),
   uaeVehicleRegistrationCard('uaeVehicleRegistrationCard'),
   uaeEsaadCard('uaeEsaadCard'),
-  ukMilitaryId('ukMilitaryId'),
-  chinaBusinessTravelPermitHongKongMacau('chinaBusinessTravelPermitHongKongMacau'),
-  irelandAgeCard('irelandAgeCard');
+  ukMilitaryId('ukMilitaryId');
 
   const RegionSpecificSubtype(this._name);
 
