@@ -231,6 +231,8 @@ class CapturedId extends Serializable {
 
   bool isVisaIcao() => document?.isVisaIcao == true;
 
+  bool isVisaLetter() => document?.isVisaLetter == true;
+
   String? get documentNumber => _documentNumber;
 
   String? get documentAdditionalNumber => _documentAdditionalNumber;
@@ -260,6 +262,8 @@ class CapturedId extends Serializable {
   MobileDocumentResult? get mobileDocument => _mobileDocument;
 
   MobileDocumentOcrResult? get mobileDocumentOcr => _mobileDocumentOcr;
+
+  String get rejectionDiagnosticJSON => _json['rejectionDiagnosticJSON'] as String? ?? '';
 
   bool isAnonymized(IdFieldType field) {
     final anonymizedFieldsList = _json['anonymizedFields'] as List<dynamic>?;
@@ -304,5 +308,7 @@ IdCaptureDocument _getDocument(IdCaptureRegion issuingCountry, String documentTy
       return ResidencePermit(issuingCountry);
     case IdCaptureDocumentType.visaIcao:
       return VisaIcao(issuingCountry);
+    case IdCaptureDocumentType.visaLetter:
+      return VisaLetter(issuingCountry);
   }
 }

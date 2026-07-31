@@ -16,6 +16,8 @@ export 'src/id_layout.dart' show IdLayoutStyle, IdLayoutLineStyle, TextHintPosit
 export 'src/result/date_result.dart' show DateResult;
 export 'src/result/mrz_result.dart' show MrzResult;
 export 'src/result/viz_result.dart' show VizResult;
+export 'src/result/visa_details.dart' show VisaDetails;
+export 'src/application_status.dart' show ApplicationStatus;
 export 'src/scandit_flutter_datacapture_id.dart' show ScanditFlutterDataCaptureId;
 export 'src/captured_sides.dart' show CapturedSides;
 export 'src/id_anonymization_mode.dart' show IdAnonymizationMode;
@@ -33,6 +35,7 @@ export 'src/id_capture_document.dart'
         RegionSpecific,
         ResidencePermit,
         VisaIcao,
+        VisaLetter,
         IdCaptureDocumentType;
 export 'src/id_capture_scanner.dart' show IdCaptureScanner;
 export 'src/result/barcode_result.dart' show BarcodeResult;

@@ -11,16 +11,19 @@ abstract class PhysicalDocumentScanner implements Serializable {
   final bool _barcode;
   final bool _machineReadableZone;
   final bool _visualInspectionZone;
+  final bool _freeFormText;
 
   PhysicalDocumentScanner._(
       {required bool isFull,
       required bool barcode,
       required bool machineReadableZone,
-      required bool visualInspectionZone})
+      required bool visualInspectionZone,
+      required bool freeFormText})
       : _isFull = isFull,
         _barcode = barcode,
         _machineReadableZone = machineReadableZone,
-        _visualInspectionZone = visualInspectionZone;
+        _visualInspectionZone = visualInspectionZone,
+        _freeFormText = freeFormText;
 
   @override
   Map<String, dynamic> toMap() {
@@ -28,7 +31,8 @@ abstract class PhysicalDocumentScanner implements Serializable {
       'options': {
         'barcode': _barcode,
         'machineReadableZone': _machineReadableZone,
-        'visualInspectionZone': _visualInspectionZone
+        'visualInspectionZone': _visualInspectionZone,
+        'freeFormText': _freeFormText,
       },
       'isFull': _isFull,
     };
@@ -42,6 +46,17 @@ class SingleSideScanner extends PhysicalDocumentScanner {
           barcode: barcode,
           machineReadableZone: machineReadableZone,
           visualInspectionZone: visualInspectionZone,
+          freeFormText: false,
+        );
+
+  SingleSideScanner.withFreeFormText(
+      bool barcode, bool machineReadableZone, bool visualInspectionZone, bool freeFormText)
+      : super._(
+          isFull: false,
+          barcode: barcode,
+          machineReadableZone: machineReadableZone,
+          visualInspectionZone: visualInspectionZone,
+          freeFormText: freeFormText,
         );
 
   bool get barcode => _barcode;
@@ -49,6 +64,8 @@ class SingleSideScanner extends PhysicalDocumentScanner {
   bool get machineReadableZone => _machineReadableZone;
 
   bool get visualInspectionZone => _visualInspectionZone;
+
+  bool get freeFormText => _freeFormText;
 }
 
 class FullDocumentScanner extends PhysicalDocumentScanner {
@@ -58,5 +75,6 @@ class FullDocumentScanner extends PhysicalDocumentScanner {
           barcode: true,
           machineReadableZone: true,
           visualInspectionZone: true,
+          freeFormText: true,
         );
 }
