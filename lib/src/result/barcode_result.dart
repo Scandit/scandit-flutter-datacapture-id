@@ -380,9 +380,9 @@ class BarcodeResult {
       weightKg: json['weightKg'] as int?,
       weightLbs: json['weightLbs'] as int?,
       isRealId: json['isRealId'] as bool?,
+      // Serialized natively as "dictionary"; exposed publicly as barcodeDataElements.
       barcodeDataElements:
-          (json['barcodeDataElements'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as String)) ??
-              {},
+          (json['dictionary'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as String)) ?? {},
       firstName: json['firstName']?.toString(),
       lastName: json['lastName']?.toString(),
       fullName: json['fullName']?.toString(),
