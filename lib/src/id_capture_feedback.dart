@@ -4,12 +4,19 @@
  * Copyright (C) 2023- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/foundation.dart';
-import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
-import 'package:scandit_flutter_datacapture_id/src/internal/id_capture_defaults.dart';
+import 'dart:convert';
 
-class IdCaptureFeedback extends ChangeNotifier implements Serializable {
-  IdCaptureFeedback();
+import 'package:flutter/services.dart';
+import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+import 'package:scandit_flutter_datacapture_id/src/function_names.dart';
+import 'package:scandit_flutter_datacapture_id/src/id_capture_defaults.dart';
+
+class IdCaptureFeedback implements Serializable {
+  late _IdCaptureFeedbackController _controller;
+
+  IdCaptureFeedback() {
+    _controller = _IdCaptureFeedbackController(this);
+  }
 
   Feedback _idCaptured = IdCaptureDefaults.idCaptureFeedbackDefaults.idCaptured;
 
@@ -17,7 +24,7 @@ class IdCaptureFeedback extends ChangeNotifier implements Serializable {
 
   set idCaptured(Feedback newValue) {
     _idCaptured = newValue;
-    notifyListeners();
+    _update();
   }
 
   Feedback _idRejected = IdCaptureDefaults.idCaptureFeedbackDefaults.idRejected;
@@ -26,13 +33,14 @@ class IdCaptureFeedback extends ChangeNotifier implements Serializable {
 
   set idRejected(Feedback newValue) {
     _idRejected = newValue;
-    notifyListeners();
+    _update();
+  }
+
+  void _update() {
+    _controller.updateFeedback();
   }
 
   static IdCaptureFeedback get defaultFeedback => IdCaptureFeedback();
-
-  static Sound get defaultSuccessSound => IdCaptureDefaults.idCaptureFeedbackDefaults.defaultSuccessSound;
-  static Sound get defaultFailureSound => IdCaptureDefaults.idCaptureFeedbackDefaults.defaultFailureSound;
 
   @override
   Map<String, dynamic> toMap() {
@@ -40,5 +48,16 @@ class IdCaptureFeedback extends ChangeNotifier implements Serializable {
       'idCaptured': idCaptured.toMap(),
       'idRejected': idRejected.toMap(),
     };
+  }
+}
+
+class _IdCaptureFeedbackController {
+  final MethodChannel _methodChannel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
+  final IdCaptureFeedback _feedback;
+
+  _IdCaptureFeedbackController(this._feedback);
+
+  Future<void> updateFeedback() {
+    return _methodChannel.invokeMethod(IdCaptureFunctionNames.updateFeedback, jsonEncode(_feedback.toMap()));
   }
 }

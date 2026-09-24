@@ -14,6 +14,7 @@ enum RegionSpecificSubtype {
   apecBusinessTravelCard('apecBusinessTravelCard'),
   pakistanAfghanCitizenCard('pakistanAfghanCitizenCard'),
   singaporeFinCard('singaporeFinCard'),
+  usGreenCard('usGreenCard'),
   malaysiaIkad('malaysiaIkad'),
   malaysiaMykad('malaysiaMykad'),
   malaysiaMypr('malaysiaMypr'),
@@ -69,9 +70,7 @@ enum RegionSpecificSubtype {
   australiaAsicCard('australiaAsicCard'),
   uaeVehicleRegistrationCard('uaeVehicleRegistrationCard'),
   uaeEsaadCard('uaeEsaadCard'),
-  ukMilitaryId('ukMilitaryId'),
-  chinaBusinessTravelPermitHongKongMacau('chinaBusinessTravelPermitHongKongMacau'),
-  irelandAgeCard('irelandAgeCard');
+  ukMilitaryId('ukMilitaryId');
 
   const RegionSpecificSubtype(this._name);
 
