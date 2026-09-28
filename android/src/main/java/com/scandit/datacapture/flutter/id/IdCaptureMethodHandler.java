@@ -7,15 +7,17 @@ package com.scandit.datacapture.flutter.id;
 
 import androidx.annotation.NonNull;
 
+import com.scandit.datacapture.flutter.core.utils.FlutterMethodCall;
 import com.scandit.datacapture.flutter.core.utils.FlutterResult;
+import com.scandit.datacapture.frameworks.core.CoreModule;
 import com.scandit.datacapture.frameworks.core.FrameworkModule;
 import com.scandit.datacapture.frameworks.core.locator.ServiceLocator;
 import com.scandit.datacapture.frameworks.id.IdCaptureModule;
 
+import org.json.JSONObject;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-
-import org.json.JSONObject;
 
 public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
 
@@ -29,77 +31,29 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
     }
 
     @Override
-    public void onMethodCall(MethodCall call, @NonNull MethodChannel.Result result) {
-        switch (call.method) {
-            case "addIdCaptureListener":
-                getSharedModule().addAsyncListener();
-                result.success(null);
-                break;
+    public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+        if (call.method.equals("executeId")) {
+            CoreModule coreModule = (CoreModule) getModule(CoreModule.class.getSimpleName());
+            if (coreModule == null) {
+                result.error("-1", "Unable to retrieve the CoreModule from the locator.", null);
+                return;
+            }
 
-            case "removeIdCaptureListener":
-                getSharedModule().removeAsyncListener();
-                result.success(null);
-                break;
+            boolean executionResult = coreModule.execute(new FlutterMethodCall(call), new FlutterResult(result), getSharedModule());
+            if (!executionResult) {
+                String methodName = call.argument("methodName");
+                if (methodName == null) {
+                    methodName = "unknown";
+                }
 
-            case "finishDidCaptureId":
-                getSharedModule().finishDidCaptureId(Boolean.TRUE.equals(call.arguments()));
-                result.success(null);
-                break;
-
-            case "finishDidRejectId":
-                getSharedModule().finishDidRejectId(Boolean.TRUE.equals(call.arguments()));
-                result.success(null);
-                break;
-
-            case "getDefaults":
-                result.success(new JSONObject(getSharedModule().getDefaults()).toString());
-                break;
-
-            case "reset":
-                getSharedModule().resetMode();
-                result.success(null);
-                break;
-
-            case "createAamvaBarcodeVerifier":
-                getSharedModule().createContextForBarcodeVerification(new FlutterResult(result));
-                break;
-
-            case "verifyCapturedIdBarcode":
-                assert call.arguments() != null;
-                getSharedModule().verifyCapturedIdBarcode(
-                        call.arguments(),
-                        new FlutterResult(result)
-                );
-                break;
-                
-            case "getLastFrameData":
-                result.success(null);
-                break;
-
-            case "setModeEnabledState":
-                getSharedModule().setModeEnabled(Boolean.TRUE.equals(call.arguments()));
-                break;
-
-            case "updateIdCaptureMode":
-                assert call.arguments() != null;
-                getSharedModule().updateModeFromJson(call.arguments(), new FlutterResult(result));
-                break;
-
-            case "applyIdCaptureModeSettings":
-                assert call.arguments() != null;
-                getSharedModule().applyModeSettings(call.arguments(), new FlutterResult(result));
-                break;
-
-            case "updateIdCaptureOverlay":
-                assert call.arguments() != null;
-                getSharedModule().updateOverlay(call.arguments(), new FlutterResult(result));
-                break;
-
-            case "updateFeedback":
-                assert call.arguments() != null;
-                getSharedModule().updateFeedback(call.arguments(), new FlutterResult(result));
-                break;
+                result.error("METHOD_NOT_FOUND", "Unknown Core method: " + methodName, null);
+            }
+            return;
+        } else if (call.method.equals("getDefaults")) {
+            result.success(new JSONObject(getSharedModule().getDefaults()).toString());
+            return;
         }
+        result.notImplemented();
     }
 
     private volatile IdCaptureModule sharedModuleInstance;
@@ -108,10 +62,14 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
         if (sharedModuleInstance == null) {
             synchronized (this) {
                 if (sharedModuleInstance == null) {
-                    sharedModuleInstance = (IdCaptureModule)this.serviceLocator.resolve(IdCaptureModule.class.getName());
+                    sharedModuleInstance = (IdCaptureModule) this.serviceLocator.resolve(IdCaptureModule.class.getSimpleName());
                 }
             }
         }
         return sharedModuleInstance;
+    }
+
+    private FrameworkModule getModule(String moduleName) {
+        return this.serviceLocator.resolve(moduleName);
     }
 }
