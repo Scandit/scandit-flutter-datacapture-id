@@ -14,6 +14,7 @@ enum IdCaptureDocumentType {
   driverLicense('driverLicense'),
   passport('passport'),
   visaIcao('visaIcao'),
+  visaLetter('visaLetter'),
   regionSpecific('regionSpecific'),
   residencePermit('residencePermit'),
   healthInsuranceCard('healthInsuranceCard');
@@ -49,6 +50,8 @@ abstract class IdCaptureDocument implements Serializable {
   bool get isPassport => _documentType == IdCaptureDocumentType.passport;
 
   bool get isVisaIcao => _documentType == IdCaptureDocumentType.visaIcao;
+
+  bool get isVisaLetter => _documentType == IdCaptureDocumentType.visaLetter;
 
   bool get isRegionSpecific => _documentType == IdCaptureDocumentType.regionSpecific;
 
@@ -97,6 +100,16 @@ class Passport extends IdCaptureDocument {
 
 class VisaIcao extends IdCaptureDocument {
   VisaIcao(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.visaIcao);
+
+  @override
+  IdCaptureDocumentType get documentType => _documentType;
+
+  @override
+  IdCaptureRegion get region => super._region;
+}
+
+class VisaLetter extends IdCaptureDocument {
+  VisaLetter(IdCaptureRegion region) : super._(region, IdCaptureDocumentType.visaLetter);
 
   @override
   IdCaptureDocumentType get documentType => _documentType;

@@ -231,6 +231,8 @@ class CapturedId extends Serializable {
 
   bool isVisaIcao() => document?.isVisaIcao == true;
 
+  bool isVisaLetter() => document?.isVisaLetter == true;
+
   String? get documentNumber => _documentNumber;
 
   String? get documentAdditionalNumber => _documentAdditionalNumber;
@@ -306,5 +308,7 @@ IdCaptureDocument _getDocument(IdCaptureRegion issuingCountry, String documentTy
       return ResidencePermit(issuingCountry);
     case IdCaptureDocumentType.visaIcao:
       return VisaIcao(issuingCountry);
+    case IdCaptureDocumentType.visaLetter:
+      return VisaLetter(issuingCountry);
   }
 }

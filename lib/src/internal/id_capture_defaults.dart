@@ -77,6 +77,7 @@ class IdCaptureSettingsDefaults {
   final bool rejectInconsistentData;
   final int? rejectHolderBelowAge;
   final bool anonymizeDefaultFields;
+  final int rejectionTimeoutSeconds;
 
   IdCaptureSettingsDefaults(
       this.anonymizationMode,
@@ -88,7 +89,8 @@ class IdCaptureSettingsDefaults {
       this.rejectForgedAamvaBarcodes,
       this.rejectInconsistentData,
       this.rejectHolderBelowAge,
-      this.anonymizeDefaultFields);
+      this.anonymizeDefaultFields,
+      this.rejectionTimeoutSeconds);
 
   factory IdCaptureSettingsDefaults.fromJSON(Map<String, dynamic> json) {
     var anonymizationMode = IdAnonymizationModeDeserializer.fromJSON(json["anonymizationMode"] as String);
@@ -106,6 +108,7 @@ class IdCaptureSettingsDefaults {
       json["rejectInconsistentData"] as bool,
       json["rejectHolderBelowAge"] as int?,
       json["anonymizeDefaultFields"] as bool,
+      json["rejectionTimeoutSeconds"] as int,
     );
   }
 }
