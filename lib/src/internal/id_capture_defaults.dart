@@ -76,6 +76,8 @@ class IdCaptureSettingsDefaults {
   final bool rejectForgedAamvaBarcodes;
   final bool rejectInconsistentData;
   final int? rejectHolderBelowAge;
+  final bool anonymizeDefaultFields;
+  final int rejectionTimeoutSeconds;
 
   IdCaptureSettingsDefaults(
       this.anonymizationMode,
@@ -86,7 +88,9 @@ class IdCaptureSettingsDefaults {
       this.rejectNotRealIdCompliant,
       this.rejectForgedAamvaBarcodes,
       this.rejectInconsistentData,
-      this.rejectHolderBelowAge);
+      this.rejectHolderBelowAge,
+      this.anonymizeDefaultFields,
+      this.rejectionTimeoutSeconds);
 
   factory IdCaptureSettingsDefaults.fromJSON(Map<String, dynamic> json) {
     var anonymizationMode = IdAnonymizationModeDeserializer.fromJSON(json["anonymizationMode"] as String);
@@ -96,13 +100,15 @@ class IdCaptureSettingsDefaults {
     return IdCaptureSettingsDefaults(
       anonymizationMode,
       json["rejectVoidedIds"] as bool,
-      json["decodeBackOfEuropeDrivingLicense"] as bool?,
+      json["decodeBackOfEuropeanDrivingLicense"] as bool?,
       json["rejectExpiredIds"] as bool,
       rejectIdsExpiringInJson?.toDurationFrom(DateTime.now()),
       json["rejectNotRealIdCompliant"] as bool,
       json["rejectForgedAamvaBarcodes"] as bool,
       json["rejectInconsistentData"] as bool,
       json["rejectHolderBelowAge"] as int?,
+      json["anonymizeDefaultFields"] as bool,
+      json["rejectionTimeoutSeconds"] as int,
     );
   }
 }

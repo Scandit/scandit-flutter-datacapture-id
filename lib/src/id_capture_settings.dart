@@ -47,6 +47,8 @@ class IdCaptureSettings implements Serializable {
 
   IdAnonymizationMode anonymizationMode = IdCaptureDefaults.captureSettingsDefaults.anonymizationMode;
 
+  bool anonymizeDefaultFields = IdCaptureDefaults.captureSettingsDefaults.anonymizeDefaultFields;
+
   bool rejectVoidedIds = IdCaptureDefaults.captureSettingsDefaults.rejectVoidedIds;
 
   bool rejectExpiredIds = IdCaptureDefaults.captureSettingsDefaults.rejectExpiredIds;
@@ -64,9 +66,25 @@ class IdCaptureSettings implements Serializable {
   bool decodeBackOfEuropeanDrivingLicense =
       IdCaptureDefaults.captureSettingsDefaults.decodeBackOfEuropeanDrivingLicense ?? false;
 
+  int rejectionTimeoutSeconds = IdCaptureDefaults.captureSettingsDefaults.rejectionTimeoutSeconds;
+
   void addAnonymizedField(IdCaptureDocument document, IdFieldType fieldType) {
     final key = jsonEncode(document.toMap());
     _anonymizationMap[key] = (_anonymizationMap[key] ?? {})..add(fieldType.toString());
+  }
+
+  void removeAnonymizedField(IdCaptureDocument document, IdFieldType fieldType) {
+    final key = jsonEncode(document.toMap());
+    final fields = _anonymizationMap[key];
+    if (fields == null) return;
+    fields.remove(fieldType.toString());
+    if (fields.isEmpty) {
+      _anonymizationMap.remove(key);
+    }
+  }
+
+  void clearAnonymizedFields() {
+    _anonymizationMap.clear();
   }
 
   @override
@@ -74,8 +92,9 @@ class IdCaptureSettings implements Serializable {
     return {
       'imageToResult': _imageToResult.map((key, value) => MapEntry(key.toString(), value)),
       'anonymizationMode': anonymizationMode.toString(),
+      'anonymizeDefaultFields': anonymizeDefaultFields,
       'rejectVoidedIds': rejectVoidedIds,
-      'decodeBackOfEuropeDrivingLicense': decodeBackOfEuropeanDrivingLicense,
+      'decodeBackOfEuropeanDrivingLicense': decodeBackOfEuropeanDrivingLicense,
       'scanner': scanner.toMap(),
       'acceptedDocuments': acceptedDocuments.map((doc) => doc.toMap()).toList(),
       'rejectedDocuments': rejectedDocuments.map((doc) => doc.toMap()).toList(),
@@ -85,6 +104,7 @@ class IdCaptureSettings implements Serializable {
       'rejectForgedAamvaBarcodes': rejectForgedAamvaBarcodes,
       'rejectInconsistentData': rejectInconsistentData,
       'rejectHolderBelowAge': rejectHolderBelowAge,
+      'rejectionTimeoutSeconds': rejectionTimeoutSeconds,
       'anonymizationMap': _anonymizationMap.map((key, value) => MapEntry(key, value.toList())),
     };
   }
