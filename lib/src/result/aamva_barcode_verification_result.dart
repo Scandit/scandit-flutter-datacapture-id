@@ -7,6 +7,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:scandit_flutter_datacapture_id/src/aamva_barcode_verification_status.dart';
 
+/// The result of a verification of AAMVA-compliant personal identification document returned in [VerificationResult] when [IdCaptureSettings.rejectForgedAamvaBarcodes] is enabled.
+///
+/// Added in version 6.19.0
 @immutable
 class AamvaBarcodeVerificationResult {
   final bool _allChecksPassed;
@@ -22,10 +25,16 @@ class AamvaBarcodeVerificationResult {
     );
   }
 
+  /// All checks passed and nothing suspicious about the document was detected.
+  ///
+  /// Added in version 6.19.0
   bool get allChecksPassed {
     return _allChecksPassed;
   }
 
+  /// Verification status containing the result of the verification
+  ///
+  /// Added in version 7.3.0
   AamvaBarcodeVerificationStatus get status {
     return _status;
   }

@@ -8,6 +8,9 @@ import 'date_result.dart';
 import 'professional_driving_permit.dart';
 import 'vehicle_restriction.dart';
 
+/// This class represents the data extracted from a document’s barcode. It aggregates information from various barcode types supported by the library. Some properties may not apply to certain document types and will be set to *null* if the corresponding data is not encoded in the barcode. For a complete overview of supported barcode types, refer to our supported documents.
+///
+/// Added in version 7.0.0
 class BarcodeResult {
   final int? _aamvaVersion;
   final String? _aliasFamilyName;
@@ -380,9 +383,9 @@ class BarcodeResult {
       weightKg: json['weightKg'] as int?,
       weightLbs: json['weightLbs'] as int?,
       isRealId: json['isRealId'] as bool?,
+      // Serialized natively as "dictionary"; exposed publicly as barcodeDataElements.
       barcodeDataElements:
-          (json['barcodeDataElements'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as String)) ??
-              {},
+          (json['dictionary'] as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as String)) ?? {},
       firstName: json['firstName']?.toString(),
       lastName: json['lastName']?.toString(),
       fullName: json['fullName']?.toString(),
@@ -396,97 +399,378 @@ class BarcodeResult {
     );
   }
 
+  /// The version level of the PDF417 barcode format. See the AAMVA DL/ID Card Design Standard for more details.
+  ///
+  /// Added in version 7.0.0
   int? get aamvaVersion => _aamvaVersion;
+  /// Other family name by which cardholder is known.
+  ///
+  /// Added in version 7.0.0
   String? get aliasFamilyName => _aliasFamilyName;
+  /// Other given name by which cardholder is known.
+  ///
+  /// Added in version 7.0.0
   String? get aliasGivenName => _aliasGivenName;
+  /// Other suffix name by which cardholder is known.
+  ///
+  /// Added in version 7.0.0
   String? get aliasSuffixName => _aliasSuffixName;
+  /// The blood type of the holder in the Rh system (A+, A-, B+, B-, O+, O-, AB+ or AB-).
+  ///
+  /// Added in version 7.0.0
   String? get bloodType => _bloodType;
+  /// The holder’s branch of service.
+  ///
+  /// Added in version 7.0.0
   String? get branchOfService => _branchOfService;
+  /// Machine-generated code that is used for security purposes.
+  ///
+  /// Added in version 7.0.0
   String? get cardInstanceIdentifier => _cardInstanceIdentifier;
+  /// Card revision date.
+  ///
+  /// Added in version 7.0.0
   DateResult? get cardRevisionDate => _cardRevisionDate;
+  /// Driving license categories.
+  ///
+  /// Added in version 7.0.0
   List<String> get categories => _categories;
+  /// The CHAMPUS effective date.
+  ///
+  /// Added in version 7.0.0
   DateResult? get champusEffectiveDate => _champusEffectiveDate;
+  /// The CHAMPUS expiration date.
+  ///
+  /// Added in version 7.0.0
   DateResult? get champusExpiryDate => _champusExpiryDate;
+  /// Whether the holder is a citizen or a permanent resident.
+  ///
+  /// Added in version 7.0.0
   String? get citizenshipStatus => _citizenshipStatus;
+  /// The code of the civilian health care privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get civilianHealthCareFlagCode => _civilianHealthCareFlagCode;
+  /// The description of the civilian health care privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get civilianHealthCareFlagDescription => _civilianHealthCareFlagDescription;
+  /// The code of the commissary privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get commissaryFlagCode => _commissaryFlagCode;
+  /// The description of the commissary privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get commissaryFlagDescription => _commissaryFlagDescription;
+  /// The human-readable name of the holder’s country of birth.
+  ///
+  /// Added in version 7.0.0
   String? get countryOfBirth => _countryOfBirth;
+  /// The three-letter country code (ISO 3166-1) of the holder’s country of birth.
+  ///
+  /// Added in version 7.0.0
   String? get countryOfBirthIso => _countryOfBirthIso;
+  /// The code of the relationship of a dependent to his or her sponsor.
+  ///
+  /// Added in version 7.0.0
   int? get deersDependentSuffixCode => _deersDependentSuffixCode;
+  /// The description of the relationship of a dependent to his or her sponsor.
+  ///
+  /// Added in version 7.0.0
   String? get deersDependentSuffixDescription => _deersDependentSuffixDescription;
+  /// The code of the direct care privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get directCareFlagCode => _directCareFlagCode;
+  /// The description of the direct care privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get directCareFlagDescription => _directCareFlagDescription;
+  /// Identifies if the document has been duplicated.
+  ///
+  /// Added in version 7.0.0
   String? get documentCopy => _documentCopy;
+  /// The document discriminator number.
+  ///
+  /// Added in version 7.0.0
   String? get documentDiscriminatorNumber => _documentDiscriminatorNumber;
+  /// The name prefix of the card holder.
+  ///
+  /// Added in version 7.0.0
   String? get driverNamePrefix => _driverNamePrefix;
+  /// The name suffix of the card holder.
+  ///
+  /// Added in version 7.0.0
   String? get driverNameSuffix => _driverNameSuffix;
+  /// The driver restriction codes. Empty array means that there is no restrictions. Number 1 stands for glasses/contact lenses. Number 2 stands for artificial limbs.
+  ///
+  /// Added in version 7.0.0
   List<int> get driverRestrictionCodes => _driverRestrictionCodes;
+  /// The holder’s DEERS-assigned numeric identifier.
+  ///
+  /// Added in version 7.0.0
   String? get ediPersonIdentifier => _ediPersonIdentifier;
+  /// The endorsement code.
+  ///
+  /// Added in version 7.0.0
   String? get endorsementsCode => _endorsementsCode;
+  /// The code of the exchange privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get exchangeFlagCode => _exchangeFlagCode;
+  /// The description of the exchange privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get exchangeFlagDescription => _exchangeFlagDescription;
+  /// The holder’s eye color.
+  ///
+  /// Added in version 7.0.0
   String? get eyeColor => _eyeColor;
+  /// Used to distinguish among sponsors who have the same SSN.
+  ///
+  /// Added in version 7.0.0
   int? get familySequenceNumber => _familySequenceNumber;
+  /// The first name truncation. A code that indicates whether a field has been truncated (‘T’), has not been truncated (‘N’), unknown whether truncated (‘U’), or the information is not present in the document (*null*).
+  ///
+  /// Added in version 7.0.0
   String? get firstNameTruncation => _firstNameTruncation;
+  /// The first name of the document holder. It doesn’t contain middle name(s).
+  ///
+  /// Added in version 7.0.0
   String? get firstNameWithoutMiddleName => _firstNameWithoutMiddleName;
+  /// The form number.
+  ///
+  /// Added in version 7.0.0
   String? get formNumber => _formNumber;
+  /// The sponsor’s appropriate Geneva Convention Category.
+  ///
+  /// Added in version 7.0.0
   String? get genevaConventionCategory => _genevaConventionCategory;
+  /// The holder’s hair color.
+  ///
+  /// Added in version 7.0.0
   String? get hairColor => _hairColor;
+  /// The height of the card holder in centimeters.
+  ///
+  /// Added in version 7.0.0
   int? get heightCm => _heightCm;
+  /// The height of the card holder in inches.
+  ///
+  /// Added in version 7.0.0
   int? get heightInch => _heightInch;
+  /// The Issuer Identification Number which uniquely identifies the issuing jurisdiction.
+  ///
+  /// Added in version 7.0.0
   String? get iIN => _iin;
+  /// The identification type of the driver’s license.
+  ///
+  /// Added in version 7.0.0
   String? get identificationType => _identificationType;
+  /// The human readable name of the issuing jurisdiction (for example: an issuing state, territory or federal district for USA, or an issuing province or territory for Canada).
+  ///
+  /// Added in version 7.0.0
   String? get issuingJurisdiction => _issuingJurisdiction;
+  /// The ISO code of the issuing jurisdiction (for example: an issuing state, territory or federal district for USA, or an issuing province or territory for Canada).
+  ///
+  /// Added in version 7.0.0
   String? get issuingJurisdictionIso => _issuingJurisdictionIso;
+  /// A compressed version of the photograph printed on the front of the card.
+  ///
+  /// Added in version 7.0.0
   String? get jpegData => _jpegData;
+  /// The jurisdiction specific version number of the implementation.
+  ///
+  /// Added in version 7.0.0
   int? get jurisdictionVersion => _jurisdictionVersion;
+  /// The last name truncation. A code that indicates whether a field has been truncated (‘T’), has not been truncated (‘N’), unknown whether truncated (‘U’), or the information is not present in the document (*null*).
+  ///
+  /// Added in version 7.0.0
   String? get lastNameTruncation => _lastNameTruncation;
+  /// The name of the country, where the Driver’s License was issued.
+  ///
+  /// Added in version 7.0.0
   String? get licenseCountryOfIssue => _licenseCountryOfIssue;
+  /// The middle name of the card holder.
+  ///
+  /// Added in version 7.0.0
   String? get middleName => _middleName;
+  /// The middle name truncation. A code that indicates whether a field has been truncated (‘T’), has not been truncated (‘N’), unknown whether truncated (‘U’), or the information is not present in the document (*null*).
+  ///
+  /// Added in version 7.0.0
   String? get middleNameTruncation => _middleNameTruncation;
+  /// The code of the Morale, Welfare & Recreation (MWR) privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get mwrFlagCode => _mwrFlagCode;
+  /// The description of the Morale, Welfare & Recreation (MWR) privilege/benefit flag.
+  ///
+  /// Added in version 7.0.0
   String? get mwrFlagDescription => _mwrFlagDescription;
+  /// The pay grade of the sponsor. Available since version 2.
+  ///
+  /// Added in version 7.0.0
   String? get payGrade => _payGrade;
+  /// The holder’s pay plan code.
+  ///
+  /// Added in version 7.0.0
   String? get payPlanCode => _payPlanCode;
+  /// The holder’s pay plan grade code.
+  ///
+  /// Added in version 7.0.0
   String? get payPlanGradeCode => _payPlanGradeCode;
+  /// The person’s designator identifier (usually, the cardholder’s SSN).
+  ///
+  /// Added in version 7.0.0
   int? get personDesignatorDocument => _personDesignatorDocument;
+  /// The card’s person designator type code.
+  ///
+  /// Added in version 7.0.0
   String? get personDesignatorTypeCode => _personDesignatorTypeCode;
+  /// The holder’s middle name initial.
+  ///
+  /// Added in version 7.0.0
   String? get personMiddleInitial => _personMiddleInitial;
+  /// The personal ID number of this Driver’s License holder.
+  ///
+  /// Added in version 7.0.0
   String? get personalIdNumber => _personalIdNumber;
+  /// The kind of personal ID number used - “02” means the number of the South Africa ID card.
+  ///
+  /// Added in version 7.0.0
   String? get personalIdNumberType => _personalIdNumberType;
+  /// The holder’s personnel category code.
+  ///
+  /// Added in version 7.0.0
   String? get personnelCategoryCode => _personnelCategoryCode;
+  /// The holder’s personnel entitlement condition type code.
+  ///
+  /// Added in version 7.0.0
   String? get personnelEntitlementConditionType => _personnelEntitlementConditionType;
+  /// The place of birth of the card holder.
+  ///
+  /// Added in version 7.0.0
   String? get placeOfBirth => _placeOfBirth;
+  /// Whether the holder of this License is allowed to transport goods, dangerous goods or passengers for an income.
+  ///
+  /// Added in version 7.0.0
   ProfessionalDrivingPermit? get professionalDrivingPermit => _professionalDrivingPermit;
+  /// The race of the card holder.
+  ///
+  /// Added in version 7.0.0
   String? get race => _race;
+  /// The holder’s rank.
+  ///
+  /// Added in version 7.0.0
   String? get rank => _rank;
+  /// The code of the dependent’s relationship to the sponsor.
+  ///
+  /// Added in version 7.0.0
   String? get relationshipCode => _relationshipCode;
+  /// The description of the dependent’s relationship to the sponsor.
+  ///
+  /// Added in version 7.0.0
   String? get relationshipDescription => _relationshipDescription;
+  /// The restriction code.
+  ///
+  /// Added in version 7.0.0
   String? get restrictionsCode => _restrictionsCode;
+  /// The card security code.
+  ///
+  /// Added in version 7.0.0
   String? get securityCode => _securityCode;
+  /// The service code.
+  ///
+  /// Added in version 7.0.0
   String? get serviceCode => _serviceCode;
+  /// Indicates whether the card holder is sponsor or dependent.
+  ///
+  /// Added in version 7.0.0
   String? get sponsorFlag => _sponsorFlag;
+  /// The name of the sponsor.
+  ///
+  /// Added in version 7.0.0
   String? get sponsorName => _sponsorName;
+  /// The sponsor’s designator identifier (Usually, the cardholder’s SSN).
+  ///
+  /// Added in version 7.0.0
   int? get sponsorPersonDesignatorIdentifier => _sponsorPersonDesignatorIdentifier;
+  /// The status of the sponsor.
+  ///
+  /// Added in version 7.0.0
   String? get statusCode => _statusCode;
+  /// The description of the the code of the status of the sponsor.
+  ///
+  /// Added in version 7.0.0
   String? get statusCodeDescription => _statusCodeDescription;
+  /// The vehicle classification.
+  ///
+  /// Added in version 7.0.0
   String? get vehicleClass => _vehicleClass;
+  /// The categories of motor vehicles that the holder of this License is permitted to drive.
+  ///
+  /// Added in version 7.0.0
   List<VehicleRestriction> get vehicleRestrictions => _vehicleRestrictions;
+  /// The version of the barcode.
+  ///
+  /// Added in version 7.0.0
   String? get version => _version;
+  /// The weight of the card holder in kilograms.
+  ///
+  /// Added in version 7.0.0
   int? get weightKg => _weightKg;
+  /// Thw weight of the card holder in pounds.
+  ///
+  /// Added in version 7.0.0
   int? get weightLbs => _weightLbs;
+  /// Returns true if the document is a Real ID.
+  ///
+  /// Added in version 7.0.0
   bool? get isRealId => _isRealId;
+  /// The mappings between all the barcode data element IDs and their values. The keys of this collection are the element IDs as defined in the AAMVA Driver License/Identification specification. For example, the specification defines a data element “Customer First Name” with the ID “DAC”. Therefore if a scanned barcode contains a string “DACMICHAEL”, then this collection will contain a mapping with “DAC” as the key and “MICHAEL” as the value. This collection contains all the data elements of the barcode - including those that are exposed also explicitly as fields of this class.
+  ///
+  /// See Barcode Data Elements for all the possible keys and their meaning.
+  ///
+  /// Added in version 7.0.0
   Map<String, String> get barcodeDataElements => _barcodeDataElements;
+  /// The first name of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get firstName => _firstName;
+  /// The last name of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get lastName => _lastName;
+  /// The full name of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get fullName => _fullName;
+  /// The sex of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get sex => _sex;
+  /// The date of birth of the document holder.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfBirth => _dateOfBirth;
+  /// The nationality of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get nationality => _nationality;
+  /// The address of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get address => _address;
+  /// The document number of the ID.
+  ///
+  /// Added in version 8.0.0
   String? get documentNumber => _documentNumber;
+  /// The expiry date of the document.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfExpiry => _dateOfExpiry;
+  /// The issue date of the document.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfIssue => _dateOfIssue;
 }

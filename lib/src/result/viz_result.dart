@@ -11,6 +11,9 @@ import '../captured_sides.dart';
 import 'date_result.dart';
 import 'visa_details.dart';
 
+/// Document scan results with information obtained from documents or their parts intended to be read by humans (for example Visual Inspection Zone (VIZ) of a Machine-Readable Travel Document (MRTD)).
+///
+/// Added in version 6.11.0
 @immutable
 class VizResult {
   final String? _additionalNameInformation;
@@ -205,73 +208,188 @@ class VizResult {
     );
   }
 
+  /// The additional name information of the document holder that might be present on the document.
+  ///
+  /// The content of this field varies by document type:**German passports and IDs**: Contains the maiden name or birth name of the document holder**French passports**: Contains the married name of the document holder
+  ///
+  /// Added in version 6.11.0
   String? get additionalNameInformation => _additionalNameInformation;
 
+  /// The additional address information of the document holder.
+  ///
+  /// Added in version 6.11.0
   String? get additionalAddressInformation => _additionalAddressInformation;
 
+  /// The place of birth of the document holder.
+  ///
+  /// Added in version 6.11.0
   String? get placeOfBirth => _placeOfBirth;
 
+  /// The race of the document holder.
+  ///
+  /// Added in version 6.11.0
   String? get race => _race;
 
+  /// The religion of the document holder.
+  ///
+  /// If [IdCaptureSettings.anonymizationMode] is enabled for the field results, the returned value might be *null* for certain documents.
+  ///
+  /// Added in version 6.11.0
   String? get religion => _religion;
 
+  /// The profession of the document holder.
+  ///
+  /// Added in version 6.11.0
   String? get profession => _profession;
 
+  /// The marital status of the document holder.
+  ///
+  /// Added in version 6.11.0
   String? get maritalStatus => _maritalStatus;
 
+  /// The residential status of the document holder.
+  ///
+  /// Added in version 6.11.0
   String? get residentialStatus => _residentialStatus;
 
+  /// The employer of the document holder.
+  ///
+  /// Added in version 6.11.0
   String? get employer => _employer;
 
+  /// The personal identification number.
+  ///
+  /// If [IdCaptureSettings.anonymizationMode] is enabled for the field results, the returned value might be *null* for certain documents.
+  ///
+  /// Added in version 6.11.0
   String? get personalIdNumber => _personalIdNumber;
 
+  /// The additional number of the document.
+  ///
+  /// If [IdCaptureSettings.anonymizationMode] is enabled for the field results, the returned value might be *null* for certain documents.
+  ///
+  /// Added in version 6.11.0
   String? get documentAdditionalNumber => _documentAdditionalNumber;
 
+  /// A human readable name of the issuing jurisdiction (for example: an issuing state, territory or federal district for USA, or an issuing province or territory for Canada).
+  ///
+  /// Added in version 6.11.0
   String? get issuingJurisdiction => _issuingJurisdiction;
 
+  /// The ISO code of the issuing jurisdiction (for example: an issuing state, territory or federal district for the USA, or an issuing province or territory for Canada). *null* if the issuing jurisdiction has no valid ISO code (for example cities in Mexico).
+  ///
+  /// The returned value will only contain the jurisdiction specific code: for instance for California the returned value would be “CA” and not “US-CA”.Please note that for the New York City ID, this field is set to “NYC” as ISO-3166-2 does not specify city-level names.
+  ///
+  /// Added in version 6.12.0
   String? get issuingJurisdictionIso => _issuingJurisdictionIso;
 
+  /// The government body issuing this ID, e.g. the Department of Motor Vehicles.
+  ///
+  /// Added in version 6.11.0
   String? get issuingAuthority => _issuingAuthority;
 
+  /// The sides of the document that were scanned to extract this VizResult.
+  ///
+  /// Added in version 6.11.0
   CapturedSides get capturedSides => _capturedSides;
 
+  /// Indicates whether the document supports scanning of the back side.
+  ///
+  /// Added in version 6.11.0
   bool get isBackSideCaptureSupported => _isBackSideCaptureSupported;
 
+  /// The blood type of the document owner.
+  ///
+  /// Added in version 6.25.0
   String? get bloodType => _bloodType;
 
+  /// The sponsor of the document owner.
+  ///
+  /// Added in version 6.25.0
   String? get sponsor => _sponsor;
 
+  /// The mother’s name of the document owner.
+  ///
+  /// Added in version 6.25.0
   String? get mothersName => _mothersName;
 
+  /// The father’s name of the document owner.
+  ///
+  /// Added in version 6.25.0
   String? get fathersName => _fathersName;
 
+  /// The visa number of the document holder.
+  ///
+  /// Added in version 7.0.0
   String? get visaNumber => _visaNumber;
 
+  /// The passport number of the document holder.
+  ///
+  /// Added in version 7.0.0
   String? get passportNumber => _passportNumber;
 
+  /// The first name of the document holder. Separated by spaces if more than one name is present. Certain documents do not distinguish between given name and surname. If the name cannot be split reliably, this field may be null.
+  ///
+  /// Added in version 7.0.0
   String? get firstName => _firstName;
 
+  /// The last name of the document holder. Separated by spaces if more than one name is present. Certain documents do not distinguish between given name and surname. If the name cannot be split reliably, this field may be null.
+  ///
+  /// Added in version 7.0.0
   String? get lastName => _lastName;
 
+  /// The full name of the document holder.
+  ///
+  /// Added in version 7.0.0
   String? get fullName => _fullName;
 
+  /// The sex of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get sex => _sex;
 
+  /// The date of birth of the document holder.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfBirth => _dateOfBirth;
 
+  /// The nationality of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get nationality => _nationality;
 
+  /// The address of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get address => _address;
 
+  /// The document number of the ID.
+  ///
+  /// Added in version 8.0.0
   String? get documentNumber => _documentNumber;
 
+  /// The expiry date of the document.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfExpiry => _dateOfExpiry;
 
+  /// The issue date of the document.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfIssue => _dateOfIssue;
 
+  /// The owner of the vehicle.
+  ///
+  /// Added in version 8.0.0
   String? get vehicleOwner => _vehicleOwner;
 
+  /// Extra information about the scanned driver’s license
+  ///
+  /// Added in version 8.0.0
   DrivingLicenseDetails? get drivingLicenseDetails => _drivingLicenseDetails;
 
+  /// Extra information about the scanned visa.
+  ///
+  /// Added in version 8.5.0
   VisaDetails? get visaDetails => _visaDetails;
 }

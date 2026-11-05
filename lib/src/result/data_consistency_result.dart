@@ -4,7 +4,7 @@
  * Copyright (C) 2025- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 // ignore: implementation_imports
 import 'package:scandit_flutter_datacapture_core/src/internal/image_extensions.dart';
 import 'package:scandit_flutter_datacapture_id/src/data_consistency_check.dart';
@@ -13,6 +13,12 @@ import 'package:scandit_flutter_datacapture_id/src/data_consistency_check.dart';
 /// with the data encoded in either MRZ or barcode.
 /// This result can be returned by DataConsistencyVerifier or performed automatically when
 /// IdCaptureSettings.RejectInconsistentData is enabled and exposed on VerificationResult.
+///
+/// The verification result of a comparison between the human-readable data of the document with the data encoded in either MRZ or barcode.
+///
+/// This result is returned in [VerificationResult] when [IdCaptureSettings.rejectInconsistentData] is enabled.
+///
+/// Added in version 8.0.0
 @immutable
 class DataConsistencyResult {
   final bool _allChecksPassed;
@@ -68,16 +74,32 @@ class DataConsistencyResult {
     );
   }
 
+  /// All checks passed and nothing suspicious about the document was detected.
+  ///
+  /// Added in version 8.0.0
   bool get allChecksPassed => _allChecksPassed;
 
+  /// The checks that failed
+  ///
+  /// Added in version 8.0.0
   Set<DataConsistencyCheck> get failedChecks => _failedChecks;
 
+  /// The checks that were skipped
+  ///
+  /// Added in version 8.0.0
   Set<DataConsistencyCheck> get skippedChecks => _skippedChecks;
 
+  /// The checks that passed
+  ///
+  /// Added in version 8.0.0
   Set<DataConsistencyCheck> get passedChecks => _passedChecks;
 
   /// Image with mismatched fields highlighted.
   /// Returns null when no mismatch found.
+  ///
+  /// Image with mismatched fields highlighted. Requires calling [IdCaptureSettings.setShouldPassImageTypeToResult] with [IdImageType.croppedDocument] enabled before creating the [IdCapture] instance.
+  ///
+  /// Added in version 8.0.0
   Image? get frontReviewImage {
     return _frontReviewImageEncoded.toImage();
   }
