@@ -49,9 +49,8 @@ public class IdCaptureMethodHandler implements MethodChannel.MethodCallHandler {
                 result.error("METHOD_NOT_FOUND", "Unknown Core method: " + methodName, null);
             }
             return;
-        } else if (call.method.equals("getDynamicDefaults")) {
-            // Only the defaults Dart cannot source from its generated static consts.
-            result.success(new JSONObject(getSharedModule().getDynamicDefaults()).toString());
+        } else if (call.method.equals("getDefaults")) {
+            result.success(new JSONObject(getSharedModule().getDefaults()).toString());
             return;
         }
         result.notImplemented();

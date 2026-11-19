@@ -7,7 +7,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:scandit_flutter_datacapture_id/src/result/date_result.dart';
 
-/// Added in version 8.0.0
 @immutable
 class DrivingLicenseCategory {
   final String _code;
@@ -30,18 +29,9 @@ class DrivingLicenseCategory {
     );
   }
 
-  /// Driver’s license code representing type of vehicle.
-  ///
-  /// Added in version 8.0.0
   String get code => _code;
 
-  /// The date of issue for the accompanying driver’s license code.
-  ///
-  /// Added in version 8.0.0
   DateResult? get dateOfIssue => _dateOfIssue;
 
-  /// The date of expiry for the accompanying driver’s license code.
-  ///
-  /// Added in version 8.0.0
   DateResult? get dateOfExpiry => _dateOfExpiry;
 }

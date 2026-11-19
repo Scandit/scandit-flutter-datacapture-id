@@ -49,26 +49,23 @@ class IdCaptureMethodHandler {
                 let methodName = call.stringValue(for: "methodName", from: args) ?? "unknown"
                 result(FlutterError(code: "-1", message: "Unknown Core method: \(methodName)", details: nil))
             }
-        // Only the defaults Dart cannot source from its generated static consts.
-        case "getDynamicDefaults":
-            reply(defaults: idModule.getDynamicDefaults(), result: result)
+        case "getDefaults":
+            do {
+                let defaults = idModule.getDefaults()
+                let defaultsJSONString = String(
+                    data: try JSONSerialization.data(
+                        withJSONObject: defaults,
+                        options: []
+                    ),
+                    encoding: .utf8
+                )
+                result(defaultsJSONString)
+            } catch {
+                result(error)
+            }
         default:
             result(FlutterMethodNotImplemented)
         }
     }
 
-    private func reply(defaults: [String: Any?], result: @escaping FlutterResult) {
-        do {
-            let defaultsJSONString = String(
-                data: try JSONSerialization.data(
-                    withJSONObject: defaults,
-                    options: []
-                ),
-                encoding: .utf8
-            )
-            result(defaultsJSONString)
-        } catch {
-            result(error)
-        }
-    }
 }
