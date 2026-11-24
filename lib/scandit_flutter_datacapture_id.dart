@@ -46,6 +46,7 @@ export 'src/data/driving_license_category.dart' show DrivingLicenseCategory;
 export 'src/result/vehicle_restriction.dart' show VehicleRestriction;
 export 'src/region_specific_subtypes.dart' show RegionSpecificSubtype;
 export 'src/id_side.dart' show IdSide;
+export 'src/result/passport_type.dart' show PassportType;
 export 'src/id_images.dart' show IdImages;
 export 'src/aamva_barcode_verification_status.dart' show AamvaBarcodeVerificationStatus;
 export 'src/result/data_consistency_result.dart' show DataConsistencyResult;

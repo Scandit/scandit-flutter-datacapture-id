@@ -11,9 +11,13 @@ import 'package:scandit_flutter_datacapture_core/src/internal/image_extensions.d
 
 import 'date_result.dart';
 
+/// This class represents data extracted from mobile identity documents. It contains information from mobile driver’s licenses and other mobile identity documents that comply with various standards such as ISO 18013-5. Some properties may not apply to certain document types and will be set to nil if the corresponding data is not available in the mobile document.
+///
+/// Added in version 8.0.0
 @immutable
 class MobileDocumentResult {
   final Image? _portrait;
+  final Image? _signature;
   final String _issuingAuthority;
   final String? _administrativeNumber;
   final int? _height;
@@ -40,6 +44,7 @@ class MobileDocumentResult {
 
   const MobileDocumentResult._({
     required Image? portrait,
+    required Image? signature,
     required String issuingAuthority,
     required String? administrativeNumber,
     required int? height,
@@ -64,6 +69,7 @@ class MobileDocumentResult {
     required DateResult? dateOfExpiry,
     required DateResult? dateOfIssue,
   })  : _portrait = portrait,
+        _signature = signature,
         _issuingAuthority = issuingAuthority,
         _administrativeNumber = administrativeNumber,
         _height = height,
@@ -91,6 +97,7 @@ class MobileDocumentResult {
   factory MobileDocumentResult.fromJSON(Map<String, dynamic> json) {
     return MobileDocumentResult._(
       portrait: json['portrait']?.toString().toImage(),
+      signature: json['signature']?.toString().toImage(),
       issuingAuthority: json['issuingAuthority']?.toString() ?? '',
       administrativeNumber: json['administrativeNumber']?.toString(),
       height: json['height'] as int?,
@@ -120,51 +127,128 @@ class MobileDocumentResult {
     );
   }
 
+  /// The portrait image of the document holder as bitmap.
+  ///
+  /// Added in version 8.0.0
   Image? get portrait => _portrait;
 
+  /// The signature image of the document holder as bitmap.
+  ///
+  /// Added in version 8.7.0
+  Image? get signature => _signature;
+
+  /// The authority that issued the mobile document.
+  ///
+  /// Added in version 8.0.0
   String get issuingAuthority => _issuingAuthority;
 
+  /// The administrative number associated with the mobile document.
+  ///
+  /// Added in version 8.0.0
   String? get administrativeNumber => _administrativeNumber;
 
+  /// The height of the document holder in centimeters.
+  ///
+  /// Added in version 8.0.0
   int? get height => _height;
 
+  /// The weight of the document holder in kilograms.
+  ///
+  /// Added in version 8.0.0
   int? get weight => _weight;
 
+  /// The eye color of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get eyeColor => _eyeColor;
 
+  /// The hair color of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get hairColor => _hairColor;
 
+  /// The place of birth of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get birthPlace => _birthPlace;
 
+  /// The list of driving license categories associated with the mobile document. Each category contains information about the type of vehicle the holder is authorized to operate and the validity period of the authorization.
+  ///
+  /// Added in version 8.0.0
   List<DrivingLicenseCategory> get drivingLicenseCategories => _drivingLicenseCategories;
 
+  /// The city of residence of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get residentCity => _residentCity;
 
+  /// The country of residence of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get residentCountry => _residentCountry;
 
+  /// The first name of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get firstName => _firstName;
 
+  /// The last name of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get lastName => _lastName;
 
+  /// The full name of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get fullName => _fullName;
 
+  /// The sex of the document holder as a string.
+  ///
+  /// Added in version 8.0.0
   String? get sex => _sex;
 
+  /// The date of birth of the document holder.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfBirth => _dateOfBirth;
 
+  /// The age of the document holder.
+  ///
+  /// Added in version 8.0.0
   int? get age => _age;
 
+  /// The nationality of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get nationality => _nationality;
 
+  /// The address of the document holder.
+  ///
+  /// Added in version 8.0.0
   String? get address => _address;
 
+  /// The ISO code of the issuing country.
+  ///
+  /// Added in version 8.0.0
   String? get issuingCountryIso => _issuingCountryIso;
 
+  /// The ISO code of the issuing jurisdiction.
+  ///
+  /// Added in version 8.0.0
   String? get issuingJurisdictionIso => _issuingJurisdictionIso;
 
+  /// The document number.
+  ///
+  /// Added in version 8.0.0
   String? get documentNumber => _documentNumber;
 
+  /// The date of expiry of the document.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfExpiry => _dateOfExpiry;
 
+  /// The date of issue of the document.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfIssue => _dateOfIssue;
 }

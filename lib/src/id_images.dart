@@ -4,11 +4,14 @@
  * Copyright (C) 2024- Scandit AG. All rights reserved.
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 // ignore: implementation_imports
 import 'package:scandit_flutter_datacapture_core/src/internal/image_extensions.dart';
 import 'package:scandit_flutter_datacapture_id/src/id_side.dart';
 
+/// A class that contains the extracted images from a document.
+///
+/// Added in version 7.0.0
 class IdImages {
   final String? _frontFaceImageEncoded;
   final String? _frontFrameEncoded;
@@ -51,6 +54,9 @@ class IdImages {
 
   Image? _frontFace;
 
+  /// Returns a bitmap corresponding to a photo of the document’s holder. This method is only supported for documents whose Visual Inspection Zone (VIZ) has been captured.
+  ///
+  /// Added in version 7.0.0
   Image? get face {
     if (_frontFace != null) return _frontFace;
     _frontFace = _frontFaceImageEncoded.toImage();
@@ -59,6 +65,9 @@ class IdImages {
 
   Image? _frontFrame;
 
+  /// Returns a bitmap corresponding the full frame the document was captured on.
+  ///
+  /// Added in version 7.0.0
   Image? get frame {
     if (_frontFrame != null) return _frontFrame;
     _frontFrame = _frontFrameEncoded.toImage();
@@ -69,6 +78,9 @@ class IdImages {
 
   Image? _backCropped;
 
+  /// Returns a bitmap of a cropped image of the specified document side. This method is only supported for documents whose Visual Inspection Zone (VIZ) has been captured.
+  ///
+  /// Added in version 7.0.0
   Image? getCroppedDocument(IdSide side) {
     switch (side) {
       case IdSide.front:
@@ -84,6 +96,9 @@ class IdImages {
 
   Image? _backFrame;
 
+  /// Returns a bitmap of the full frame the specified document side was captured on.
+  ///
+  /// Added in version 7.0.0
   Image? getFrame(IdSide side) {
     switch (side) {
       case IdSide.front:

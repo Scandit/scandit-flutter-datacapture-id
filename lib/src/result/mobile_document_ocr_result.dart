@@ -7,6 +7,9 @@
 import 'package:flutter/foundation.dart';
 import 'date_result.dart';
 
+/// This class represents data extracted from mobile documents using optical character recognition (OCR). It contains information from mobile driver’s licenses captured using OCR-based scanning methods, such as Australian mobile driver licenses. Some properties may not apply to certain document types and will be set to nil if the corresponding data is not available or could not be extracted via OCR.
+///
+/// Added in version 8.0.0
 @immutable
 class MobileDocumentOcrResult {
   final String? _firstName;
@@ -72,29 +75,68 @@ class MobileDocumentOcrResult {
     );
   }
 
+  /// The first name of the document holder extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get firstName => _firstName;
 
+  /// The last name of the document holder extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get lastName => _lastName;
 
+  /// The full name of the document holder extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get fullName => _fullName;
 
+  /// The date of birth of the document holder extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfBirth => _dateOfBirth;
 
+  /// The document number extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get documentNumber => _documentNumber;
 
+  /// The date of expiry of the document extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfExpiry => _dateOfExpiry;
 
+  /// The issuing jurisdiction of the document extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get issuingJurisdiction => _issuingJurisdiction;
 
+  /// The ISO code of the issuing jurisdiction extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get issuingJurisdictionIso => _issuingJurisdictionIso;
 
+  /// The sex of the document holder extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get sex => _sex;
 
+  /// The nationality of the document holder extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get nationality => _nationality;
 
+  /// The address of the document holder extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get address => _address;
 
+  /// The additional document number extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   String? get documentAdditionalNumber => _documentAdditionalNumber;
 
+  /// The date of issue of the document extracted via OCR.
+  ///
+  /// Added in version 8.0.0
   DateResult? get dateOfIssue => _dateOfIssue;
 }

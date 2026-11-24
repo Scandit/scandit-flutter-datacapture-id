@@ -7,6 +7,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:scandit_flutter_datacapture_id/src/result/date_result.dart';
 
+/// Added in version 6.11.0
 @immutable
 class VehicleRestriction {
   final String _vehicleCode;
@@ -19,14 +20,23 @@ class VehicleRestriction {
       : this._(json["vehicleCode"], json["vehicleRestriction"],
             DateResult.fromJSON(json["dateOfIssue"] as Map<String, dynamic>));
 
+  /// The category of motor vehicle the Driver’s License is valid for. Check the information printed on the Driver’s License for the list of valid codes.
+  ///
+  /// Added in version 6.11.0
   String get vehicleCode {
     return _vehicleCode;
   }
 
+  /// The restriction that applies to the motor vehicle category. Check the information printed on the Driver’s License for the list of possible restrictions.
+  ///
+  /// Added in version 6.11.0
   String get vehicleRestriction {
     return _vehicleRestriction;
   }
 
+  /// The date when this vehicle restriction starts to apply.
+  ///
+  /// Added in version 6.11.0
   DateResult get dateOfIssue {
     return _dateOfIssue;
   }

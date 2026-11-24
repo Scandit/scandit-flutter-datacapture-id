@@ -1,0 +1,35 @@
+name: scandit_flutter_datacapture_id_example
+description: Demonstrates how to use the scandit_flutter_datacapture_id plugin.
+
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.44.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  material_ui: '>=1.0.0 <1.4.0'
+
+  scandit_flutter_datacapture_id:
+    path: ../
+  scandit_flutter_datacapture_id_aamva_barcode_verification:
+    path: ../../scandit-flutter-datacapture-id-aamva-barcode-verification
+  scandit_flutter_datacapture_id_europe_driving_license:
+    path: ../../scandit-flutter-datacapture-id-europe-driving-license
+  scandit_flutter_datacapture_id_voided_detection:
+    path: ../../scandit-flutter-datacapture-id-voided-detection
+  scandit_flutter_datacapture_core:
+    path: ../../scandit-flutter-datacapture-core
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  config:
+    enable-swift-package-manager: true

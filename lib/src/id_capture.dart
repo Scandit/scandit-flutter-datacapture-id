@@ -6,6 +6,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:math';
 
 import 'package:flutter/services.dart';
@@ -13,22 +14,39 @@ import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_cor
 // ignore: implementation_imports
 import 'package:scandit_flutter_datacapture_core/src/internal/base_controller.dart';
 import 'package:scandit_flutter_datacapture_id/src/internal/generated/id_method_handler.dart';
+import 'package:scandit_flutter_datacapture_id/src/internal/generated/schema_types.dart'
+    show IdCaptureListenerDidCaptureId, IdCaptureListenerDidRejectId, ImageInfo;
 
 import 'package:scandit_flutter_datacapture_id/src/rejection_reson.dart';
 
 import '../scandit_flutter_datacapture_id.dart';
 import 'internal/function_names.dart';
 import 'internal/id_capture_defaults.dart';
+import 'tolerant_payload_parser.dart';
 
+/// Listener interface for id capture.
+///
+/// Added in version 6.11.0
 abstract class IdCaptureListener {
   static const String _didCaptureId = "IdCaptureListener.didCaptureId";
   static const String _didRejectId = "IdCaptureListener.didRejectId";
 
+  /// Called whenever a document is recognized and parsed.
+  ///
+  /// Set [IdCapture.isEnabled] to *false* at the start of this callback to prevent additional captures while the result is being handled, and restore it to *true* when processing is complete. This method is called on a background thread — dispatch any UI work to the main thread.
+  ///
+  /// Added in version 7.0.0
   Future<void> didCaptureId(IdCapture idCapture, CapturedId capturedId);
 
+  /// Called whenever a personal identification document or its part is recognized in a frame, but rejected. A document is rejected if (a) it’s not enabled in the settings, (b) it’s a barcode of a correct symbology or a Machine Readable Zone (MRZ), but the data is encoded in an unexpected/incorrect format, (c) it meets the requirement of a rejection rule defined in the settings (for instance, voided ID rejection or expired ID rejection).
+  ///
+  /// This method is called on a background thread — dispatch any UI work to the main thread.
+  ///
+  /// Added in version 7.0.0
   Future<void> didRejectId(IdCapture idCapture, CapturedId? rejectedId, RejectionReason reason);
 }
 
+/// Added in version 6.11.0
 class IdCapture extends DataCaptureMode {
   late _IdCaptureListenerController _controller;
 
@@ -49,12 +67,18 @@ class IdCapture extends DataCaptureMode {
     _feedback.addListener(_onFeedbackChanged);
   }
 
+  /// Constructs a new [IdCapture] with the provided settings.
+  ///
+  /// Added in version 7.6.0
   IdCapture(IdCaptureSettings settings) : this._(null, settings);
 
   void _onFeedbackChanged() {
     _controller.updateFeedback(_feedback);
   }
 
+  /// Creates the recommended camera settings to use with this mode.
+  ///
+  /// Added in version 7.6.0
   static CameraSettings createRecommendedCameraSettings() {
     var defaults = IdCaptureDefaults.cameraSettingsDefaults;
     return CameraSettings(
@@ -71,21 +95,36 @@ class IdCapture extends DataCaptureMode {
     );
   }
 
+  /// Implemented from [DataCaptureMode]. See [DataCaptureMode.context].
+  ///
+  /// Added in version 6.11.0
   @override
   // ignore: unnecessary_overrides
   DataCaptureContext? get context => super.context;
 
+  /// Implemented from [DataCaptureMode]. See [DataCaptureMode.isEnabled].
+  ///
+  /// Added in version 6.11.0
   @override
   bool get isEnabled => _enabled;
 
+  /// Implemented from [DataCaptureMode]. See [DataCaptureMode.isEnabled].
+  ///
+  /// Added in version 6.11.0
   @override
   set isEnabled(bool newValue) {
     _enabled = newValue;
     _controller.setModeEnabledState(newValue);
   }
 
+  /// Instance of [IdCaptureFeedback], determines what feedback (vibration, sound) should be emitted during the ID Capture process.
+  ///
+  /// Added in version 6.22.0
   IdCaptureFeedback get feedback => _feedback;
 
+  /// Instance of [IdCaptureFeedback], determines what feedback (vibration, sound) should be emitted during the ID Capture process.
+  ///
+  /// Added in version 6.22.0
   set feedback(IdCaptureFeedback newValue) {
     _feedback.removeListener(_onFeedbackChanged);
     _feedback = newValue;
@@ -93,6 +132,11 @@ class IdCapture extends DataCaptureMode {
     _feedback.addListener(_onFeedbackChanged);
   }
 
+  /// Adds the listener to this id capture instance.
+  ///
+  /// In case the same listener is already observing this instance, calling this method will not add the listener again.
+  ///
+  /// Added in version 6.11.0
   void addListener(IdCaptureListener listener) {
     if (_listeners.isEmpty) {
       _controller.subscribeListeners();
@@ -103,6 +147,11 @@ class IdCapture extends DataCaptureMode {
     _listeners.add(listener);
   }
 
+  /// Removes listener from this id capture instance.
+  ///
+  /// In case the listener is not currently observing this instance, calling this method has no effect.
+  ///
+  /// Added in version 6.11.0
   void removeListener(IdCaptureListener listener) {
     _listeners.remove(listener);
     if (_listeners.isEmpty) {
@@ -112,17 +161,29 @@ class IdCapture extends DataCaptureMode {
 
   String? _externalTransactionId;
 
+  /// Sets or retrieves an external transaction ID. This ID is attached to ID scan analytics data, to be linkable to customer transactions. Set to *null* to clear the transaction ID.
+  ///
+  /// Added in version 8.0.0
   String? get externalTransactionId => _externalTransactionId;
 
+  /// Sets or retrieves an external transaction ID. This ID is attached to ID scan analytics data, to be linkable to customer transactions. Set to *null* to clear the transaction ID.
+  ///
+  /// Added in version 8.0.0
   set externalTransactionId(String? value) {
     _externalTransactionId = value;
     _controller.updateIdCaptureMode();
   }
 
+  /// Resets the ongoing scanning process. This method can be used to abandon scanning the back side of a document.
+  ///
+  /// Added in version 6.11.0
   Future<void> reset() {
     return _controller.reset();
   }
 
+  /// Asynchronously applies the new settings to the ID Capture. If the scanner is currently running, the task will complete when the next frame is processed, and will use the new settings for that frame. If the scanner is currently *not* running, the task will complete as soon as the settings have been stored and won’t wait until the next frame is going to be processed.
+  ///
+  /// Added in version 6.19.0
   Future<void> applySettings(IdCaptureSettings settings) {
     _settings = settings;
     return _controller.applyNewSettings(settings);
@@ -137,7 +198,6 @@ class IdCapture extends DataCaptureMode {
       'externalTransactionId': _externalTransactionId,
       'modeId': _modeId,
       'enabled': _enabled,
-      'hasListeners': _listeners.isNotEmpty,
     };
   }
 }
@@ -169,26 +229,98 @@ class _IdCaptureListenerController extends BaseController {
   }
 
   void _setupIdCaptureSubscription() {
-    _idCaptureSubscription = _eventChannel.receiveBroadcastStream().forMode(_idCapture._modeId).listen((event) {
-      if (_idCapture._listeners.isEmpty) return;
-
+    _idCaptureSubscription = _eventChannel.receiveBroadcastStream().forMode(_idCapture._modeId).listen((event) async {
+      // A different event on this stream owes no ack, so this is the only check that may sit
+      // outside the try.
       if (event.isEvent(IdCaptureListener._didCaptureId)) {
-        var capturedId = _parseCapturedId(event.payload);
-        _notifyDidCaptureId(capturedId).then((value) {
-          idMethodHandler
-              .finishDidCaptureCallback(modeId: _idCapture._modeId, enabled: _idCapture.isEnabled)
-              .onError(onError);
-        });
+        await _handleDidCaptureId(event);
       } else if (event.isEvent(IdCaptureListener._didRejectId)) {
-        CapturedId? capturedId = event.payload["id"] != null ? _parseCapturedId(event.payload) : null;
-        var rejectionReson = RejectionReasonDeserializer.fromJSON(event.payload['rejectionReason']);
-        _notifyDidRejectId(capturedId, rejectionReson).then((value) {
-          idMethodHandler
-              .finishDidRejectCallback(modeId: _idCapture._modeId, enabled: _idCapture.isEnabled)
-              .onError(onError);
-        });
+        await _handleDidRejectId(event);
       }
     });
+  }
+
+  // ACK-owing (2s bounded timeout, both platforms): native blocks on finishDidCaptureCallback,
+  // so a throwing (or schema-rejected) payload must still ack. Work in `try`, ack in `finally`.
+  Future<void> _handleDidCaptureId(FlutterEvent event) async {
+    try {
+      if (_idCapture._listeners.isEmpty) return;
+      final payload = parsePayloadTolerantly<IdCaptureListenerDidCaptureId>(
+        event.payload,
+        (raw) => IdCaptureListenerDidCaptureId.fromJson(raw),
+        (raw) {
+          final map = raw is Map ? raw : const <String, dynamic>{};
+          // `id` is required and cannot be reconstructed from a missing/invalid value
+          // (an empty placeholder would report a bogus document), so decline.
+          if (map['id'] is! String) return null;
+          return IdCaptureListenerDidCaptureId(
+            id: map['id'] as String,
+            imageInfo: _tolerantImageInfo(map['imageInfo']),
+            frontReviewImage: map['frontReviewImage'] is String ? map['frontReviewImage'] as String : null,
+            modeId: map['modeId'] is int ? map['modeId'] as int : _idCapture._modeId,
+            event: IdCaptureListener._didCaptureId,
+          );
+        },
+        'didCaptureId',
+        'IdCaptureListenerController',
+      );
+      if (payload == null) return;
+      var capturedId = _parseCapturedId(payload.id, payload.imageInfo, payload.frontReviewImage);
+      await _notifyDidCaptureId(capturedId);
+    } catch (error) {
+      developer.log('IdCaptureListenerController didCaptureId failed: $error');
+    } finally {
+      await idMethodHandler
+          .finishDidCaptureCallback(modeId: _idCapture._modeId, enabled: _idCapture.isEnabled)
+          .onError(onError);
+    }
+  }
+
+  // ACK-owing, same contract as _handleDidCaptureId: native blocks on finishDidRejectCallback.
+  Future<void> _handleDidRejectId(FlutterEvent event) async {
+    try {
+      if (_idCapture._listeners.isEmpty) return;
+      final payload = parsePayloadTolerantly<IdCaptureListenerDidRejectId>(
+        event.payload,
+        (raw) => IdCaptureListenerDidRejectId.fromJson(raw),
+        (raw) {
+          final map = raw is Map ? raw : const <String, dynamic>{};
+          // `rejectionReason` is required and cannot be guessed from a missing/invalid
+          // value, so decline.
+          if (map['rejectionReason'] is! String) return null;
+          return IdCaptureListenerDidRejectId(
+            rejectionReason: map['rejectionReason'] as String,
+            id: map['id'] is String ? map['id'] as String : null,
+            imageInfo: _tolerantImageInfo(map['imageInfo']),
+            frontReviewImage: map['frontReviewImage'] is String ? map['frontReviewImage'] as String : null,
+            modeId: map['modeId'] is int ? map['modeId'] as int : _idCapture._modeId,
+            event: IdCaptureListener._didRejectId,
+          );
+        },
+        'didRejectId',
+        'IdCaptureListenerController',
+      );
+      if (payload == null) return;
+      CapturedId? capturedId =
+          payload.id != null ? _parseCapturedId(payload.id!, payload.imageInfo, payload.frontReviewImage) : null;
+      // Decline explicitly rather than letting fromJSON's StateError fall into the catch below:
+      // a Dart enum cannot carry a schema value it does not declare.
+      final rejectionReason = RejectionReasonDeserializer.tryFromJSON(payload.rejectionReason);
+      if (rejectionReason == null) {
+        developer.log(
+          'IdCaptureListenerController didRejectId: declining unrepresentable rejectionReason '
+          "'${payload.rejectionReason}'",
+        );
+        return;
+      }
+      await _notifyDidRejectId(capturedId, rejectionReason);
+    } catch (error) {
+      developer.log('IdCaptureListenerController didRejectId failed: $error');
+    } finally {
+      await idMethodHandler
+          .finishDidRejectCallback(modeId: _idCapture._modeId, enabled: _idCapture.isEnabled)
+          .onError(onError);
+    }
   }
 
   void unsubscribeListeners() {
@@ -196,19 +328,35 @@ class _IdCaptureListenerController extends BaseController {
     idMethodHandler.removeIdCaptureListener(modeId: _idCapture._modeId).onError(onError);
   }
 
-  CapturedId _parseCapturedId(Map<String, dynamic> eventJSON) {
-    final decodedId = jsonDecode(eventJSON["id"]);
+  // Best-effort reconstruction for the tolerant fallback: a malformed `imageInfo` sub-object
+  // must not sink the whole payload, since `id`/`rejectionReason` are what the ack is gated on.
+  ImageInfo? _tolerantImageInfo(Object? raw) {
+    if (raw is! Map) return null;
+    try {
+      return ImageInfo.fromJson(raw);
+    } catch (error) {
+      logPayloadIssueOnce('IdCaptureListenerController', 'imageInfo', 'imageInfo payload declined: $error');
+      return null;
+    }
+  }
 
-    if (eventJSON["imageInfo"] != null) {
-      final idImagesJson = eventJSON["imageInfo"] as Map<String, dynamic>;
-      decodedId["imageInfo"] = idImagesJson;
+  CapturedId _parseCapturedId(String id, ImageInfo? imageInfo, String? frontReviewImage) {
+    final decodedId = jsonDecode(id);
+
+    if (imageInfo != null) {
+      // IdImages.fromJSON reads nested keys off the maps, so an omitted key and an explicit
+      // null are equivalent to it; the generated toJson() omits nulls.
+      decodedId["imageInfo"] = {
+        "front": imageInfo.front?.toJson() ?? const <String, Object?>{},
+        "back": imageInfo.back?.toJson() ?? const <String, Object?>{},
+      };
     }
 
-    if (eventJSON["frontReviewImage"] != null) {
+    if (frontReviewImage != null) {
       final verificationResultJson = decodedId["verificationResult"] as Map<String, dynamic>;
       if (verificationResultJson["dataConsistencyResult"] != null) {
         final dataConsistencyResultJson = verificationResultJson["dataConsistencyResult"] as Map<String, dynamic>;
-        dataConsistencyResultJson["frontReviewImage"] = eventJSON["frontReviewImage"];
+        dataConsistencyResultJson["frontReviewImage"] = frontReviewImage;
       }
     }
 

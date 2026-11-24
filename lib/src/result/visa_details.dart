@@ -9,6 +9,9 @@ import 'package:scandit_flutter_datacapture_id/src/application_status.dart';
 
 import 'date_result.dart';
 
+/// This class represents data extracted from a visa document processed in the cloud.
+///
+/// Added in version 8.5.0
 @immutable
 class VisaDetails {
   final ApplicationStatus? _applicationStatus;
@@ -89,33 +92,78 @@ class VisaDetails {
     );
   }
 
+  /// The status of the application for the document.
+  ///
+  /// Added in version 8.5.0
   ApplicationStatus? get applicationStatus => _applicationStatus;
 
+  /// The date when the visa was issued.
+  ///
+  /// Added in version 8.5.0
   DateResult? get dateOfIssue => _dateOfIssue;
 
+  /// The duration of the visa in days.
+  ///
+  /// Added in version 8.5.0
   int? get durationInDays => _durationInDays;
 
+  /// The authority that issued the document, or the place where it was issued.
+  ///
+  /// Added in version 8.5.0
   String? get issuingAuthority => _issuingAuthority;
 
+  /// The full name of the person holding the visa or applicant on the document.
+  ///
+  /// Added in version 8.5.0
   String? get fullName => _fullName;
 
+  /// The geographic validity of the document. For example “Schengen States” or “United States of America”.
+  ///
+  /// Added in version 8.5.0
   String? get geographicValidity => _geographicValidity;
 
+  /// The ISO code (Alpha-3 code) of the country issuing the document.
+  ///
+  /// Added in version 8.5.0
   String? get issuingCountryIso => _issuingCountryIso;
 
+  /// Whether the visa allows multiple entries.
+  ///
+  /// Added in version 8.5.0
   bool? get multipleEntries => _multipleEntries;
 
+  /// The number of entries allowed on the visa.
+  ///
+  /// Added in version 8.5.0
   int? get numberOfEntries => _numberOfEntries;
 
+  /// The number of the passport referenced by the visa.
+  ///
+  /// Added in version 8.5.0
   String? get passportNumber => _passportNumber;
 
+  /// The start date of the visa validity.
+  ///
+  /// Added in version 8.5.0
   DateResult? get validFrom => _validFrom;
 
+  /// The end date of the visa validity. Sometimes also called “expiry date”.
+  ///
+  /// Added in version 8.5.0
   DateResult? get validUntil => _validUntil;
 
+  /// The number of the visa.
+  ///
+  /// Added in version 8.5.0
   String? get visaNumber => _visaNumber;
 
+  /// The type of the visa. Usually a single character like ‘C’, ‘A’ or ‘D’.
+  ///
+  /// Added in version 8.5.0
   String? get visaType => _visaType;
 
+  /// The foil number of the visa, if available. Typically an eight-digit alphanumeric code printed in red ink on a U.S. visa sticker, usually found in the lower right-hand corner.
+  ///
+  /// Added in version 8.5.0
   String? get foilNumber => _foilNumber;
 }

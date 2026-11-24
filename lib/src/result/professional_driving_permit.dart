@@ -7,6 +7,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:scandit_flutter_datacapture_id/src/result/date_result.dart';
 
+/// The professional driving permit (PrDP) of the Driver’s License holder.
+///
+/// Added in version 6.11.0
 @immutable
 class ProfessionalDrivingPermit {
   final DateResult _dateOfExpiry;
@@ -17,10 +20,16 @@ class ProfessionalDrivingPermit {
   ProfessionalDrivingPermit.fromJSON(Map<String, dynamic> json)
       : this._(DateResult.fromJSON(json["dateOfExpiry"] as Map<String, dynamic>), json["codes"] as List<String>);
 
+  /// The date when this permit expires.
+  ///
+  /// Added in version 6.11.0
   DateResult get dateOfExpiry {
     return _dateOfExpiry;
   }
 
+  /// The categories of the permit. Check the information printed on the Driver’s License for the list of valid PrDP categories.
+  ///
+  /// Added in version 6.11.0
   List<String> get codes {
     return _codes;
   }

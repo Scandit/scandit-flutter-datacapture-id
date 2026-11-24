@@ -7,6 +7,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:scandit_flutter_datacapture_id/src/data/driving_license_category.dart';
 
+/// Added in version 8.0.0
 @immutable
 class DrivingLicenseDetails {
   final List<DrivingLicenseCategory> _drivingLicenseCategories;
@@ -35,9 +36,18 @@ class DrivingLicenseDetails {
     );
   }
 
+  /// Additional information from driver licenses such as vehicle categories.
+  ///
+  /// Added in version 8.0.0
   List<DrivingLicenseCategory> get drivingLicenseCategories => _drivingLicenseCategories;
 
+  /// The restrictions to driving privileges for the driver license owner.
+  ///
+  /// Added in version 8.0.0
   String? get restrictions => _restrictions;
 
+  /// The additional privileges granted to the driver license owner.
+  ///
+  /// Added in version 8.0.0
   String? get endorsements => _endorsements;
 }

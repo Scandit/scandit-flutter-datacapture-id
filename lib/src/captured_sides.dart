@@ -4,8 +4,17 @@
  * Copyright (C) 2021- Scandit AG. All rights reserved.
  */
 
+/// Sides of a personal identification document scanned by ID Capture.
+///
+/// Added in version 6.11.0
 enum CapturedSides {
+  /// Only the front side of a document.
+  ///
+  /// Added in version 6.11.0
   frontOnly('frontOnly'),
+  /// Both the front and the back side of a document.
+  ///
+  /// Added in version 6.11.0
   frontAndBack('frontAndBack');
 
   const CapturedSides(this._name);

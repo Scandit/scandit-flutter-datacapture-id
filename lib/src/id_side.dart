@@ -4,8 +4,17 @@
  * Copyright (C) 2024- Scandit AG. All rights reserved.
  */
 
+/// Sides of a document.
+///
+/// Added in version 7.0.0
 enum IdSide {
+  /// Front side of a document.
+  ///
+  /// Added in version 7.0.0
   front('front'),
+  /// Back side of the document.
+  ///
+  /// Added in version 7.0.0
   back('back');
 
   const IdSide(this._name);

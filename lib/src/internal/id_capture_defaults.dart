@@ -5,23 +5,148 @@
  */
 
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
 import 'package:scandit_flutter_datacapture_core/scandit_flutter_datacapture_core.dart';
+// ignore: implementation_imports
+import 'package:scandit_flutter_datacapture_core/src/internal/logging/logging_method_channel.dart';
 import 'package:scandit_flutter_datacapture_id/src/id_layout.dart';
 
 import 'function_names.dart';
 import '../id_anonymization_mode.dart';
 import 'duration_extensions.dart';
+import '../generated/id_generated_defaults.dart';
+
+// Picks the platform-split value of a generated default. Kept private: a
+// small per-package helper, mirroring core's, so this package doesn't need a
+// cross-package dependency just for this.
+T _platformDefault<T>({required T android, required T ios}) => Platform.isIOS ? ios : android;
+
+// Builds a Brush from a generated flat {fillColor, strokeColor, strokeWidth}
+// default literal - the shape the wrappers actually emit. A missing key means
+// "unset", i.e. fully transparent / zero width - matching the native
+// getDefaults() snapshot at
+// scripts/defaults_generator/defaults/generated/expected_defaults_*.json.
+Brush _buildStaticBrush(Map<String, Object?> json) {
+  final fillColor = ColorDeserializer.fromRgbaHex(json['fillColor'] as String? ?? '#00000000');
+  final strokeColor = ColorDeserializer.fromRgbaHex(json['strokeColor'] as String? ?? '#00000000');
+  final strokeWidth = (json['strokeWidth'] as num?)?.toDouble() ?? 0.0;
+  return Brush(fillColor, strokeColor, strokeWidth);
+}
+
+// Builds a Feedback from a generated {vibration, sound} default literal.
+// Mirrors IdCaptureFeedbackDefaults.feedbackFromJson's null-tolerant
+// semantics but - unlike that method - tolerates an explicit `null` value
+// for a present key (e.g. IdCaptureFeedbackGeneratedDefaults.idRejected is
+// {'vibration': null, 'sound': null}), which feedbackFromJson's
+// unconditional `as Map` cast would crash on.
+Feedback _buildStaticFeedback(Map<String, Object?> json) {
+  final vibrationJson = json['vibration'] as Map<String, Object?>?;
+  final soundJson = json['sound'] as Map<String, Object?>?;
+
+  Vibration? vibration;
+  if (vibrationJson != null) {
+    switch (vibrationJson['type']) {
+      case 'selectionHaptic':
+        vibration = Vibration.selectionHapticFeedback;
+        break;
+      case 'successHaptic':
+        vibration = Vibration.successHapticFeedback;
+        break;
+      default:
+        vibration = Vibration.defaultVibration;
+    }
+  }
+
+  Sound? sound;
+  if (soundJson != null) {
+    sound = soundJson.containsKey('resource') ? Sound(soundJson['resource'] as String?) : Sound(null);
+  }
+
+  return Feedback(vibration, sound);
+}
+
+IdCaptureOverlayDefaults _buildStaticIdCaptureOverlayDefaults() {
+  return IdCaptureOverlayDefaults(
+    _buildStaticBrush(IdCaptureOverlayGeneratedDefaults.DefaultCapturedBrush),
+    // Fill alpha is platform-split: native white(0.5f) serializes as #FFFFFF80
+    // on Android and #FFFFFF7F on iOS. See id.json for the full note.
+    _buildStaticBrush(_platformDefault(
+      android: IdCaptureOverlayGeneratedDefaults.DefaultLocalizedBrushAndroid,
+      ios: IdCaptureOverlayGeneratedDefaults.DefaultLocalizedBrushIos,
+    )),
+    _buildStaticBrush(_platformDefault(
+      android: IdCaptureOverlayGeneratedDefaults.DefaultRejectedBrushAndroid,
+      ios: IdCaptureOverlayGeneratedDefaults.DefaultRejectedBrushIos,
+    )),
+    IdLayoutStyleDeserializer.fromJSON(IdCaptureOverlayGeneratedDefaults.defaultIdLayoutStyle),
+    IdLayoutLineStyleDeserializer.fromJSON(IdCaptureOverlayGeneratedDefaults.defaultIdLayoutLineStyle),
+  );
+}
+
+IdCaptureSettingsDefaults _buildStaticIdCaptureSettingsDefaults() {
+  return IdCaptureSettingsDefaults(
+    IdAnonymizationModeDeserializer.fromJSON(IdCaptureSettingsGeneratedDefaults.anonymizationMode),
+    IdCaptureSettingsGeneratedDefaults.rejectVoidedIds,
+    IdCaptureSettingsGeneratedDefaults.decodeBackOfEuropeanDrivingLicense,
+    IdCaptureSettingsGeneratedDefaults.rejectExpiredIds,
+    // rejectIdsExpiringIn: the generated const is Object? and always null (the
+    // fromJSON path only ever builds a Duration relative to DateTime.now(), so
+    // there is no meaningful static value). Passed as a literal null rather
+    // than `const as Duration?` so a future non-null generated value has to be
+    // wired deliberately instead of throwing a _CastError at class-init time.
+    null,
+    IdCaptureSettingsGeneratedDefaults.rejectNotRealIdCompliant,
+    IdCaptureSettingsGeneratedDefaults.rejectForgedAamvaBarcodes,
+    IdCaptureSettingsGeneratedDefaults.rejectInconsistentData,
+    // Generated const is Object? and always null - see rejectIdsExpiringIn above.
+    null,
+    IdCaptureSettingsGeneratedDefaults.anonymizeDefaultFields,
+    IdCaptureSettingsGeneratedDefaults.rejectionTimeoutSeconds,
+  );
+}
+
+IdCaptureFeedbackDefaults _buildStaticIdCaptureFeedbackDefaults() {
+  final idCaptured = _platformDefault(
+    android: IdCaptureFeedbackGeneratedDefaults.idCapturedAndroid,
+    ios: IdCaptureFeedbackGeneratedDefaults.idCapturedIos,
+  );
+  final defaultSuccessSound = _platformDefault(
+    android: IdCaptureFeedbackGeneratedDefaults.defaultSuccessSoundAndroid,
+    ios: IdCaptureFeedbackGeneratedDefaults.defaultSuccessSoundIos,
+  );
+  final defaultFailureSound = _platformDefault(
+    android: IdCaptureFeedbackGeneratedDefaults.defaultFailureSoundAndroid,
+    ios: IdCaptureFeedbackGeneratedDefaults.defaultFailureSoundIos,
+  );
+
+  return IdCaptureFeedbackDefaults(
+    _buildStaticFeedback(idCaptured),
+    _buildStaticFeedback(IdCaptureFeedbackGeneratedDefaults.idRejected),
+    Sound.fromJSON(defaultSuccessSound),
+    Sound.fromJSON(defaultFailureSound),
+  );
+}
 
 // ignore: avoid_classes_with_only_static_members
 class IdCaptureDefaults {
   static bool _isInitialized = false;
-  static MethodChannel channel = const MethodChannel(IdCaptureFunctionNames.methodsChannelName);
-  static late IdCaptureOverlayDefaults _idCaptureOverlayDefaults;
+  static MethodChannel channel = const LoggingMethodChannel(IdCaptureFunctionNames.methodsChannelName);
+
+  // Statically sourced from generated/id_generated_defaults.dart - byte
+  // identical to the native getDefaults() response, available immediately,
+  // no method-channel round trip needed. See SDC-32174.
+  static final IdCaptureOverlayDefaults _idCaptureOverlayDefaults = _buildStaticIdCaptureOverlayDefaults();
+  static final IdCaptureSettingsDefaults _captureSettingsDefaults = _buildStaticIdCaptureSettingsDefaults();
+  static final IdCaptureFeedbackDefaults _idCaptureFeedbackDefaults = _buildStaticIdCaptureFeedbackDefaults();
+
+  // RecommendedCameraSettings is intentionally NOT staticized: the shared
+  // Android wrapper (CameraSettingsDefaults.kt) hardcodes focusRange/
+  // macroMode/torchLevel while iOS reads the real compiled
+  // recommendedCameraSettings object, so a static value here can't be proven
+  // equal to what native emits. Stays fully dynamic.
   static late CameraSettingsDefaults _cameraSettingsDefaults;
-  static late IdCaptureSettingsDefaults _captureSettingsDefaults;
-  static late IdCaptureFeedbackDefaults _idCaptureFeedbackDefaults;
 
   static IdCaptureOverlayDefaults get idCaptureOverlayDefaults => _idCaptureOverlayDefaults;
 
@@ -33,13 +158,13 @@ class IdCaptureDefaults {
 
   static Future<void> initializeDefaults() async {
     if (_isInitialized) return;
-    var result = await channel.invokeMethod("getDefaults");
+    // Narrow endpoint: only RecommendedCameraSettings, the single residual key
+    // read below. It is the only defaults endpoint - the full-blob getDefaults
+    // was removed in SDC-32178.
+    var result = await channel.invokeMethod("getDynamicDefaults");
     var json = jsonDecode(result as String);
 
     _cameraSettingsDefaults = CameraSettingsDefaults.fromJSON(json["RecommendedCameraSettings"]);
-    _idCaptureOverlayDefaults = IdCaptureOverlayDefaults.fromJSON(json["IdCaptureOverlay"]);
-    _captureSettingsDefaults = IdCaptureSettingsDefaults.fromJSON(json["IdCaptureSettings"]);
-    _idCaptureFeedbackDefaults = IdCaptureFeedbackDefaults.fromJSON(json);
 
     _isInitialized = true;
   }
